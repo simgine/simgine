@@ -1,0 +1,26 @@
+[workspace]
+resolver = "2"
+members = ["core", "ui", "app"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-or-later"
+authors = [
+  "Hennadii Chernyshchyk <genaloner@gmail.com>",
+  "Irina Chernyshchyk <irina.kdr@gmail.com>",
+]
+repository = "https://github.com/simgine/simgine"
+
+[workspace.dependencies]
+bevy = { version = "0.18.0-rc.1", default-features = false }
+bevy_enhanced_input = "0.21.0-rc.1"
+simgine_core = { path = "core" }
+serde = "1.0"
+walkdir = "2.5"
+ron = "0.12"
+
+[workspace.lints.clippy]
+type_complexity = "allow"
+too_many_arguments = "allow"
+doc_markdown = "warn"

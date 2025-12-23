@@ -1,0 +1,20 @@
+[package]
+name = "simgine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+bevy = { workspace = true, features = [
+  "default_app",
+  "default_platform",
+  "3d_bevy_render",
+] }
+bevy_enhanced_input.workspace = true
+simgine_core.workspace = true
+
+[features]
+default = ["debug"]
+debug = ["bevy/debug"]

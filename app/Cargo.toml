@@ -10,7 +10,8 @@ publish.workspace = true
 [dependencies]
 bevy = { workspace = true, features = [
   "default_app",
-  "default_platform",
+  "wayland",
+  "multi_threaded",
   "3d_bevy_render",
 ] }
 bevy_enhanced_input.workspace = true

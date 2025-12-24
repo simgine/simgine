@@ -21,7 +21,7 @@ impl Plugin for SimgineCorePlugin {
     }
 }
 
-#[derive(States, Clone, PartialEq, Eq, Hash, Debug, Default)]
+#[derive(States, Default, Debug, PartialEq, Eq, Hash, Clone)]
 #[states(state_scoped = true)]
 enum GameState {
     #[default]

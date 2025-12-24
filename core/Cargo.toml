@@ -17,7 +17,7 @@ bevy = { workspace = true, features = [
   "bevy_state",
   "bevy_log",
 ] }
-serde.workspace = true
 bevy_enhanced_input.workspace = true
-walkdir.workspace = true
 ron.workspace = true
+serde.workspace = true
+walkdir.workspace = true

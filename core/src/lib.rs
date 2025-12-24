@@ -2,6 +2,7 @@ mod asset_manifest;
 mod city;
 mod player_camera;
 mod sky;
+pub mod speed;
 
 use bevy::prelude::*;
 
@@ -17,6 +18,7 @@ impl Plugin for SimgineCorePlugin {
                 city::plugin,
                 player_camera::plugin,
                 sky::plugin,
+                speed::plugin,
             ));
     }
 }

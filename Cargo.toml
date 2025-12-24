@@ -19,6 +19,7 @@ bevy_enhanced_input = "0.21.0-rc.1"
 simgine_core = { path = "core" }
 ron = "0.12"
 serde = "1.0"
+strum = "0.27"
 walkdir = "2.5"
 
 [workspace.lints.clippy]

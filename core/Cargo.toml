@@ -20,5 +20,4 @@ bevy = { workspace = true, features = [
 bevy_enhanced_input.workspace = true
 ron.workspace = true
 serde.workspace = true
-strum = { workspace = true, features = ["derive"] }
 walkdir.workspace = true

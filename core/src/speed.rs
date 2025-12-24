@@ -1,13 +1,12 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
-use strum::EnumIter;
 
 use crate::GameState;
 
 pub(crate) fn plugin(app: &mut App) {
     app.init_resource::<GameSpeed>()
         .add_input_context::<SpeedControls>()
-        .add_observer(set_speed::<TogglePause>)
+        .add_observer(toggle_pause)
         .add_observer(set_speed::<SetNormal>)
         .add_observer(set_speed::<SetFast>)
         .add_observer(set_speed::<SetUltra>)
@@ -28,13 +27,15 @@ fn spawn(mut commands: Commands) {
     ));
 }
 
+fn toggle_pause(_on: On<Fire<TogglePause>>, mut speed: ResMut<GameSpeed>) {
+    *speed = match *speed {
+        GameSpeed::Running { speed } => GameSpeed::Paused { previous: speed },
+        GameSpeed::Paused { previous } => GameSpeed::Running { speed: previous },
+    };
+}
+
 fn set_speed<A: SpeedAction>(_on: On<Fire<A>>, mut speed: ResMut<GameSpeed>) {
-    if *speed == GameSpeed::Pause && A::SPEED == GameSpeed::Pause {
-        // Toggle if already paused.
-        *speed = GameSpeed::Normal;
-    } else {
-        speed.set_if_neq(A::SPEED);
-    }
+    *speed = GameSpeed::Running { speed: A::SPEED };
 }
 
 fn set_time(speed: Res<GameSpeed>, mut time: ResMut<Time<Virtual>>) {
@@ -42,22 +43,42 @@ fn set_time(speed: Res<GameSpeed>, mut time: ResMut<Time<Virtual>>) {
     time.set_relative_speed(speed.multiplier());
 }
 
-#[derive(Resource, EnumIter, Default, Debug, PartialEq)]
+#[derive(Resource, Debug, Clone, Copy)]
 pub enum GameSpeed {
-    Pause,
-    #[default]
-    Normal,
-    Fast,
-    Ultra,
+    Paused { previous: RunSpeed },
+    Running { speed: RunSpeed },
 }
 
 impl GameSpeed {
     fn multiplier(&self) -> f32 {
         match self {
-            GameSpeed::Pause => 0.0,
-            GameSpeed::Normal => 1.0,
-            GameSpeed::Fast => 3.0,
-            GameSpeed::Ultra => 8.0,
+            GameSpeed::Paused { .. } => 0.0,
+            GameSpeed::Running { speed } => speed.multiplier(),
+        }
+    }
+}
+
+impl Default for GameSpeed {
+    fn default() -> Self {
+        Self::Paused {
+            previous: RunSpeed::Normal,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum RunSpeed {
+    Normal,
+    Fast,
+    Ultra,
+}
+
+impl RunSpeed {
+    fn multiplier(&self) -> f32 {
+        match self {
+            RunSpeed::Normal => 1.0,
+            RunSpeed::Fast => 3.0,
+            RunSpeed::Ultra => 8.0,
         }
     }
 }
@@ -69,16 +90,12 @@ struct SpeedControls;
 #[action_output(bool)]
 struct TogglePause;
 
-impl SpeedAction for TogglePause {
-    const SPEED: GameSpeed = GameSpeed::Pause;
-}
-
 #[derive(InputAction)]
 #[action_output(bool)]
 struct SetNormal;
 
 impl SpeedAction for SetNormal {
-    const SPEED: GameSpeed = GameSpeed::Normal;
+    const SPEED: RunSpeed = RunSpeed::Normal;
 }
 
 #[derive(InputAction)]
@@ -86,7 +103,7 @@ impl SpeedAction for SetNormal {
 struct SetFast;
 
 impl SpeedAction for SetFast {
-    const SPEED: GameSpeed = GameSpeed::Fast;
+    const SPEED: RunSpeed = RunSpeed::Fast;
 }
 
 #[derive(InputAction)]
@@ -94,9 +111,9 @@ impl SpeedAction for SetFast {
 struct SetUltra;
 
 impl SpeedAction for SetUltra {
-    const SPEED: GameSpeed = GameSpeed::Ultra;
+    const SPEED: RunSpeed = RunSpeed::Ultra;
 }
 
 trait SpeedAction: InputAction {
-    const SPEED: GameSpeed;
+    const SPEED: RunSpeed;
 }

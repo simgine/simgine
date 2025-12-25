@@ -96,11 +96,11 @@ impl RunSpeed {
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct TogglePause;
+pub struct TogglePause;
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct SetNormal;
+pub struct SetNormal;
 
 impl SpeedAction for SetNormal {
     const SPEED: RunSpeed = RunSpeed::Normal;
@@ -108,7 +108,7 @@ impl SpeedAction for SetNormal {
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct SetFast;
+pub struct SetFast;
 
 impl SpeedAction for SetFast {
     const SPEED: RunSpeed = RunSpeed::Fast;
@@ -116,7 +116,7 @@ impl SpeedAction for SetFast {
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct SetUltra;
+pub struct SetUltra;
 
 impl SpeedAction for SetUltra {
     const SPEED: RunSpeed = RunSpeed::Ultra;

@@ -17,6 +17,7 @@ publish = false
 bevy = { version = "0.18.0-rc.1", default-features = false }
 bevy_enhanced_input = "0.21.0-rc.1"
 simgine_core = { path = "core" }
+simgine_ui = { path = "ui" }
 ron = "0.12"
 serde = "1.0"
 walkdir = "2.5"

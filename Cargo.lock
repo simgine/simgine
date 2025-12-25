@@ -684,6 +684,7 @@ dependencies = [
  "bevy_pbr",
  "bevy_render",
  "bevy_shader",
+ "bevy_sprite_render",
  "bevy_transform",
  "bevy_utils",
  "bytemuck",
@@ -783,6 +784,7 @@ dependencies = [
  "bevy_ecs",
  "bevy_input",
  "bevy_math",
+ "bevy_picking",
  "bevy_reflect",
  "bevy_ui",
  "bevy_window",
@@ -819,6 +821,7 @@ dependencies = [
  "bevy_math",
  "bevy_mesh",
  "bevy_pbr",
+ "bevy_picking",
  "bevy_platform",
  "bevy_post_process",
  "bevy_ptr",
@@ -833,6 +836,8 @@ dependencies = [
  "bevy_text",
  "bevy_time",
  "bevy_transform",
+ "bevy_ui",
+ "bevy_ui_render",
  "bevy_utils",
  "bevy_window",
  "bevy_winit",
@@ -974,6 +979,28 @@ dependencies = [
  "static_assertions",
  "thiserror 2.0.17",
  "tracing",
+]
+
+[[package]]
+name = "bevy_picking"
+version = "0.18.0-rc.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac55022debc64d3a6b36cb3b2b6e40bdca817076d9ff673aae60d632538ef78b"
+dependencies = [
+ "bevy_app",
+ "bevy_asset",
+ "bevy_camera",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_input",
+ "bevy_math",
+ "bevy_platform",
+ "bevy_reflect",
+ "bevy_time",
+ "bevy_transform",
+ "bevy_window",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
@@ -1354,6 +1381,7 @@ dependencies = [
  "bevy_image",
  "bevy_input",
  "bevy_math",
+ "bevy_picking",
  "bevy_platform",
  "bevy_reflect",
  "bevy_sprite",
@@ -1365,6 +1393,38 @@ dependencies = [
  "smallvec",
  "taffy",
  "thiserror 2.0.17",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
+name = "bevy_ui_render"
+version = "0.18.0-rc.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae9e11a8d83b72028c3f19ed6532772e7ee0b9a42a9f29c0bf5c6d970caee48a"
+dependencies = [
+ "bevy_app",
+ "bevy_asset",
+ "bevy_camera",
+ "bevy_color",
+ "bevy_core_pipeline",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_image",
+ "bevy_math",
+ "bevy_mesh",
+ "bevy_platform",
+ "bevy_reflect",
+ "bevy_render",
+ "bevy_shader",
+ "bevy_sprite",
+ "bevy_sprite_render",
+ "bevy_text",
+ "bevy_transform",
+ "bevy_ui",
+ "bevy_utils",
+ "bytemuck",
+ "derive_more",
  "tracing",
 ]
 
@@ -3649,6 +3709,7 @@ dependencies = [
  "bevy",
  "bevy_enhanced_input",
  "simgine_core",
+ "simgine_ui",
 ]
 
 [[package]]
@@ -3665,6 +3726,11 @@ dependencies = [
 [[package]]
 name = "simgine_ui"
 version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_enhanced_input",
+ "simgine_core",
+]
 
 [[package]]
 name = "skrifa"

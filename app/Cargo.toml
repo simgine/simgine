@@ -13,9 +13,11 @@ bevy = { workspace = true, features = [
   "wayland",
   "multi_threaded",
   "3d_bevy_render",
+  "ui_bevy_render",
 ] }
 bevy_enhanced_input.workspace = true
 simgine_core.workspace = true
+simgine_ui.workspace = true
 
 [features]
 default = ["debug"]

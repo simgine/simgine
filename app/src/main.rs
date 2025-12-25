@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::EnhancedInputPlugin;
 use simgine_core::SimgineCorePlugin;
+use simgine_ui::SimgineUiPlugin;
 
 fn main() {
     let mut app = App::new();
@@ -14,6 +15,7 @@ fn main() {
         }),
         EnhancedInputPlugin,
         SimgineCorePlugin,
+        SimgineUiPlugin,
     ));
 
     app.run();

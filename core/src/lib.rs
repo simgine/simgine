@@ -1,8 +1,8 @@
 mod asset_manifest;
 mod city;
+pub mod game_speed;
 mod player_camera;
 mod sky;
-pub mod speed;
 
 use bevy::prelude::*;
 
@@ -16,9 +16,9 @@ impl Plugin for SimgineCorePlugin {
             .add_plugins((
                 asset_manifest::plugin,
                 city::plugin,
+                game_speed::plugin,
                 player_camera::plugin,
                 sky::plugin,
-                speed::plugin,
             ));
     }
 }

@@ -4,21 +4,20 @@ use bevy_enhanced_input::prelude::{Press, *};
 use crate::GameState;
 
 pub(crate) fn plugin(app: &mut App) {
-    app.init_resource::<GameSpeed>()
-        .add_input_context::<SpeedControls>()
+    app.add_input_context::<GameSpeed>()
         .add_observer(toggle_pause)
         .add_observer(set_speed::<SetNormal>)
         .add_observer(set_speed::<SetFast>)
         .add_observer(set_speed::<SetUltra>)
-        .add_systems(OnEnter(GameState::InGame), spawn)
-        .add_systems(Update, set_time.run_if(resource_changed::<GameSpeed>));
+        .add_observer(set_time)
+        .add_systems(OnEnter(GameState::InGame), spawn);
 }
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
-        SpeedControls,
+        GameSpeed::default(),
         DespawnOnExit(GameState::InGame),
-        actions!(SpeedControls[
+        actions!(GameSpeed[
             (Action::<TogglePause>::new(), Press::default(), bindings![KeyCode::Digit0]),
             (Action::<SetNormal>::new(), Press::default(), bindings![KeyCode::Digit1]),
             (Action::<SetFast>::new(), Press::default(), bindings![KeyCode::Digit2]),
@@ -27,23 +26,35 @@ fn spawn(mut commands: Commands) {
     ));
 }
 
-fn toggle_pause(_on: On<Fire<TogglePause>>, mut speed: ResMut<GameSpeed>) {
-    *speed = match *speed {
+fn toggle_pause(
+    toggle_pause: On<Fire<TogglePause>>,
+    mut commands: Commands,
+    game_speed: Single<&GameSpeed>,
+) {
+    let new_speed = match **game_speed {
         GameSpeed::Running { speed } => GameSpeed::Paused { previous: speed },
         GameSpeed::Paused { previous } => GameSpeed::Running { speed: previous },
     };
+    commands.entity(toggle_pause.context).insert(new_speed);
 }
 
-fn set_speed<A: SpeedAction>(_on: On<Fire<A>>, mut speed: ResMut<GameSpeed>) {
-    *speed = GameSpeed::Running { speed: A::SPEED };
+fn set_speed<A: SpeedAction>(fire: On<Fire<A>>, mut commands: Commands) {
+    commands
+        .entity(fire.context)
+        .insert(GameSpeed::Running { speed: A::SPEED });
 }
 
-fn set_time(speed: Res<GameSpeed>, mut time: ResMut<Time<Virtual>>) {
-    debug!("setting game speed to `{:?}`", *speed);
-    time.set_relative_speed(speed.multiplier());
+fn set_time(
+    _on: On<Insert, GameSpeed>,
+    mut time: ResMut<Time<Virtual>>,
+    game_speed: Single<&GameSpeed>,
+) {
+    debug!("setting game speed to `{:?}`", *game_speed);
+    time.set_relative_speed(game_speed.multiplier());
 }
 
-#[derive(Resource, Debug, Clone, Copy)]
+#[derive(Component, Debug, Clone, Copy)]
+#[component(immutable)]
 pub enum GameSpeed {
     Paused { previous: RunSpeed },
     Running { speed: RunSpeed },
@@ -82,9 +93,6 @@ impl RunSpeed {
         }
     }
 }
-
-#[derive(Component)]
-struct SpeedControls;
 
 #[derive(InputAction)]
 #[action_output(bool)]

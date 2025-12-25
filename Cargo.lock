@@ -613,8 +613,7 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input"
 version = "0.21.0-rc.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "155e1f829c933c79960daae6dad12ab8ab14669916d2bd58f298c1024afc054a"
+source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#ed0b1c7aa7154558ef510d47d521220ba02ae79c"
 dependencies = [
  "bevy",
  "bevy_enhanced_input_macros",
@@ -627,8 +626,7 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input_macros"
 version = "0.21.0-rc.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb94020f511adf3f7c59f5822ce819161ca79455ba9c3885c1a8eff3ea3df7bd"
+source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#ed0b1c7aa7154558ef510d47d521220ba02ae79c"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -30,7 +30,7 @@ impl ComponentResExt for App {
 struct InsertComponentRes<C: Component>(C);
 
 impl<C: Component> Command for InsertComponentRes<C> {
-    fn apply(self, world: &mut World) -> () {
+    fn apply(self, world: &mut World) {
         let entities = world.resource::<ResEntities>();
         if let Some(&entity) = entities.get_type::<C>() {
             world.entity_mut(entity).insert(self.0);

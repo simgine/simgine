@@ -2,6 +2,7 @@ mod asset_manifest;
 mod city;
 pub mod component_res;
 pub mod game_speed;
+pub mod game_time;
 mod player_camera;
 mod sky;
 
@@ -20,6 +21,7 @@ impl Plugin for SimgineCorePlugin {
                 component_res::plugin,
                 city::plugin,
                 game_speed::plugin,
+                game_time::plugin,
                 player_camera::plugin,
                 sky::plugin,
             ));

@@ -26,6 +26,7 @@ fn unload(mut commands: Commands) {
 
 const MINS_PER_DAY: u64 = 24 * 60;
 const SECS_PER_GAME_MINUTE: u64 = 2;
+const SECS_PER_GAME_DAY: u64 = SECS_PER_GAME_MINUTE * MINS_PER_DAY;
 
 fn tick(
     time: Res<Time>,
@@ -61,6 +62,11 @@ pub struct GameClock {
 impl GameClock {
     fn elapsed_mins(&self) -> u64 {
         self.elapsed.as_secs() / SECS_PER_GAME_MINUTE
+    }
+
+    pub(crate) fn day_fract(&self) -> f32 {
+        let sec_of_day = self.elapsed.as_secs_f32() % SECS_PER_GAME_DAY as f32;
+        sec_of_day / SECS_PER_GAME_DAY as f32
     }
 }
 

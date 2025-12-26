@@ -1,26 +1,56 @@
-use std::f32::consts::PI;
+use std::f32::consts::{FRAC_PI_2, TAU};
 
 use bevy::{light::light_consts::lux, prelude::*};
 
-use crate::GameState;
+use crate::{GameState, game_time::GameClock};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::InGame), spawn)
-        .add_systems(Update, move_sun.run_if(in_state(GameState::InGame)));
+        .add_systems(Update, move_planets.run_if(in_state(GameState::InGame)));
 }
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
+        Sun,
         DirectionalLight {
             shadows_enabled: true,
             illuminance: lux::RAW_SUNLIGHT,
             ..Default::default()
         },
-        Transform::from_xyz(1.0, 0.4, 0.0).looking_at(Vec3::ZERO, Vec3::Y),
+    ));
+
+    commands.spawn((
+        Moon,
+        DirectionalLight {
+            shadows_enabled: true,
+            illuminance: 400.0, // Keep nights bright.
+            ..Default::default()
+        },
     ));
 }
 
-fn move_sun(mut sun: Single<&mut Transform, With<DirectionalLight>>, time: Res<Time>) {
-    const SPEED: f32 = 100.0;
-    sun.rotate_x(-time.delta_secs() * PI / SPEED);
+fn move_planets(
+    clock: Res<GameClock>,
+    mut sun: Single<&mut Transform, With<Sun>>,
+    mut moon: Single<&mut Transform, (With<Moon>, Without<Sun>)>,
+) {
+    let day_fract = clock.day_fract();
+    let angle = day_fract * TAU; // 0 is midnight, 1 is TAU.
+
+    // Shift sun and moon accordingly.
+    let sun_angle = angle - FRAC_PI_2;
+    let moon_angle = angle + FRAC_PI_2;
+
+    let sun_dir = Vec3::new(0.0, sun_angle.sin(), sun_angle.cos());
+    let moon_dir = Vec3::new(0.0, moon_angle.sin(), moon_angle.cos());
+
+    // Position doesn't matter for `DirectionalLight`.
+    sun.look_at(-sun_dir, Vec3::Y);
+    moon.look_at(-moon_dir, Vec3::Y);
 }
+
+#[derive(Component)]
+struct Sun;
+
+#[derive(Component)]
+struct Moon;

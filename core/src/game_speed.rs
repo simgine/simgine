@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 
-use crate::GameState;
+use crate::{GameState, component_res::ComponentResExt};
 
 pub(crate) fn plugin(app: &mut App) {
-    app.add_observer(set_time)
+    app.register_resource_component::<GameSpeed>()
+        .add_observer(set_time)
         .add_systems(OnEnter(GameState::InGame), spawn);
 }
 

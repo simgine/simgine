@@ -7,6 +7,7 @@ use bevy::{
 use bevy_enhanced_input::prelude::{Press, *};
 use simgine_core::{
     FamilyMode,
+    component_res::InsertComponentResExt,
     game_speed::{GameSpeed, RunSpeed},
 };
 
@@ -60,24 +61,17 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn toggle_pause(
     _on: On<Fire<TogglePause>>,
     mut commands: Commands,
-    game_speed: Single<(Entity, &GameSpeed)>,
+    game_speed: Single<&GameSpeed>,
 ) {
-    let (speed_entity, &game_speed) = *game_speed;
-    let new_speed = match game_speed {
+    let new_speed = match **game_speed {
         GameSpeed::Running { speed } => GameSpeed::Paused { previous: speed },
         GameSpeed::Paused { previous } => GameSpeed::Running { speed: previous },
     };
-    commands.entity(speed_entity).insert(new_speed);
+    commands.insert_component_resource(new_speed);
 }
 
-fn set_speed<A: SpeedAction>(
-    _on: On<Fire<A>>,
-    mut commands: Commands,
-    game_speed: Single<Entity, With<GameSpeed>>,
-) {
-    commands
-        .entity(*game_speed)
-        .insert(GameSpeed::Running { speed: A::SPEED });
+fn set_speed<A: SpeedAction>(_on: On<Fire<A>>, mut commands: Commands) {
+    commands.insert_component_resource(GameSpeed::Running { speed: A::SPEED });
 }
 
 fn reset_speed_buttons(

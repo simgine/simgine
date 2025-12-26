@@ -1,5 +1,6 @@
 mod asset_manifest;
 mod city;
+pub mod component_res;
 pub mod game_speed;
 mod player_camera;
 mod sky;
@@ -16,6 +17,7 @@ impl Plugin for SimgineCorePlugin {
             .insert_resource(GlobalAmbientLight::NONE)
             .add_plugins((
                 asset_manifest::plugin,
+                component_res::plugin,
                 city::plugin,
                 game_speed::plugin,
                 player_camera::plugin,

@@ -1,16 +1,24 @@
+use std::fmt::Debug;
+
 use bevy::{
     color::palettes::tailwind::{BLUE_500, RED_500},
-    ecs::relationship::RelatedSpawner,
     prelude::*,
 };
-use bevy_enhanced_input::prelude::*;
+use bevy_enhanced_input::prelude::{Press, *};
 use simgine_core::{
     FamilyMode,
-    game_speed::{GameSpeed, SetFast, SetNormal, SetUltra, TogglePause},
+    game_speed::{GameSpeed, RunSpeed},
 };
 
+use crate::utils;
+
 pub(crate) fn plugin(app: &mut App) {
-    app.add_observer(reset_speed_buttons)
+    app.add_input_context::<SpeedPanel>()
+        .add_observer(toggle_pause)
+        .add_observer(set_speed::<SetNormal>)
+        .add_observer(set_speed::<SetFast>)
+        .add_observer(set_speed::<SetUltra>)
+        .add_observer(reset_speed_buttons)
         .add_observer(update_speed_buttons)
         .add_systems(OnEnter(FamilyMode::Family), spawn);
 }
@@ -32,56 +40,44 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..Default::default()
             },
             DespawnOnExit(FamilyMode::Family),
-            Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-                parent
-                    .spawn((
-                        Button,
-                        ImageNode {
-                            image: pause,
-                            ..Default::default()
-                        },
-                    ))
-                    .observe(mock_speed_action::<TogglePause>);
-                parent
-                    .spawn((
-                        Button,
-                        ImageNode {
-                            image: normal_speed,
-                            ..Default::default()
-                        },
-                    ))
-                    .observe(mock_speed_action::<SetNormal>);
-                parent
-                    .spawn((
-                        Button,
-                        ImageNode {
-                            image: fast_speed,
-                            ..Default::default()
-                        },
-                    ))
-                    .observe(mock_speed_action::<SetFast>);
-                parent
-                    .spawn((
-                        Button,
-                        ImageNode {
-                            image: ultra_speed,
-                            ..Default::default()
-                        },
-                    ))
-                    .observe(mock_speed_action::<SetUltra>);
-            })),
+            actions!(SpeedPanel[
+                (Action::<TogglePause>::new(), Press::default(), bindings![KeyCode::Digit0]),
+                (Action::<SetNormal>::new(), Press::default(), bindings![KeyCode::Digit1]),
+                (Action::<SetFast>::new(), Press::default(), bindings![KeyCode::Digit2]),
+                (Action::<SetUltra>::new(), Press::default(), bindings![KeyCode::Digit3]),
+            ]),
+            children![
+                (Button, ImageNode::new(pause)),
+                (Button, ImageNode::new(normal_speed)),
+                (Button, ImageNode::new(fast_speed)),
+                (Button, ImageNode::new(ultra_speed)),
+            ],
         ))
-        .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
+        .insert(SpeedPanel) // Workaround to react on insertion after hierarchy spawn.
+        .observe(utils::mock_action::<SpeedPanel>);
 }
 
-fn mock_speed_action<A: InputAction>(
-    _on: On<Pointer<Click>>,
+fn toggle_pause(
+    _on: On<Fire<TogglePause>>,
     mut commands: Commands,
-    action: Single<Entity, With<Action<A>>>,
+    game_speed: Single<(Entity, &GameSpeed)>,
+) {
+    let (speed_entity, &game_speed) = *game_speed;
+    let new_speed = match game_speed {
+        GameSpeed::Running { speed } => GameSpeed::Paused { previous: speed },
+        GameSpeed::Paused { previous } => GameSpeed::Running { speed: previous },
+    };
+    commands.entity(speed_entity).insert(new_speed);
+}
+
+fn set_speed<A: SpeedAction>(
+    _on: On<Fire<A>>,
+    mut commands: Commands,
+    game_speed: Single<Entity, With<GameSpeed>>,
 ) {
     commands
-        .entity(*action)
-        .insert(ActionMock::once(ActionState::Fired, true));
+        .entity(*game_speed)
+        .insert(GameSpeed::Running { speed: A::SPEED });
 }
 
 fn reset_speed_buttons(
@@ -124,5 +120,37 @@ fn update_speed_buttons(
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 struct SpeedPanel;
+
+#[derive(InputAction)]
+#[action_output(bool)]
+pub struct TogglePause;
+
+#[derive(InputAction)]
+#[action_output(bool)]
+pub struct SetNormal;
+
+impl SpeedAction for SetNormal {
+    const SPEED: RunSpeed = RunSpeed::Normal;
+}
+
+#[derive(InputAction)]
+#[action_output(bool)]
+pub struct SetFast;
+
+impl SpeedAction for SetFast {
+    const SPEED: RunSpeed = RunSpeed::Fast;
+}
+
+#[derive(InputAction)]
+#[action_output(bool)]
+pub struct SetUltra;
+
+impl SpeedAction for SetUltra {
+    const SPEED: RunSpeed = RunSpeed::Ultra;
+}
+
+trait SpeedAction: InputAction {
+    const SPEED: RunSpeed;
+}

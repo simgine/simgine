@@ -1,4 +1,5 @@
 mod time_panel;
+mod utils;
 
 use bevy::prelude::*;
 

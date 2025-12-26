@@ -8,7 +8,7 @@ use bevy_enhanced_input::prelude::{Press, *};
 use simgine_core::{
     FamilyMode,
     component_res::InsertComponentResExt,
-    game_speed::{GameSpeed, RunSpeed},
+    speed::{GameSpeed, RunSpeed},
 };
 
 use crate::utils;

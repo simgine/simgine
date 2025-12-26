@@ -2,7 +2,7 @@ use std::f32::consts::{FRAC_PI_2, TAU};
 
 use bevy::{light::light_consts::lux, prelude::*};
 
-use crate::{GameState, game_time::GameClock};
+use crate::{GameState, clock::GameClock};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::InGame), spawn)

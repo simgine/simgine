@@ -1,10 +1,10 @@
 mod asset_manifest;
 mod city;
+pub mod clock;
 pub mod component_res;
-pub mod game_speed;
-pub mod game_time;
 mod player_camera;
 mod sky;
+pub mod speed;
 
 use bevy::prelude::*;
 
@@ -18,12 +18,12 @@ impl Plugin for SimgineCorePlugin {
             .insert_resource(GlobalAmbientLight::NONE)
             .add_plugins((
                 asset_manifest::plugin,
-                component_res::plugin,
                 city::plugin,
-                game_speed::plugin,
-                game_time::plugin,
+                clock::plugin,
+                component_res::plugin,
                 player_camera::plugin,
                 sky::plugin,
+                speed::plugin,
             ));
     }
 }

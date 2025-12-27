@@ -1,85 +1,81 @@
-use std::time::Duration;
+use std::{
+    fmt::{self, Display, Formatter},
+    time::Duration,
+};
 
 use bevy::prelude::*;
 
-use crate::GameState;
+use crate::{
+    GameState,
+    component_res::{ComponentResExt, InsertComponentResExt},
+};
 
 pub(crate) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(GameState::InGame), load)
-        .add_systems(OnExit(GameState::InGame), unload)
+    app.register_resource_component::<Weekday>()
+        .register_resource_component::<GameTime>()
+        .add_systems(OnEnter(GameState::InGame), spawn)
         .add_systems(PreUpdate, tick.run_if(in_state(GameState::InGame)));
 }
 
-fn load(mut commands: Commands) {
-    commands.init_resource::<GameClock>();
-    commands.init_resource::<Weekday>();
-    commands.init_resource::<Hour>();
-    commands.init_resource::<Minute>();
+fn spawn(mut commands: Commands) {
+    commands.spawn((
+        Name::new("Game clock"),
+        MinuteCarry::default(),
+        GameTime::default(),
+        Weekday::default(),
+        DespawnOnExit(GameState::InGame),
+    ));
 }
 
-fn unload(mut commands: Commands) {
-    commands.remove_resource::<GameClock>();
-    commands.remove_resource::<Weekday>();
-    commands.remove_resource::<Hour>();
-    commands.remove_resource::<Minute>();
-}
-
-const MINS_PER_DAY: u64 = 24 * 60;
-const SECS_PER_GAME_MINUTE: u64 = 2;
-const SECS_PER_GAME_DAY: u64 = SECS_PER_GAME_MINUTE * MINS_PER_DAY;
+const SECS_PER_MIN: u64 = 2;
+pub(crate) const SECS_PER_DAY: u64 = 24 * 60 * SECS_PER_MIN;
 
 fn tick(
+    mut commands: Commands,
     time: Res<Time>,
-    mut clock: ResMut<GameClock>,
-    mut weekday: ResMut<Weekday>,
-    mut hour: ResMut<Hour>,
-    mut minute: ResMut<Minute>,
+    game_clock: Single<(&mut MinuteCarry, &Weekday, &GameTime)>,
 ) {
-    clock.elapsed += time.delta();
+    let (mut carry, &weekday, &game_time) = game_clock.into_inner();
+    **carry += time.delta();
 
-    let elapsed_mins = clock.elapsed_mins();
-    let elapsed_days = elapsed_mins / MINS_PER_DAY;
-    let minute_of_day = elapsed_mins % MINS_PER_DAY;
+    let minutes = carry.as_secs() / SECS_PER_MIN;
+    if minutes == 0 {
+        return;
+    }
+    let consumed = minutes * SECS_PER_MIN;
+    **carry -= Duration::from_secs(consumed);
 
-    let current_weekday = Weekday::from_elapsed_days(elapsed_days);
-    let current_hour = (minute_of_day / 60) as u8;
-    let current_minute = (minute_of_day % 60) as u8;
+    let mut current_weekday = weekday;
+    let mut hour = game_time.hour as u64;
+    let mut minute = game_time.minute as u64 + minutes;
+    if minute >= 60 {
+        hour += minute / 60;
+        minute %= 60;
+    }
+    if hour >= 24 {
+        current_weekday.advance(hour / 24);
+        hour %= 24;
+    }
+    let current_time = GameTime {
+        hour: hour as u8,
+        minute: minute as u8,
+    };
 
-    weekday.set_if_neq(current_weekday);
-    hour.set_if_neq(Hour(current_hour));
-    minute.set_if_neq(Minute(current_minute));
-
-    if minute.is_changed() || hour.is_changed() || weekday.is_changed() {
-        debug!("time changed: {:?} {:02}:{:02}", *weekday, **hour, **minute)
+    if current_weekday != weekday {
+        debug!("changing weekday to {current_weekday}");
+        commands.insert_component_resource(current_weekday);
+    }
+    if current_time != game_time {
+        debug!("changing time to {current_time}");
+        commands.insert_component_resource(current_time);
     }
 }
 
-#[derive(Resource)]
-pub struct GameClock {
-    elapsed: Duration,
-}
+#[derive(Component, Default, Deref, DerefMut)]
+pub(crate) struct MinuteCarry(Duration);
 
-impl GameClock {
-    fn elapsed_mins(&self) -> u64 {
-        self.elapsed.as_secs() / SECS_PER_GAME_MINUTE
-    }
-
-    pub(crate) fn day_fract(&self) -> f32 {
-        let sec_of_day = self.elapsed.as_secs_f32() % SECS_PER_GAME_DAY as f32;
-        sec_of_day / SECS_PER_GAME_DAY as f32
-    }
-}
-
-impl Default for GameClock {
-    fn default() -> Self {
-        // Mon 13:00
-        Self {
-            elapsed: Duration::from_secs(13 * 60 * SECS_PER_GAME_MINUTE),
-        }
-    }
-}
-
-#[derive(Resource, Default, Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Component, Default, Debug, PartialEq, Eq, Clone, Copy)]
+#[component(immutable)]
 pub enum Weekday {
     #[default]
     Mon,
@@ -92,8 +88,8 @@ pub enum Weekday {
 }
 
 impl Weekday {
-    fn from_elapsed_days(elapsed_days: u64) -> Self {
-        match elapsed_days % 7 {
+    fn advance(&mut self, days: u64) {
+        *self = match (*self as u64 + days) % 7 {
             0 => Weekday::Mon,
             1 => Weekday::Tue,
             2 => Weekday::Wed,
@@ -106,8 +102,46 @@ impl Weekday {
     }
 }
 
-#[derive(Resource, Deref, Default, PartialEq)]
-pub struct Hour(u8);
+impl Display for Weekday {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let name = match self {
+            Weekday::Mon => "Mon",
+            Weekday::Tue => "Tue",
+            Weekday::Wed => "Wed",
+            Weekday::Thu => "Thu",
+            Weekday::Fri => "Fri",
+            Weekday::Sat => "Sat",
+            Weekday::Sun => "Sun",
+        };
+        f.write_str(name)
+    }
+}
 
-#[derive(Resource, Deref, Default, PartialEq)]
-pub struct Minute(u8);
+#[derive(Component, PartialEq, Clone, Copy)]
+#[component(immutable)]
+pub struct GameTime {
+    hour: u8,
+    minute: u8,
+}
+
+impl GameTime {
+    pub(crate) fn secs_since_midnight(&self) -> u64 {
+        let mins = self.hour as u64 * 60 + self.minute as u64;
+        mins * SECS_PER_MIN
+    }
+}
+
+impl Default for GameTime {
+    fn default() -> Self {
+        Self {
+            hour: 13,
+            minute: 0,
+        }
+    }
+}
+
+impl Display for GameTime {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "{:02}:{:02}", self.hour, self.minute)
+    }
+}

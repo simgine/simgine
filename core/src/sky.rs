@@ -2,7 +2,10 @@ use std::f32::consts::{FRAC_PI_2, TAU};
 
 use bevy::{light::light_consts::lux, prelude::*};
 
-use crate::{GameState, clock::GameClock};
+use crate::{
+    GameState,
+    clock::{GameTime, MinuteCarry, SECS_PER_DAY},
+};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::InGame), spawn)
@@ -30,11 +33,14 @@ fn spawn(mut commands: Commands) {
 }
 
 fn move_planets(
-    clock: Res<GameClock>,
+    game_clock: Single<(&GameTime, &MinuteCarry)>,
     mut sun: Single<&mut Transform, With<Sun>>,
     mut moon: Single<&mut Transform, (With<Moon>, Without<Sun>)>,
 ) {
-    let day_fract = clock.day_fract();
+    let (game_time, carry) = game_clock.into_inner();
+    let secs = game_time.secs_since_midnight() as f32 + carry.as_secs_f32();
+    let day_fract = secs / SECS_PER_DAY as f32;
+
     let angle = day_fract * TAU; // 0 is midnight, 1 is TAU.
 
     // Shift sun and moon accordingly.

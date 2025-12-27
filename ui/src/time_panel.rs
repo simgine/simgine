@@ -1,12 +1,14 @@
-use std::fmt::Debug;
+use std::{fmt::Debug, fmt::Write};
 
 use bevy::{
     color::palettes::tailwind::{BLUE_500, RED_500},
+    ecs::relationship::RelatedSpawner,
     prelude::*,
 };
 use bevy_enhanced_input::prelude::{Press, *};
 use simgine_core::{
     FamilyMode,
+    clock::{GameTime, Weekday},
     component_res::InsertComponentResExt,
     speed::{GameSpeed, Paused},
 };
@@ -18,6 +20,8 @@ pub(crate) fn plugin(app: &mut App) {
         .add_observer(set_speed::<SetNormal>)
         .add_observer(set_speed::<SetFast>)
         .add_observer(set_speed::<SetUltra>)
+        .add_observer(update_weekday)
+        .add_observer(update_time)
         .add_observer(update_pause_button)
         .add_observer(reset_speed_button)
         .add_observer(update_speed_button)
@@ -30,37 +34,61 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
     let fast_speed = asset_server.load("base/ui/icons/fast_speed.png");
     let ultra_speed = asset_server.load("base/ui/icons/ultra_speed.png");
 
-    commands
-        .spawn((
-            Node {
-                position_type: PositionType::Absolute,
-                height: px(50.0),
-                width: px(50.0),
-                left: px(16.0),
-                top: px(16.0),
-                ..Default::default()
-            },
-            DespawnOnExit(FamilyMode::Family),
-            children![
-                (
-                    ImageNode::new(pause),
-                    button_bindings!(TogglePause[KeyCode::Digit0]),
-                ),
-                (
-                    ImageNode::new(normal_speed),
-                    button_bindings!(SetNormal[KeyCode::Digit1])
-                ),
-                (
-                    ImageNode::new(fast_speed),
-                    button_bindings!(SetFast[KeyCode::Digit2])
-                ),
-                (
-                    ImageNode::new(ultra_speed),
-                    button_bindings!(SetUltra[KeyCode::Digit3])
-                ),
-            ],
-        ))
-        .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
+    commands.spawn((
+        Node {
+            flex_direction: FlexDirection::Column,
+            position_type: PositionType::Absolute,
+            left: px(16.0),
+            top: px(16.0),
+            ..Default::default()
+        },
+        DespawnOnExit(FamilyMode::Family),
+        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+            parent.spawn(WeekdayLabel);
+            parent.spawn(TimeLabel);
+            parent
+                .spawn((
+                    Node::default(),
+                    children![
+                        (
+                            ImageNode::new(pause),
+                            button_bindings!(TogglePause[KeyCode::Digit0]),
+                        ),
+                        (
+                            ImageNode::new(normal_speed),
+                            button_bindings!(SetNormal[KeyCode::Digit1])
+                        ),
+                        (
+                            ImageNode::new(fast_speed),
+                            button_bindings!(SetFast[KeyCode::Digit2])
+                        ),
+                        (
+                            ImageNode::new(ultra_speed),
+                            button_bindings!(SetUltra[KeyCode::Digit3])
+                        ),
+                    ],
+                ))
+                .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
+        })),
+    ));
+}
+
+fn update_weekday(
+    _on: On<Insert, (Weekday, WeekdayLabel)>,
+    weekday: Single<&Weekday>,
+    mut text: Single<&mut Text, With<WeekdayLabel>>,
+) {
+    text.clear();
+    write!(text, "{}", *weekday).unwrap();
+}
+
+fn update_time(
+    _on: On<Insert, (GameTime, TimeLabel)>,
+    time: Single<&GameTime>,
+    mut text: Single<&mut Text, With<TimeLabel>>,
+) {
+    text.clear();
+    write!(text, "{}", *time).unwrap();
 }
 
 fn toggle_pause(_on: On<Fire<TogglePause>>, mut commands: Commands, paused: Single<&Paused>) {
@@ -111,6 +139,20 @@ fn update_speed_button(
     let mut node = nodes.get_mut(speed_button).unwrap();
     node.color = BLUE_500.into();
 }
+
+#[derive(Component)]
+#[require(
+    Text,
+    TextFont { font_size: 20.0, ..Default::default() },
+)]
+struct WeekdayLabel;
+
+#[derive(Component)]
+#[require(
+    Text,
+    TextFont { font_size: 28.0, ..Default::default() },
+)]
+struct TimeLabel;
 
 #[derive(Component, Debug)]
 struct SpeedPanel;

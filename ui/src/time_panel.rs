@@ -1,4 +1,4 @@
-use std::{fmt::Debug, fmt::Write};
+use std::fmt::Write;
 
 use bevy::{
     color::palettes::tailwind::{BLUE_500, RED_500},
@@ -154,7 +154,7 @@ struct WeekdayLabel;
 )]
 struct TimeLabel;
 
-#[derive(Component, Debug)]
+#[derive(Component)]
 struct SpeedPanel;
 
 #[derive(InputAction)]

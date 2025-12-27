@@ -74,7 +74,7 @@ fn tick(
 #[derive(Component, Default, Deref, DerefMut)]
 pub(crate) struct MinuteCarry(Duration);
 
-#[derive(Component, Default, Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Component, Default, PartialEq, Eq, Clone, Copy)]
 #[component(immutable)]
 pub enum Weekday {
     #[default]

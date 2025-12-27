@@ -8,6 +8,10 @@ repository.workspace = true
 publish.workspace = true
 
 [dependencies]
-bevy = { workspace = true, features = ["bevy_ui", "ui_picking", "default_font"] }
+bevy = { workspace = true, features = [
+  "bevy_ui",
+  "ui_picking",
+  "default_font",
+] }
 bevy_enhanced_input.workspace = true
 simgine_core.workspace = true

@@ -25,7 +25,7 @@ pub(crate) fn plugin(app: &mut App) {
         .add_observer(update_pause_button)
         .add_observer(reset_speed_button)
         .add_observer(update_speed_button)
-        .add_systems(OnEnter(FamilyMode::Family), spawn);
+        .add_systems(OnEnter(FamilyMode::Life), spawn);
 }
 
 fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
@@ -42,7 +42,7 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
             top: px(16.0),
             ..Default::default()
         },
-        DespawnOnExit(FamilyMode::Family),
+        DespawnOnExit(FamilyMode::Life),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             parent.spawn(WeekdayLabel);
             parent.spawn(TimeLabel);

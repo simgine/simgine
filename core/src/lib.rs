@@ -41,6 +41,6 @@ pub enum GameState {
 #[states(state_scoped = true)]
 pub enum FamilyMode {
     #[default]
-    Family,
+    Life,
     Building,
 }

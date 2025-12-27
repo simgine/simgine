@@ -11,11 +11,10 @@ use simgine_core::{
     speed::{GameSpeed, RunSpeed},
 };
 
-use crate::utils;
+use crate::{action_button::ActionButton, button_bindings, utils};
 
 pub(crate) fn plugin(app: &mut App) {
-    app.add_input_context::<SpeedPanel>()
-        .add_observer(toggle_pause)
+    app.add_observer(toggle_pause)
         .add_observer(set_speed::<SetNormal>)
         .add_observer(set_speed::<SetFast>)
         .add_observer(set_speed::<SetUltra>)
@@ -41,21 +40,26 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
                 ..Default::default()
             },
             DespawnOnExit(FamilyMode::Family),
-            actions!(SpeedPanel[
-                (Action::<TogglePause>::new(), Press::default(), bindings![KeyCode::Digit0]),
-                (Action::<SetNormal>::new(), Press::default(), bindings![KeyCode::Digit1]),
-                (Action::<SetFast>::new(), Press::default(), bindings![KeyCode::Digit2]),
-                (Action::<SetUltra>::new(), Press::default(), bindings![KeyCode::Digit3]),
-            ]),
             children![
-                (Button, ImageNode::new(pause)),
-                (Button, ImageNode::new(normal_speed)),
-                (Button, ImageNode::new(fast_speed)),
-                (Button, ImageNode::new(ultra_speed)),
+                (
+                    ImageNode::new(pause),
+                    button_bindings!(TogglePause[KeyCode::Digit0]),
+                ),
+                (
+                    ImageNode::new(normal_speed),
+                    button_bindings!(SetNormal[KeyCode::Digit1])
+                ),
+                (
+                    ImageNode::new(fast_speed),
+                    button_bindings!(SetFast[KeyCode::Digit2])
+                ),
+                (
+                    ImageNode::new(ultra_speed),
+                    button_bindings!(SetUltra[KeyCode::Digit3])
+                ),
             ],
         ))
-        .insert(SpeedPanel) // Workaround to react on insertion after hierarchy spawn.
-        .observe(utils::mock_action::<SpeedPanel>);
+        .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
 }
 
 fn toggle_pause(

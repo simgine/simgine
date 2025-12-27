@@ -29,10 +29,10 @@ pub(crate) struct ActionButton;
 macro_rules! button_bindings {
     ($action:ty [$($bindings:expr),*$(,)?]) => {
         (
-            ActionButton,
+            $crate::action_button::ActionButton,
             ::bevy_enhanced_input::prelude::actions!($crate::action_button::ActionButton[(
-                Action::<$action>::new(),
-                Press::default(),
+                ::bevy_enhanced_input::prelude::Action::<$action>::new(),
+                ::bevy_enhanced_input::prelude::Press::default(),
                 bindings![$($bindings),*],
             )])
         )

@@ -5,7 +5,7 @@ use bevy::{
     ecs::relationship::RelatedSpawner,
     prelude::*,
 };
-use bevy_enhanced_input::prelude::{Press, *};
+use bevy_enhanced_input::prelude::*;
 use simgine_core::{
     FamilyMode,
     clock::{GameTime, Weekday},
@@ -13,7 +13,7 @@ use simgine_core::{
     speed::{GameSpeed, Paused},
 };
 
-use crate::{action_button::ActionButton, button_bindings};
+use crate::button_bindings;
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_observer(toggle_pause)

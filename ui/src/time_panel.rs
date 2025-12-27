@@ -8,18 +8,19 @@ use bevy_enhanced_input::prelude::{Press, *};
 use simgine_core::{
     FamilyMode,
     component_res::InsertComponentResExt,
-    speed::{GameSpeed, RunSpeed},
+    speed::{GameSpeed, Paused},
 };
 
-use crate::{action_button::ActionButton, button_bindings, utils};
+use crate::{action_button::ActionButton, button_bindings};
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_observer(toggle_pause)
         .add_observer(set_speed::<SetNormal>)
         .add_observer(set_speed::<SetFast>)
         .add_observer(set_speed::<SetUltra>)
-        .add_observer(reset_speed_buttons)
-        .add_observer(update_speed_buttons)
+        .add_observer(update_pause_button)
+        .add_observer(reset_speed_button)
+        .add_observer(update_speed_button)
         .add_systems(OnEnter(FamilyMode::Family), spawn);
 }
 
@@ -62,60 +63,53 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
 }
 
-fn toggle_pause(
-    _on: On<Fire<TogglePause>>,
-    mut commands: Commands,
-    game_speed: Single<&GameSpeed>,
+fn toggle_pause(_on: On<Fire<TogglePause>>, mut commands: Commands, paused: Single<&Paused>) {
+    commands.insert_component_resource(paused.toggled());
+}
+
+fn set_speed<A: SpeedAction>(_on: On<Fire<A>>, mut commands: Commands, paused: Single<&Paused>) {
+    commands.insert_component_resource(A::SPEED);
+    if ***paused {
+        commands.insert_component_resource(Paused(false));
+    }
+}
+
+fn update_pause_button(
+    _on: On<Insert, (Paused, SpeedPanel)>,
+    speed_buttons: Single<&Children, With<SpeedPanel>>,
+    paused: Single<&Paused>,
+    mut nodes: Query<&mut ImageNode>,
 ) {
-    let new_speed = match **game_speed {
-        GameSpeed::Running { speed } => GameSpeed::Paused { previous: speed },
-        GameSpeed::Paused { previous } => GameSpeed::Running { speed: previous },
+    let pause_button = speed_buttons[0];
+    let mut node = nodes.get_mut(pause_button).unwrap();
+    let color = if ***paused {
+        RED_500.into()
+    } else {
+        Color::WHITE
     };
-    commands.insert_component_resource(new_speed);
+    node.color = color;
 }
 
-fn set_speed<A: SpeedAction>(_on: On<Fire<A>>, mut commands: Commands) {
-    commands.insert_component_resource(GameSpeed::Running { speed: A::SPEED });
-}
-
-fn reset_speed_buttons(
+fn reset_speed_button(
     _on: On<Replace, GameSpeed>,
     game_speed: Single<&GameSpeed>,
     speed_buttons: Single<&Children, With<SpeedPanel>>,
     mut nodes: Query<&mut ImageNode>,
 ) {
-    match **game_speed {
-        GameSpeed::Paused { previous } => {
-            let mut pause = nodes.get_mut(speed_buttons[0]).unwrap();
-            pause.color = Color::WHITE;
-            let mut previous = nodes.get_mut(speed_buttons[previous as usize + 1]).unwrap();
-            previous.color = Color::WHITE;
-        }
-        GameSpeed::Running { speed } => {
-            let mut button = nodes.get_mut(speed_buttons[speed as usize + 1]).unwrap();
-            button.color = Color::WHITE;
-        }
-    }
+    let speed_button = speed_buttons[**game_speed as usize + 1];
+    let mut node = nodes.get_mut(speed_button).unwrap();
+    node.color = Color::WHITE;
 }
 
-fn update_speed_buttons(
+fn update_speed_button(
     _on: On<Insert, (GameSpeed, SpeedPanel)>,
     game_speed: Single<&GameSpeed>,
     speed_buttons: Single<&Children, With<SpeedPanel>>,
     mut nodes: Query<&mut ImageNode>,
 ) {
-    match **game_speed {
-        GameSpeed::Paused { previous } => {
-            let mut pause = nodes.get_mut(speed_buttons[0]).unwrap();
-            pause.color = RED_500.into();
-            let mut previous = nodes.get_mut(speed_buttons[previous as usize + 1]).unwrap();
-            previous.color = BLUE_500.into();
-        }
-        GameSpeed::Running { speed } => {
-            let mut button = nodes.get_mut(speed_buttons[speed as usize + 1]).unwrap();
-            button.color = BLUE_500.into();
-        }
-    }
+    let speed_button = speed_buttons[**game_speed as usize + 1];
+    let mut node = nodes.get_mut(speed_button).unwrap();
+    node.color = BLUE_500.into();
 }
 
 #[derive(Component, Debug)]
@@ -130,7 +124,7 @@ pub struct TogglePause;
 pub struct SetNormal;
 
 impl SpeedAction for SetNormal {
-    const SPEED: RunSpeed = RunSpeed::Normal;
+    const SPEED: GameSpeed = GameSpeed::Normal;
 }
 
 #[derive(InputAction)]
@@ -138,7 +132,7 @@ impl SpeedAction for SetNormal {
 pub struct SetFast;
 
 impl SpeedAction for SetFast {
-    const SPEED: RunSpeed = RunSpeed::Fast;
+    const SPEED: GameSpeed = GameSpeed::Fast;
 }
 
 #[derive(InputAction)]
@@ -146,9 +140,9 @@ impl SpeedAction for SetFast {
 pub struct SetUltra;
 
 impl SpeedAction for SetUltra {
-    const SPEED: RunSpeed = RunSpeed::Ultra;
+    const SPEED: GameSpeed = GameSpeed::Ultra;
 }
 
 trait SpeedAction: InputAction {
-    const SPEED: RunSpeed;
+    const SPEED: GameSpeed;
 }

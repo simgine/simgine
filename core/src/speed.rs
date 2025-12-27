@@ -4,60 +4,78 @@ use crate::{GameState, component_res::ComponentResExt};
 
 pub(crate) fn plugin(app: &mut App) {
     app.register_resource_component::<GameSpeed>()
-        .add_observer(set_time)
+        .register_resource_component::<Paused>()
+        .add_observer(set_speed)
+        .add_observer(pause_unpause)
         .add_systems(OnEnter(GameState::InGame), spawn);
 }
 
 fn spawn(mut commands: Commands) {
-    commands.spawn((GameSpeed::default(), DespawnOnExit(GameState::InGame)));
+    commands.spawn((
+        GameSpeed::default(),
+        Paused::default(),
+        DespawnOnExit(GameState::InGame),
+    ));
 }
 
-fn set_time(
+fn set_speed(
     _on: On<Insert, GameSpeed>,
     mut time: ResMut<Time<Virtual>>,
+    paused: Single<&Paused>,
     game_speed: Single<&GameSpeed>,
 ) {
-    debug!("setting game speed to `{:?}`", *game_speed);
-    time.set_relative_speed(game_speed.multiplier());
+    if !***paused {
+        info!("setting speed to `{:?}`", *game_speed);
+        time.set_relative_speed(game_speed.multiplier());
+    }
 }
 
-#[derive(Component, Debug, Clone, Copy)]
+fn pause_unpause(
+    _on: On<Insert, Paused>,
+    mut time: ResMut<Time<Virtual>>,
+    paused: Single<&Paused>,
+    game_speed: Single<&GameSpeed>,
+) {
+    if ***paused {
+        info!("pausing the game");
+        time.set_relative_speed(0.0);
+    } else {
+        info!("unpausing game");
+        time.set_relative_speed(game_speed.multiplier());
+    }
+}
+
+#[derive(Component, Deref, DerefMut)]
+#[component(immutable)]
+pub struct Paused(pub bool);
+
+impl Paused {
+    pub fn toggled(&self) -> Self {
+        Self(!self.0)
+    }
+}
+
+impl Default for Paused {
+    fn default() -> Self {
+        Self(true)
+    }
+}
+
+#[derive(Component, Default, Debug, Clone, Copy)]
 #[component(immutable)]
 pub enum GameSpeed {
-    Paused { previous: RunSpeed },
-    Running { speed: RunSpeed },
-}
-
-impl GameSpeed {
-    fn multiplier(&self) -> f32 {
-        match self {
-            GameSpeed::Paused { .. } => 0.0,
-            GameSpeed::Running { speed } => speed.multiplier(),
-        }
-    }
-}
-
-impl Default for GameSpeed {
-    fn default() -> Self {
-        Self::Paused {
-            previous: RunSpeed::Normal,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum RunSpeed {
+    #[default]
     Normal,
     Fast,
     Ultra,
 }
 
-impl RunSpeed {
+impl GameSpeed {
     fn multiplier(&self) -> f32 {
         match self {
-            RunSpeed::Normal => 1.0,
-            RunSpeed::Fast => 3.0,
-            RunSpeed::Ultra => 8.0,
+            GameSpeed::Normal => 1.0,
+            GameSpeed::Fast => 3.0,
+            GameSpeed::Ultra => 8.0,
         }
     }
 }

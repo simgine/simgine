@@ -8,7 +8,7 @@ use bevy::{
 use bevy_enhanced_input::prelude::*;
 use simgine_core::{
     FamilyMode,
-    clock::{GameTime, Weekday},
+    clock::{Clock, Weekday},
     component_res::InsertComponentResExt,
     speed::{GameSpeed, Paused},
 };
@@ -19,7 +19,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(toggle_pause)
         .add_observer(set_speed)
         .add_observer(update_weekday)
-        .add_observer(update_time)
+        .add_observer(update_clock)
         .add_observer(update_pause_button)
         .add_observer(reset_speed_button)
         .add_observer(update_speed_button)
@@ -43,7 +43,7 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         DespawnOnExit(FamilyMode::Life),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             parent.spawn(WeekdayLabel);
-            parent.spawn(TimeLabel);
+            parent.spawn(ClockLabel);
             parent
                 .spawn((
                     Node::default(),
@@ -84,13 +84,13 @@ fn update_weekday(
     write!(text, "{}", *weekday).unwrap();
 }
 
-fn update_time(
-    _on: On<Insert, (GameTime, TimeLabel)>,
-    time: Single<&GameTime>,
-    mut text: Single<&mut Text, With<TimeLabel>>,
+fn update_clock(
+    _on: On<Insert, (Clock, ClockLabel)>,
+    clock: Single<&Clock>,
+    mut text: Single<&mut Text, With<ClockLabel>>,
 ) {
     text.clear();
-    write!(text, "{}", *time).unwrap();
+    write!(text, "{}", *clock).unwrap();
 }
 
 fn toggle_pause(_on: On<Fire<TogglePause>>, mut commands: Commands, paused: Single<&Paused>) {
@@ -155,7 +155,7 @@ struct WeekdayLabel;
     Text,
     TextFont { font_size: 28.0, ..Default::default() },
 )]
-struct TimeLabel;
+struct ClockLabel;
 
 #[derive(Component)]
 struct PauseButton;

@@ -4,7 +4,7 @@ use bevy::{light::light_consts::lux, prelude::*};
 
 use crate::{
     GameState,
-    clock::{GameTime, MinuteCarry, SECS_PER_DAY},
+    clock::{Clock, MinuteCarry, SECS_PER_DAY},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -33,7 +33,7 @@ fn spawn(mut commands: Commands) {
 }
 
 fn move_planets(
-    game_clock: Single<(&GameTime, &MinuteCarry)>,
+    game_clock: Single<(&Clock, &MinuteCarry)>,
     mut sun: Single<&mut Transform, With<Sun>>,
     mut moon: Single<&mut Transform, (With<Moon>, Without<Sun>)>,
 ) {

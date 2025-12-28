@@ -12,17 +12,17 @@ use crate::{
 
 pub(super) fn plugin(app: &mut App) {
     app.register_resource_component::<Weekday>()
-        .register_resource_component::<GameTime>()
+        .register_resource_component::<Clock>()
         .add_systems(OnEnter(GameState::InGame), spawn)
         .add_systems(PreUpdate, tick.run_if(in_state(GameState::InGame)));
 }
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
-        Name::new("Game clock"),
+        Name::new("Clock"),
         MinuteCarry::default(),
-        GameTime::default(),
         Weekday::default(),
+        Clock::default(),
         DespawnOnExit(GameState::InGame),
     ));
 }
@@ -33,7 +33,7 @@ pub(crate) const SECS_PER_DAY: u64 = 24 * 60 * SECS_PER_MIN;
 fn tick(
     mut commands: Commands,
     time: Res<Time>,
-    game_clock: Single<(&mut MinuteCarry, &Weekday, &GameTime)>,
+    game_clock: Single<(&mut MinuteCarry, &Weekday, &Clock)>,
 ) {
     let (mut carry, &weekday, &game_time) = game_clock.into_inner();
     **carry += time.delta();
@@ -56,7 +56,7 @@ fn tick(
         current_weekday.advance(hour / 24);
         hour %= 24;
     }
-    let current_time = GameTime {
+    let current_time = Clock {
         hour: hour as u8,
         minute: minute as u8,
     };
@@ -119,19 +119,19 @@ impl Display for Weekday {
 
 #[derive(Component, PartialEq, Clone, Copy)]
 #[component(immutable)]
-pub struct GameTime {
+pub struct Clock {
     hour: u8,
     minute: u8,
 }
 
-impl GameTime {
+impl Clock {
     pub(crate) fn secs_since_midnight(&self) -> u64 {
         let mins = self.hour as u64 * 60 + self.minute as u64;
         mins * SECS_PER_MIN
     }
 }
 
-impl Default for GameTime {
+impl Default for Clock {
     fn default() -> Self {
         Self {
             hour: 13,
@@ -140,7 +140,7 @@ impl Default for GameTime {
     }
 }
 
-impl Display for GameTime {
+impl Display for Clock {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "{:02}:{:02}", self.hour, self.minute)
     }

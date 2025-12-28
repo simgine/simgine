@@ -29,6 +29,7 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
             height: px(50),
             ..Default::default()
         },
+        DespawnOnExit(GameState::InGame),
         children![
             (
                 ImageNode::new(building_mode),

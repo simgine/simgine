@@ -50,6 +50,7 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
                     children![
                         (
                             ImageNode::new(pause),
+                            PauseButton,
                             button_bindings!(TogglePause[KeyCode::Digit0]),
                         ),
                         (
@@ -111,40 +112,35 @@ fn set_speed(
 
 fn update_pause_button(
     _on: On<Insert, (Paused, SpeedPanel)>,
-    speed_buttons: Single<&Children, With<SpeedPanel>>,
+    mut pause_node: Single<&mut ImageNode, With<PauseButton>>,
     paused: Single<&Paused>,
-    mut nodes: Query<&mut ImageNode>,
 ) {
-    let pause_button = speed_buttons[0];
-    let mut node = nodes.get_mut(pause_button).unwrap();
     let color = if ***paused {
         RED_500.into()
     } else {
         Color::WHITE
     };
-    node.color = color;
+    pause_node.color = color;
 }
 
 fn reset_speed_button(
     _on: On<Replace, GameSpeed>,
     game_speed: Single<&GameSpeed>,
-    speed_buttons: Single<&Children, With<SpeedPanel>>,
-    mut nodes: Query<&mut ImageNode>,
+    mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
 ) {
-    let speed_button = speed_buttons[**game_speed as usize + 1];
-    let mut node = nodes.get_mut(speed_button).unwrap();
-    node.color = Color::WHITE;
+    if let Some((mut node, _)) = speed_buttons.iter_mut().find(|&(_, s)| **s == **game_speed) {
+        node.color = Color::WHITE;
+    }
 }
 
 fn update_speed_button(
     _on: On<Insert, (GameSpeed, SpeedPanel)>,
     game_speed: Single<&GameSpeed>,
-    speed_buttons: Single<&Children, With<SpeedPanel>>,
-    mut nodes: Query<&mut ImageNode>,
+    mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
 ) {
-    let speed_button = speed_buttons[**game_speed as usize + 1];
-    let mut node = nodes.get_mut(speed_button).unwrap();
-    node.color = BLUE_500.into();
+    if let Some((mut node, _)) = speed_buttons.iter_mut().find(|&(_, s)| **s == **game_speed) {
+        node.color = BLUE_500.into();
+    }
 }
 
 #[derive(Component)]
@@ -160,6 +156,9 @@ struct WeekdayLabel;
     TextFont { font_size: 28.0, ..Default::default() },
 )]
 struct TimeLabel;
+
+#[derive(Component)]
+struct PauseButton;
 
 #[derive(Component)]
 struct SpeedPanel;

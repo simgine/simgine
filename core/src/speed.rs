@@ -61,7 +61,7 @@ impl Default for Paused {
     }
 }
 
-#[derive(Component, Default, Debug, Clone, Copy)]
+#[derive(Component, Default, Debug, PartialEq, Clone, Copy)]
 #[component(immutable)]
 pub enum GameSpeed {
     #[default]

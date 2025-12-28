@@ -16,10 +16,10 @@ use simgine_core::{
 use crate::button_bindings;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(toggle_pause)
-        .add_observer(set_speed)
-        .add_observer(update_weekday)
+    app.add_observer(update_weekday)
         .add_observer(update_clock)
+        .add_observer(toggle_pause)
+        .add_observer(set_speed)
         .add_observer(update_pause_button)
         .add_observer(reset_speed_button)
         .add_observer(update_speed_button)

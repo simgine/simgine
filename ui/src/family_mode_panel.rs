@@ -24,7 +24,6 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
             height: px(50),
             ..Default::default()
         },
-        ModePanel,
         children![
             (
                 ImageNode::new(building_mode),
@@ -61,9 +60,6 @@ fn set_mode(
     let mode = **mode_buttons.get(set_mode.context).unwrap();
     family_mode.as_mut().set_if_neq(mode);
 }
-
-#[derive(Component)]
-struct ModePanel;
 
 #[derive(Component, Deref, Clone, Copy)]
 struct ModeButton(FamilyMode);

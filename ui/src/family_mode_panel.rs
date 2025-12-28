@@ -43,11 +43,9 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 fn update_buttons(
     family_mode: Res<State<FamilyMode>>,
-    mode_buttons: Single<&Children, With<ModePanel>>,
-    mut nodes: Query<(&mut ImageNode, &ModeButton)>,
+    mut mode_nodes: Query<(&mut ImageNode, &ModeButton)>,
 ) {
-    let mut iter = nodes.iter_many_mut(*mode_buttons);
-    while let Some((mut node, &button_mode)) = iter.fetch_next() {
+    for (mut node, &button_mode) in &mut mode_nodes {
         if *button_mode == **family_mode {
             node.color = GREEN_500.into();
         } else {

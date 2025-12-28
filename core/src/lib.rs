@@ -36,7 +36,7 @@ pub enum GameState {
     InGame,
 }
 
-#[derive(SubStates, Default, Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(SubStates, Default, Debug, PartialEq, Eq, Hash, Clone, Copy)]
 #[source(GameState = GameState::InGame)]
 #[states(state_scoped = true)]
 pub enum FamilyMode {

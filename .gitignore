@@ -1,5 +1,5 @@
 # Binaries
 target
 
-# Temporarely ignore assets haven't decided on the style yet.
-app/assets
+# Temporarely ignore assets because we haven't decided on the style yet.
+app/assets/base/objects

@@ -29,12 +29,12 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         children![
             (
                 ImageNode::new(building_mode),
-                ButtonMode(FamilyMode::Building),
+                ModeButton(FamilyMode::Building),
                 button_bindings!(SetMode[KeyCode::F2])
             ),
             (
                 ImageNode::new(life_mode),
-                ButtonMode(FamilyMode::Life),
+                ModeButton(FamilyMode::Life),
                 button_bindings!(SetMode[KeyCode::F1]),
             ),
         ],
@@ -44,7 +44,7 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn update_buttons(
     family_mode: Res<State<FamilyMode>>,
     mode_buttons: Single<&Children, With<ModePanel>>,
-    mut nodes: Query<(&mut ImageNode, &ButtonMode)>,
+    mut nodes: Query<(&mut ImageNode, &ModeButton)>,
 ) {
     let mut iter = nodes.iter_many_mut(*mode_buttons);
     while let Some((mut node, &button_mode)) = iter.fetch_next() {
@@ -57,19 +57,19 @@ fn update_buttons(
 }
 
 fn set_mode(
-    fire: On<Fire<SetMode>>,
+    set_mode: On<Fire<SetMode>>,
     mut family_mode: ResMut<NextState<FamilyMode>>,
-    button_modes: Query<&ButtonMode>,
+    mode_buttons: Query<&ModeButton>,
 ) {
-    let button_mode = button_modes.get(fire.context).unwrap();
-    family_mode.as_mut().set_if_neq(**button_mode);
+    let mode = **mode_buttons.get(set_mode.context).unwrap();
+    family_mode.as_mut().set_if_neq(mode);
 }
 
 #[derive(Component)]
 struct ModePanel;
 
 #[derive(Component, Deref, Clone, Copy)]
-struct ButtonMode(FamilyMode);
+struct ModeButton(FamilyMode);
 
 #[derive(InputAction)]
 #[action_output(bool)]

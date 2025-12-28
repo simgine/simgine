@@ -4,7 +4,7 @@ use crate::GameState;
 
 const HALF_CITY_SIZE: f32 = 250.0;
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::InGame), spawn);
 }
 

@@ -12,7 +12,7 @@ use bevy_enhanced_input::prelude::*;
 
 use crate::GameState;
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<PlayerCamera>()
         .add_observer(pan)
         .add_observer(zoom)

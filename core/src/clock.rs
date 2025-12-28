@@ -10,7 +10,7 @@ use crate::{
     component_res::{ComponentResExt, InsertComponentResExt},
 };
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.register_resource_component::<Weekday>()
         .register_resource_component::<GameTime>()
         .add_systems(OnEnter(GameState::InGame), spawn)

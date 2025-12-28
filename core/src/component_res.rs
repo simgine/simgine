@@ -12,7 +12,7 @@ use bevy::{
     utils::{TypeIdMap, TypeIdMapExt},
 };
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.init_resource::<ResEntities>();
 }
 

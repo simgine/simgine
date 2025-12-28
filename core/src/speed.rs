@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::{GameState, component_res::ComponentResExt};
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.register_resource_component::<GameSpeed>()
         .register_resource_component::<Paused>()
         .add_observer(set_speed)

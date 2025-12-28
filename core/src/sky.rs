@@ -7,7 +7,7 @@ use crate::{
     clock::{GameTime, MinuteCarry, SECS_PER_DAY},
 };
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(GameState::InGame), spawn)
         .add_systems(Update, move_planets.run_if(in_state(GameState::InGame)));
 }

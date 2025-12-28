@@ -10,7 +10,7 @@ use walkdir::WalkDir;
 
 use crate::GameState;
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.init_asset::<ObjectManifest>()
         .init_asset_loader::<ManifestLoader<ObjectManifest>>()
         .init_resource::<AssetManifests>()

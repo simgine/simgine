@@ -1,10 +1,10 @@
 mod asset_manifest;
 mod city;
-pub mod clock;
 pub mod component_res;
 mod player_camera;
 mod sky;
 pub mod speed;
+pub mod time;
 
 use bevy::prelude::*;
 
@@ -20,7 +20,7 @@ impl Plugin for SimgineCorePlugin {
             .add_plugins((
                 asset_manifest::plugin,
                 city::plugin,
-                clock::plugin,
+                time::plugin,
                 component_res::plugin,
                 player_camera::plugin,
                 sky::plugin,

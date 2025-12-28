@@ -8,9 +8,9 @@ use bevy::{
 use bevy_enhanced_input::prelude::*;
 use simgine_core::{
     FamilyMode,
-    clock::{Clock, Weekday},
     component_res::InsertComponentResExt,
     speed::{GameSpeed, Paused},
+    time::{Clock, Weekday},
 };
 
 use crate::button_bindings;

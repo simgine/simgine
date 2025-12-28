@@ -17,9 +17,7 @@ use crate::button_bindings;
 
 pub(crate) fn plugin(app: &mut App) {
     app.add_observer(toggle_pause)
-        .add_observer(set_speed::<SetNormal>)
-        .add_observer(set_speed::<SetFast>)
-        .add_observer(set_speed::<SetUltra>)
+        .add_observer(set_speed)
         .add_observer(update_weekday)
         .add_observer(update_time)
         .add_observer(update_pause_button)
@@ -56,15 +54,18 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
                         ),
                         (
                             ImageNode::new(normal_speed),
-                            button_bindings!(SetNormal[KeyCode::Digit1])
+                            SpeedButton(GameSpeed::Normal),
+                            button_bindings!(SetSpeed[KeyCode::Digit1])
                         ),
                         (
                             ImageNode::new(fast_speed),
-                            button_bindings!(SetFast[KeyCode::Digit2])
+                            SpeedButton(GameSpeed::Fast),
+                            button_bindings!(SetSpeed[KeyCode::Digit2])
                         ),
                         (
                             ImageNode::new(ultra_speed),
-                            button_bindings!(SetUltra[KeyCode::Digit3])
+                            SpeedButton(GameSpeed::Ultra),
+                            button_bindings!(SetSpeed[KeyCode::Digit3])
                         ),
                     ],
                 ))
@@ -95,8 +96,14 @@ fn toggle_pause(_on: On<Fire<TogglePause>>, mut commands: Commands, paused: Sing
     commands.insert_component_resource(paused.toggled());
 }
 
-fn set_speed<A: SpeedAction>(_on: On<Fire<A>>, mut commands: Commands, paused: Single<&Paused>) {
-    commands.insert_component_resource(A::SPEED);
+fn set_speed(
+    set_speed: On<Fire<SetSpeed>>,
+    mut commands: Commands,
+    paused: Single<&Paused>,
+    mut speed_buttons: Query<&SpeedButton>,
+) {
+    let speed = **speed_buttons.get_mut(set_speed.context).unwrap();
+    commands.insert_component_resource(speed);
     if ***paused {
         commands.insert_component_resource(Paused(false));
     }
@@ -157,34 +164,13 @@ struct TimeLabel;
 #[derive(Component)]
 struct SpeedPanel;
 
+#[derive(Component, Deref, Clone, Copy)]
+struct SpeedButton(GameSpeed);
+
 #[derive(InputAction)]
 #[action_output(bool)]
 pub struct TogglePause;
 
 #[derive(InputAction)]
 #[action_output(bool)]
-pub struct SetNormal;
-
-impl SpeedAction for SetNormal {
-    const SPEED: GameSpeed = GameSpeed::Normal;
-}
-
-#[derive(InputAction)]
-#[action_output(bool)]
-pub struct SetFast;
-
-impl SpeedAction for SetFast {
-    const SPEED: GameSpeed = GameSpeed::Fast;
-}
-
-#[derive(InputAction)]
-#[action_output(bool)]
-pub struct SetUltra;
-
-impl SpeedAction for SetUltra {
-    const SPEED: GameSpeed = GameSpeed::Ultra;
-}
-
-trait SpeedAction: InputAction {
-    const SPEED: GameSpeed;
-}
+pub struct SetSpeed;

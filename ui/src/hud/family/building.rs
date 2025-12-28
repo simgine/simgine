@@ -1,7 +1,7 @@
 use bevy::{color::palettes::tailwind::BLUE_500, prelude::*};
 use simgine_core::{BuildingMode, FamilyMode};
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.add_observer(set_mode)
         .add_systems(OnEnter(FamilyMode::Building), spawn)
         .add_systems(OnEnter(BuildingMode::Objects), update_buttons)

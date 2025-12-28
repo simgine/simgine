@@ -1,11 +1,16 @@
+mod building;
+mod life;
+
 use bevy::{color::palettes::tailwind::GREEN_500, prelude::*};
 use bevy_enhanced_input::prelude::*;
 use simgine_core::{FamilyMode, GameState};
 
 use crate::button_bindings;
 
-pub(crate) fn plugin(app: &mut App) {
-    app.add_observer(set_mode)
+pub(super) fn plugin(app: &mut App) {
+    app.add_plugins(building::plugin)
+        .add_plugins(life::plugin)
+        .add_observer(set_mode)
         .add_systems(OnEnter(GameState::InGame), spawn)
         .add_systems(OnEnter(FamilyMode::Life), update_buttons)
         .add_systems(OnEnter(FamilyMode::Building), update_buttons);

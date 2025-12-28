@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<ActionButton>()
         .add_observer(mock_action);
 }

@@ -15,7 +15,7 @@ use simgine_core::{
 
 use crate::button_bindings;
 
-pub(crate) fn plugin(app: &mut App) {
+pub(super) fn plugin(app: &mut App) {
     app.add_observer(toggle_pause)
         .add_observer(set_speed)
         .add_observer(update_weekday)

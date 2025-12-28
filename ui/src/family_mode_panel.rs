@@ -21,7 +21,6 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
             flex_direction: FlexDirection::RowReverse,
             right: px(16.0),
             top: px(16.0),
-            width: px(50),
             height: px(50),
             ..Default::default()
         },

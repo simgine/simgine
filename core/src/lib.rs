@@ -14,6 +14,7 @@ impl Plugin for SimgineCorePlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>()
             .add_sub_state::<FamilyMode>()
+            .add_sub_state::<BuildingMode>()
             .insert_resource(ClearColor(Color::BLACK))
             .insert_resource(GlobalAmbientLight::NONE)
             .add_plugins((
@@ -43,4 +44,13 @@ pub enum FamilyMode {
     #[default]
     Life,
     Building,
+}
+
+#[derive(SubStates, Default, Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[source(FamilyMode = FamilyMode::Building)]
+#[states(state_scoped = true)]
+pub enum BuildingMode {
+    #[default]
+    Objects,
+    Walls,
 }

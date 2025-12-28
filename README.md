@@ -9,3 +9,4 @@ Previous development available at [`project_harmonia`](https://github.com/simgin
 The code licensed under [GNU Affero General Public License v3.0](./COPYING).
 
 [Game icons](app/assets/base/ui/icons) are from [Kenney's Game Icons](https://kenney.nl/assets/game-icons) and licensed under [CC0](./LICENSE-CC0).
+They are temporary placeholders.

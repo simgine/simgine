@@ -124,7 +124,7 @@ fn set_speed(
 }
 
 fn update_pause_button(
-    _on: On<Insert, (Paused, SpeedNode)>,
+    _on: On<Insert, (Paused, PauseButton)>,
     mut pause_node: Single<&mut ImageNode, With<PauseButton>>,
     paused: Single<&Paused>,
 ) {

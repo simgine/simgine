@@ -60,7 +60,7 @@ fn spawn(mut commands: Commands) {
                         ),
                     ],
                 ))
-                .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
+                .insert(SpeedNode); // Workaround to react on insertion after hierarchy spawn.
         })),
     ));
 }
@@ -124,7 +124,7 @@ fn set_speed(
 }
 
 fn update_pause_button(
-    _on: On<Insert, (Paused, SpeedPanel)>,
+    _on: On<Insert, (Paused, SpeedNode)>,
     mut pause_node: Single<&mut ImageNode, With<PauseButton>>,
     paused: Single<&Paused>,
 ) {
@@ -147,7 +147,7 @@ fn reset_speed_button(
 }
 
 fn update_speed_button(
-    _on: On<Insert, (GameSpeed, SpeedPanel)>,
+    _on: On<Insert, (GameSpeed, SpeedNode)>,
     game_speed: Single<&GameSpeed>,
     mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
 ) {
@@ -175,7 +175,7 @@ struct ClockLabel;
 struct PauseButton;
 
 #[derive(Component)]
-struct SpeedPanel;
+struct SpeedNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[require(ImageNode, ActionButton)]

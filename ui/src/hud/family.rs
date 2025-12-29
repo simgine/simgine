@@ -10,16 +10,14 @@ use crate::button_bindings;
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(building::plugin)
         .add_plugins(life::plugin)
+        .add_observer(init_button)
         .add_observer(set_mode)
         .add_systems(OnEnter(GameState::InGame), spawn)
         .add_systems(OnEnter(FamilyMode::Life), update_buttons)
         .add_systems(OnEnter(FamilyMode::Building), update_buttons);
 }
 
-fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let life_mode = asset_server.load("base/ui/icons/life_mode.png");
-    let building_mode = asset_server.load("base/ui/icons/building_mode.png");
-
+fn spawn(mut commands: Commands) {
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
@@ -32,17 +30,28 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         DespawnOnExit(GameState::InGame),
         children![
             (
-                ImageNode::new(building_mode),
                 ModeButton(FamilyMode::Building),
                 button_bindings!(SetMode[KeyCode::F2])
             ),
             (
-                ImageNode::new(life_mode),
                 ModeButton(FamilyMode::Life),
                 button_bindings!(SetMode[KeyCode::F1]),
             ),
         ],
     ));
+}
+
+fn init_button(
+    insert: On<Insert, ModeButton>,
+    asset_server: Res<AssetServer>,
+    mut mode_buttons: Query<(&mut ImageNode, &ModeButton)>,
+) {
+    let (mut node, &mode_button) = mode_buttons.get_mut(insert.entity).unwrap();
+    let image = match *mode_button {
+        FamilyMode::Life => asset_server.load("base/ui/icons/life_mode.png"),
+        FamilyMode::Building => asset_server.load("base/ui/icons/building_mode.png"),
+    };
+    node.image = image;
 }
 
 fn update_buttons(

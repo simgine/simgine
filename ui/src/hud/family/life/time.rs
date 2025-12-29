@@ -16,7 +16,9 @@ use simgine_core::{
 use crate::button_bindings;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(update_weekday)
+    app.add_observer(init_pause_button)
+        .add_observer(init_speed_button)
+        .add_observer(update_weekday)
         .add_observer(update_clock)
         .add_observer(toggle_pause)
         .add_observer(set_speed)
@@ -26,12 +28,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(OnEnter(FamilyMode::Life), spawn);
 }
 
-fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let pause = asset_server.load("base/ui/icons/pause.png");
-    let normal_speed = asset_server.load("base/ui/icons/normal_speed.png");
-    let fast_speed = asset_server.load("base/ui/icons/fast_speed.png");
-    let ultra_speed = asset_server.load("base/ui/icons/ultra_speed.png");
-
+fn spawn(mut commands: Commands) {
     commands.spawn((
         Node {
             flex_direction: FlexDirection::Column,
@@ -48,23 +45,16 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .spawn((
                     Node::default(),
                     children![
+                        (PauseButton, button_bindings!(TogglePause[KeyCode::Digit0])),
                         (
-                            ImageNode::new(pause),
-                            PauseButton,
-                            button_bindings!(TogglePause[KeyCode::Digit0]),
-                        ),
-                        (
-                            ImageNode::new(normal_speed),
                             SpeedButton(GameSpeed::Normal),
                             button_bindings!(SetSpeed[KeyCode::Digit1])
                         ),
                         (
-                            ImageNode::new(fast_speed),
                             SpeedButton(GameSpeed::Fast),
                             button_bindings!(SetSpeed[KeyCode::Digit2])
                         ),
                         (
-                            ImageNode::new(ultra_speed),
                             SpeedButton(GameSpeed::Ultra),
                             button_bindings!(SetSpeed[KeyCode::Digit3])
                         ),
@@ -73,6 +63,29 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
                 .insert(SpeedPanel); // Workaround to react on insertion after hierarchy spawn.
         })),
     ));
+}
+
+fn init_pause_button(
+    insert: On<Insert, PauseButton>,
+    asset_server: Res<AssetServer>,
+    mut nodes: Query<&mut ImageNode>,
+) {
+    let mut node = nodes.get_mut(insert.entity).unwrap();
+    node.image = asset_server.load("base/ui/icons/pause.png");
+}
+
+fn init_speed_button(
+    insert: On<Insert, SpeedButton>,
+    asset_server: Res<AssetServer>,
+    mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
+) {
+    let (mut node, &speed_button) = speed_buttons.get_mut(insert.entity).unwrap();
+    let image = match *speed_button {
+        GameSpeed::Normal => asset_server.load("base/ui/icons/normal_speed.png"),
+        GameSpeed::Fast => asset_server.load("base/ui/icons/fast_speed.png"),
+        GameSpeed::Ultra => asset_server.load("base/ui/icons/ultra_speed.png"),
+    };
+    node.image = image;
 }
 
 fn update_weekday(
@@ -158,12 +171,14 @@ struct WeekdayLabel;
 struct ClockLabel;
 
 #[derive(Component)]
+#[require(ImageNode)]
 struct PauseButton;
 
 #[derive(Component)]
 struct SpeedPanel;
 
 #[derive(Component, Deref, Clone, Copy)]
+#[require(ImageNode)]
 struct SpeedButton(GameSpeed);
 
 #[derive(InputAction)]

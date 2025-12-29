@@ -2,16 +2,14 @@ use bevy::{color::palettes::tailwind::BLUE_500, prelude::*};
 use simgine_core::{BuildingMode, FamilyMode};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(set_mode)
+    app.add_observer(init_button)
+        .add_observer(set_mode)
         .add_systems(OnEnter(FamilyMode::Building), spawn)
         .add_systems(OnEnter(BuildingMode::Objects), update_buttons)
         .add_systems(OnEnter(BuildingMode::Walls), update_buttons);
 }
 
-fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let objects_mode = asset_server.load("base/ui/icons/objects_mode.png");
-    let walls_mode = asset_server.load("base/ui/icons/walls_mode.png");
-
+fn spawn(mut commands: Commands) {
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
@@ -22,13 +20,23 @@ fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         },
         DespawnOnExit(FamilyMode::Building),
         children![
-            (
-                ImageNode::new(objects_mode),
-                ModeButton(BuildingMode::Objects),
-            ),
-            (ImageNode::new(walls_mode), ModeButton(BuildingMode::Walls)),
+            ModeButton(BuildingMode::Objects),
+            ModeButton(BuildingMode::Walls),
         ],
     ));
+}
+
+fn init_button(
+    insert: On<Insert, ModeButton>,
+    asset_server: Res<AssetServer>,
+    mut mode_buttons: Query<(&mut ImageNode, &ModeButton)>,
+) {
+    let (mut node, &mode_button) = mode_buttons.get_mut(insert.entity).unwrap();
+    let image = match *mode_button {
+        BuildingMode::Objects => asset_server.load("base/ui/icons/objects_mode.png"),
+        BuildingMode::Walls => asset_server.load("base/ui/icons/walls_mode.png"),
+    };
+    node.image = image;
 }
 
 fn update_buttons(
@@ -56,4 +64,5 @@ fn set_mode(
 }
 
 #[derive(Component, Deref, Clone, Copy)]
+#[require(ImageNode)]
 struct ModeButton(BuildingMode);

@@ -1,15 +1,20 @@
 mod objects;
 
-use bevy::{color::palettes::tailwind::BLUE_500, prelude::*};
+use bevy::prelude::*;
 use simgine_core::{BuildingMode, FamilyMode};
+
+use crate::widget::{
+    SCREEN_OFFSET,
+    button::{
+        icon::ButtonIcon,
+        toggle::{Exclusive, Toggled},
+    },
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(objects::plugin)
-        .add_observer(init_button)
         .add_observer(set_mode)
-        .add_systems(OnEnter(FamilyMode::Building), spawn)
-        .add_systems(OnEnter(BuildingMode::Objects), update_buttons)
-        .add_systems(OnEnter(BuildingMode::Walls), update_buttons);
+        .add_systems(OnEnter(FamilyMode::Building), spawn);
 }
 
 fn spawn(mut commands: Commands) {
@@ -17,8 +22,8 @@ fn spawn(mut commands: Commands) {
         Node {
             position_type: PositionType::Absolute,
             flex_direction: FlexDirection::Column,
-            left: px(16.0),
-            top: px(16.0),
+            left: SCREEN_OFFSET,
+            top: SCREEN_OFFSET,
             ..Default::default()
         },
         DespawnOnExit(FamilyMode::Building),
@@ -26,8 +31,15 @@ fn spawn(mut commands: Commands) {
             (
                 Node::default(),
                 children![
-                    BuildingModeButton(BuildingMode::Objects),
-                    BuildingModeButton(BuildingMode::Walls),
+                    (
+                        ButtonIcon::new("base/ui/icons/objects_mode.png"),
+                        Toggled(true),
+                        BuildingModeButton(BuildingMode::Objects)
+                    ),
+                    (
+                        ButtonIcon::new("base/ui/icons/walls_mode.png"),
+                        BuildingModeButton(BuildingMode::Walls),
+                    )
                 ]
             ),
             objects::objects_node(),
@@ -35,44 +47,18 @@ fn spawn(mut commands: Commands) {
     ));
 }
 
-fn init_button(
-    insert: On<Insert, BuildingModeButton>,
-    asset_server: Res<AssetServer>,
-    mut buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
-) {
-    let (mut node, &mode_button) = buttons.get_mut(insert.entity).unwrap();
-    let image = match *mode_button {
-        BuildingMode::Objects => asset_server.load("base/ui/icons/objects_mode.png"),
-        BuildingMode::Walls => asset_server.load("base/ui/icons/walls_mode.png"),
-    };
-    node.image = image;
-}
-
-fn update_buttons(
-    building_mode: Res<State<BuildingMode>>,
-    mut buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
-) {
-    for (mut node, &mode_button) in &mut buttons {
-        if *mode_button == **building_mode {
-            node.color = BLUE_500.into();
-        } else {
-            node.color = Color::WHITE;
-        }
-    }
-}
-
 fn set_mode(
     mut click: On<Pointer<Click>>,
     mut building_mode: ResMut<NextState<BuildingMode>>,
     buttons: Query<&BuildingModeButton>,
 ) {
-    if let Ok(&mode_button) = buttons.get(click.entity) {
+    if let Ok(&mode) = buttons.get(click.entity) {
         click.propagate(false);
-        building_mode.as_mut().set_if_neq(*mode_button);
+        building_mode.as_mut().set_if_neq(*mode);
     }
 }
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ImageNode)]
+#[require(Exclusive)]
 struct BuildingModeButton(BuildingMode);

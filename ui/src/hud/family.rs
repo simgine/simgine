@@ -1,20 +1,27 @@
 mod building;
 mod life;
 
-use bevy::{color::palettes::tailwind::GREEN_500, prelude::*};
+use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 use simgine_core::{FamilyMode, GameState};
 
-use crate::{button_action::ButtonAction, button_bindings};
+use crate::{
+    button_bindings,
+    widget::{
+        SCREEN_OFFSET,
+        button::{
+            action::{Activate, ButtonContext},
+            icon::ButtonIcon,
+            toggle::{Exclusive, Toggled},
+        },
+    },
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(building::plugin)
         .add_plugins(life::plugin)
-        .add_observer(init_button)
         .add_observer(set_mode)
-        .add_systems(OnEnter(GameState::InGame), spawn)
-        .add_systems(OnEnter(FamilyMode::Life), update_buttons)
-        .add_systems(OnEnter(FamilyMode::Building), update_buttons);
+        .add_systems(OnEnter(GameState::InGame), spawn);
 }
 
 fn spawn(mut commands: Commands) {
@@ -22,65 +29,39 @@ fn spawn(mut commands: Commands) {
         Node {
             position_type: PositionType::Absolute,
             flex_direction: FlexDirection::RowReverse,
-            right: px(16.0),
-            top: px(16.0),
-            height: px(50),
+            right: SCREEN_OFFSET,
+            top: SCREEN_OFFSET,
+            height: px(50.0),
             ..Default::default()
         },
         DespawnOnExit(GameState::InGame),
         children![
             (
+                ButtonIcon::new("base/ui/icons/life_mode.png"),
                 FamilyModeButton(FamilyMode::Building),
-                button_bindings!(SetMode[KeyCode::F2])
+                button_bindings![KeyCode::F2]
             ),
             (
+                ButtonIcon::new("base/ui/icons/building_mode.png"),
+                Toggled(true),
                 FamilyModeButton(FamilyMode::Life),
-                button_bindings!(SetMode[KeyCode::F1]),
+                button_bindings![KeyCode::F1],
             ),
         ],
     ));
 }
 
-fn init_button(
-    insert: On<Insert, FamilyModeButton>,
-    asset_server: Res<AssetServer>,
-    mut buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
-) {
-    let (mut node, &mode_button) = buttons.get_mut(insert.entity).unwrap();
-    let image = match *mode_button {
-        FamilyMode::Life => asset_server.load("base/ui/icons/life_mode.png"),
-        FamilyMode::Building => asset_server.load("base/ui/icons/building_mode.png"),
-    };
-    node.image = image;
-}
-
-fn update_buttons(
-    family_mode: Res<State<FamilyMode>>,
-    mut buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
-) {
-    for (mut node, &mode_button) in &mut buttons {
-        if *mode_button == **family_mode {
-            node.color = GREEN_500.into();
-        } else {
-            node.color = Color::WHITE;
-        }
-    }
-}
-
 fn set_mode(
-    set_mode: On<Fire<SetMode>>,
+    activate: On<Fire<Activate>>,
     mut family_mode: ResMut<NextState<FamilyMode>>,
     buttons: Query<&FamilyModeButton>,
 ) {
-    let mode = **buttons.get(set_mode.context).unwrap();
-    family_mode.as_mut().set_if_neq(mode);
+    if let Ok(&mode) = buttons.get(activate.context) {
+        family_mode.as_mut().set_if_neq(*mode);
+    }
 }
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ImageNode, ButtonAction)]
+#[require(ButtonContext, Exclusive)]
 struct FamilyModeButton(FamilyMode);
-
-#[derive(InputAction)]
-#[action_output(bool)]
-struct SetMode;

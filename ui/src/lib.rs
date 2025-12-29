@@ -1,5 +1,5 @@
-pub(crate) mod button_action;
 mod hud;
+mod widget;
 
 use bevy::prelude::*;
 
@@ -7,6 +7,6 @@ pub struct SimgineUiPlugin;
 
 impl Plugin for SimgineUiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((button_action::plugin, hud::plugin));
+        app.add_plugins((hud::plugin, widget::plugin));
     }
 }

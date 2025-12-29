@@ -1,15 +1,13 @@
-use bevy::{color::palettes::tailwind::BLUE_500, prelude::*};
-use simgine_core::{
-    BuildingMode,
-    asset_manifest::{ObjectCategory, ObjectManifest},
+use bevy::prelude::*;
+use simgine_core::asset_manifest::{ObjectCategory, ObjectManifest};
+
+use crate::widget::button::{
+    icon::ButtonIcon,
+    toggle::{Exclusive, Toggled},
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(init_category_button)
-        .add_observer(spawn_object_buttons)
-        .add_observer(apply_filter)
-        .add_systems(OnEnter(BuildingMode::Objects), update_visibility)
-        .add_systems(OnEnter(BuildingMode::Walls), update_visibility);
+    app.add_observer(spawn_object_buttons);
 }
 
 fn spawn_object_buttons(
@@ -32,45 +30,6 @@ fn spawn_object_buttons(
     });
 }
 
-fn init_category_button(
-    insert: On<Insert, CategoryButton>,
-    asset_server: Res<AssetServer>,
-    mut buttons: Query<(&mut ImageNode, &CategoryButton)>,
-) {
-    let (mut node, &category_button) = buttons.get_mut(insert.entity).unwrap();
-    let image = match *category_button {
-        CategoryFilter::AllObjects => asset_server.load("base/ui/icons/all_objects.png"),
-        CategoryFilter::Category(ObjectCategory::Furniture) => {
-            asset_server.load("base/ui/icons/furniture.png")
-        }
-    };
-    node.image = image;
-}
-
-fn apply_filter(
-    _on: On<Insert, ObjectsFilter>,
-    objects_filter: Single<&ObjectsFilter>,
-    mut buttons: Query<(&mut ImageNode, &CategoryButton)>,
-) {
-    for (mut node, category_button) in &mut buttons {
-        node.color = if **category_button == objects_filter.category {
-            BLUE_500.into()
-        } else {
-            Color::WHITE
-        };
-    }
-}
-
-fn update_visibility(
-    building_mode: Res<State<BuildingMode>>,
-    mut visibility: Single<&mut Visibility, With<ObjectsNode>>,
-) {
-    match **building_mode {
-        BuildingMode::Objects => **visibility = Visibility::Visible,
-        BuildingMode::Walls => **visibility = Visibility::Hidden,
-    }
-}
-
 pub(super) fn objects_node() -> impl Bundle {
     (
         Node {
@@ -82,13 +41,19 @@ pub(super) fn objects_node() -> impl Bundle {
             (
                 Node::default(),
                 children![
-                    CategoryButton::from(CategoryFilter::AllObjects),
-                    CategoryButton::from(ObjectCategory::Furniture),
+                    (
+                        ButtonIcon::new("base/ui/icons/all_objects.png"),
+                        Toggled(true),
+                        CategoryButton::from(CategoryFilter::AllObjects)
+                    ),
+                    (
+                        ButtonIcon::new("base/ui/icons/furniture.png"),
+                        CategoryButton::from(ObjectCategory::Furniture),
+                    )
                 ],
             ),
             (
                 ObjectsGrid,
-                ObjectsFilter::default(),
                 Node {
                     display: Display::Grid,
                     column_gap: px(8),
@@ -106,7 +71,7 @@ struct ObjectsNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(Button, ImageNode)]
+#[require(Exclusive)]
 struct CategoryButton(CategoryFilter);
 
 impl<T: Into<CategoryFilter>> From<T> for CategoryButton {
@@ -117,11 +82,6 @@ impl<T: Into<CategoryFilter>> From<T> for CategoryButton {
 
 #[derive(Component)]
 struct ObjectsGrid;
-
-#[derive(Component, Default)]
-struct ObjectsFilter {
-    category: CategoryFilter,
-}
 
 #[derive(Default, PartialEq, Clone, Copy)]
 enum CategoryFilter {

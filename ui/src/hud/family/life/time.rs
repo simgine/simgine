@@ -1,7 +1,7 @@
 use std::fmt::Write;
 
 use bevy::{
-    color::palettes::tailwind::{BLUE_500, RED_500},
+    color::palettes::tailwind::{RED_50, RED_400, RED_500},
     ecs::relationship::RelatedSpawner,
     prelude::*,
 };
@@ -13,17 +13,25 @@ use simgine_core::{
     time::{Clock, Weekday},
 };
 
-use crate::{button_action::ButtonAction, button_bindings};
+use crate::{
+    button_bindings,
+    widget::{
+        SCREEN_OFFSET,
+        button::{
+            ButtonStyle,
+            action::{Activate, ButtonContext},
+            icon::ButtonIcon,
+            toggle::{Exclusive, Toggled},
+        },
+    },
+};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(init_pause_button)
-        .add_observer(init_speed_button)
-        .add_observer(update_weekday)
+    app.add_observer(update_weekday)
         .add_observer(update_clock)
         .add_observer(toggle_pause)
         .add_observer(set_speed)
         .add_observer(update_pause_button)
-        .add_observer(reset_speed_button)
         .add_observer(update_speed_button)
         .add_systems(OnEnter(FamilyMode::Life), spawn);
 }
@@ -33,8 +41,8 @@ fn spawn(mut commands: Commands) {
         Node {
             flex_direction: FlexDirection::Column,
             position_type: PositionType::Absolute,
-            left: px(16.0),
-            top: px(16.0),
+            left: SCREEN_OFFSET,
+            top: SCREEN_OFFSET,
             ..Default::default()
         },
         DespawnOnExit(FamilyMode::Life),
@@ -45,47 +53,27 @@ fn spawn(mut commands: Commands) {
                 .spawn((
                     Node::default(),
                     children![
-                        (PauseButton, button_bindings!(TogglePause[KeyCode::Digit0])),
+                        (PauseButton, button_bindings![KeyCode::Digit0]),
                         (
+                            ButtonIcon::new("base/ui/icons/normal_speed.png"),
                             SpeedButton(GameSpeed::Normal),
-                            button_bindings!(SetSpeed[KeyCode::Digit1])
+                            button_bindings![KeyCode::Digit1]
                         ),
                         (
+                            ButtonIcon::new("base/ui/icons/fast_speed.png"),
                             SpeedButton(GameSpeed::Fast),
-                            button_bindings!(SetSpeed[KeyCode::Digit2])
+                            button_bindings![KeyCode::Digit2]
                         ),
                         (
+                            ButtonIcon::new("base/ui/icons/ultra_speed.png"),
                             SpeedButton(GameSpeed::Ultra),
-                            button_bindings!(SetSpeed[KeyCode::Digit3])
+                            button_bindings![KeyCode::Digit3]
                         ),
                     ],
                 ))
                 .insert(SpeedNode); // Workaround to react on insertion after hierarchy spawn.
         })),
     ));
-}
-
-fn init_pause_button(
-    insert: On<Insert, PauseButton>,
-    asset_server: Res<AssetServer>,
-    mut nodes: Query<&mut ImageNode>,
-) {
-    let mut node = nodes.get_mut(insert.entity).unwrap();
-    node.image = asset_server.load("base/ui/icons/pause.png");
-}
-
-fn init_speed_button(
-    insert: On<Insert, SpeedButton>,
-    asset_server: Res<AssetServer>,
-    mut buttons: Query<(&mut ImageNode, &SpeedButton)>,
-) {
-    let (mut node, &speed_button) = buttons.get_mut(insert.entity).unwrap();
-    let image = match *speed_button {
-        GameSpeed::Normal => asset_server.load("base/ui/icons/normal_speed.png"),
-        GameSpeed::Fast => asset_server.load("base/ui/icons/fast_speed.png"),
-        GameSpeed::Ultra => asset_server.load("base/ui/icons/ultra_speed.png"),
-    };
-    node.image = image;
 }
 
 fn update_weekday(
@@ -106,53 +94,51 @@ fn update_clock(
     write!(text, "{}", *clock).unwrap();
 }
 
-fn toggle_pause(_on: On<Fire<TogglePause>>, mut commands: Commands, paused: Single<&Paused>) {
-    commands.insert_component_resource(paused.toggled());
+fn toggle_pause(
+    activate: On<Fire<Activate>>,
+    mut commands: Commands,
+    buttons: Query<(), With<PauseButton>>,
+    paused: Single<&Paused>,
+) {
+    if buttons.get(activate.context).is_ok() {
+        commands.insert_component_resource(paused.toggled());
+    }
 }
 
 fn set_speed(
-    set_speed: On<Fire<SetSpeed>>,
+    activate: On<Fire<Activate>>,
     mut commands: Commands,
     paused: Single<&Paused>,
     mut buttons: Query<&SpeedButton>,
 ) {
-    let speed = **buttons.get_mut(set_speed.context).unwrap();
-    commands.insert_component_resource(speed);
-    if ***paused {
-        commands.insert_component_resource(Paused(false));
+    if let Ok(&speed) = buttons.get_mut(activate.context) {
+        commands.insert_component_resource(*speed);
+        if ***paused {
+            commands.insert_component_resource(Paused(false));
+        }
     }
 }
 
 fn update_pause_button(
     _on: On<Insert, (Paused, PauseButton)>,
-    mut pause_node: Single<&mut ImageNode, With<PauseButton>>,
+    mut commands: Commands,
+    pause_button: Single<(Entity, &Toggled), With<PauseButton>>,
     paused: Single<&Paused>,
 ) {
-    let color = if ***paused {
-        RED_500.into()
-    } else {
-        Color::WHITE
-    };
-    pause_node.color = color;
-}
-
-fn reset_speed_button(
-    _on: On<Replace, GameSpeed>,
-    game_speed: Single<&GameSpeed>,
-    mut buttons: Query<(&mut ImageNode, &SpeedButton)>,
-) {
-    if let Some((mut node, _)) = buttons.iter_mut().find(|&(_, s)| **s == **game_speed) {
-        node.color = Color::WHITE;
+    let (entity, &toggle) = pause_button.into_inner();
+    if *toggle != ***paused {
+        commands.entity(entity).insert(Toggled(***paused));
     }
 }
 
 fn update_speed_button(
     _on: On<Insert, (GameSpeed, SpeedNode)>,
+    mut commands: Commands,
     game_speed: Single<&GameSpeed>,
-    mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
+    buttons: Query<(Entity, &SpeedButton)>,
 ) {
-    if let Some((mut node, _)) = speed_buttons.iter_mut().find(|&(_, s)| **s == **game_speed) {
-        node.color = BLUE_500.into();
+    if let Some((entity, _)) = buttons.iter().find(|&(_, s)| **s == **game_speed) {
+        commands.entity(entity).insert(Toggled(true));
     }
 }
 
@@ -171,7 +157,17 @@ struct WeekdayLabel;
 struct ClockLabel;
 
 #[derive(Component)]
-#[require(ImageNode, ButtonAction)]
+#[require(
+    ButtonContext,
+    ButtonIcon::new("base/ui/icons/pause.png"),
+    ButtonStyle {
+        hovered_pressed: RED_400.into(),
+        pressed: RED_500.into(),
+        hovered: RED_50.into(),
+        ..Default::default()
+    },
+    Toggled
+)]
 struct PauseButton;
 
 #[derive(Component)]
@@ -179,13 +175,5 @@ struct SpeedNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ImageNode, ButtonAction)]
+#[require(ButtonContext, Exclusive)]
 struct SpeedButton(GameSpeed);
-
-#[derive(InputAction)]
-#[action_output(bool)]
-pub struct TogglePause;
-
-#[derive(InputAction)]
-#[action_output(bool)]
-pub struct SetSpeed;

@@ -58,8 +58,8 @@ fn update_buttons(
     family_mode: Res<State<FamilyMode>>,
     mut buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
 ) {
-    for (mut node, &button_mode) in &mut buttons {
-        if *button_mode == **family_mode {
+    for (mut node, &mode_button) in &mut buttons {
+        if *mode_button == **family_mode {
             node.color = GREEN_500.into();
         } else {
             node.color = Color::WHITE;

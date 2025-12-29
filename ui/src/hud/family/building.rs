@@ -55,8 +55,8 @@ fn update(
     mut buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
     mut objects_visibility: Single<&mut Visibility, With<ObjectsNode>>,
 ) {
-    for (mut node, &button_mode) in &mut buttons {
-        if *button_mode == **building_mode {
+    for (mut node, &mode_button) in &mut buttons {
+        if *mode_button == **building_mode {
             node.color = BLUE_500.into();
         } else {
             node.color = Color::WHITE;

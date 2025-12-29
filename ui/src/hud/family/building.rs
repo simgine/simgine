@@ -40,9 +40,9 @@ fn spawn(mut commands: Commands) {
 fn init_button(
     insert: On<Insert, BuildingModeButton>,
     asset_server: Res<AssetServer>,
-    mut mode_buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
+    mut buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
 ) {
-    let (mut node, &mode_button) = mode_buttons.get_mut(insert.entity).unwrap();
+    let (mut node, &mode_button) = buttons.get_mut(insert.entity).unwrap();
     let image = match *mode_button {
         BuildingMode::Objects => asset_server.load("base/ui/icons/objects_mode.png"),
         BuildingMode::Walls => asset_server.load("base/ui/icons/walls_mode.png"),
@@ -52,10 +52,10 @@ fn init_button(
 
 fn update(
     building_mode: Res<State<BuildingMode>>,
-    mut mode_nodes: Query<(&mut ImageNode, &BuildingModeButton)>,
+    mut buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
     mut objects_visibility: Single<&mut Visibility, With<ObjectsNode>>,
 ) {
-    for (mut node, &button_mode) in &mut mode_nodes {
+    for (mut node, &button_mode) in &mut buttons {
         if *button_mode == **building_mode {
             node.color = BLUE_500.into();
         } else {
@@ -72,9 +72,9 @@ fn update(
 fn set_mode(
     mut click: On<Pointer<Click>>,
     mut building_mode: ResMut<NextState<BuildingMode>>,
-    mode_buttons: Query<&BuildingModeButton>,
+    buttons: Query<&BuildingModeButton>,
 ) {
-    if let Ok(&mode_button) = mode_buttons.get(click.entity) {
+    if let Ok(&mode_button) = buttons.get(click.entity) {
         click.propagate(false);
         building_mode.as_mut().set_if_neq(*mode_button);
     }

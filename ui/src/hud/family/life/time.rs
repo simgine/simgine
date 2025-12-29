@@ -77,9 +77,9 @@ fn init_pause_button(
 fn init_speed_button(
     insert: On<Insert, SpeedButton>,
     asset_server: Res<AssetServer>,
-    mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
+    mut buttons: Query<(&mut ImageNode, &SpeedButton)>,
 ) {
-    let (mut node, &speed_button) = speed_buttons.get_mut(insert.entity).unwrap();
+    let (mut node, &speed_button) = buttons.get_mut(insert.entity).unwrap();
     let image = match *speed_button {
         GameSpeed::Normal => asset_server.load("base/ui/icons/normal_speed.png"),
         GameSpeed::Fast => asset_server.load("base/ui/icons/fast_speed.png"),
@@ -114,9 +114,9 @@ fn set_speed(
     set_speed: On<Fire<SetSpeed>>,
     mut commands: Commands,
     paused: Single<&Paused>,
-    mut speed_buttons: Query<&SpeedButton>,
+    mut buttons: Query<&SpeedButton>,
 ) {
-    let speed = **speed_buttons.get_mut(set_speed.context).unwrap();
+    let speed = **buttons.get_mut(set_speed.context).unwrap();
     commands.insert_component_resource(speed);
     if ***paused {
         commands.insert_component_resource(Paused(false));
@@ -139,9 +139,9 @@ fn update_pause_button(
 fn reset_speed_button(
     _on: On<Replace, GameSpeed>,
     game_speed: Single<&GameSpeed>,
-    mut speed_buttons: Query<(&mut ImageNode, &SpeedButton)>,
+    mut buttons: Query<(&mut ImageNode, &SpeedButton)>,
 ) {
-    if let Some((mut node, _)) = speed_buttons.iter_mut().find(|&(_, s)| **s == **game_speed) {
+    if let Some((mut node, _)) = buttons.iter_mut().find(|&(_, s)| **s == **game_speed) {
         node.color = Color::WHITE;
     }
 }

@@ -44,9 +44,9 @@ fn spawn(mut commands: Commands) {
 fn init_button(
     insert: On<Insert, FamilyModeButton>,
     asset_server: Res<AssetServer>,
-    mut mode_buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
+    mut buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
 ) {
-    let (mut node, &mode_button) = mode_buttons.get_mut(insert.entity).unwrap();
+    let (mut node, &mode_button) = buttons.get_mut(insert.entity).unwrap();
     let image = match *mode_button {
         FamilyMode::Life => asset_server.load("base/ui/icons/life_mode.png"),
         FamilyMode::Building => asset_server.load("base/ui/icons/building_mode.png"),
@@ -56,9 +56,9 @@ fn init_button(
 
 fn update_buttons(
     family_mode: Res<State<FamilyMode>>,
-    mut mode_nodes: Query<(&mut ImageNode, &FamilyModeButton)>,
+    mut buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
 ) {
-    for (mut node, &button_mode) in &mut mode_nodes {
+    for (mut node, &button_mode) in &mut buttons {
         if *button_mode == **family_mode {
             node.color = GREEN_500.into();
         } else {
@@ -70,9 +70,9 @@ fn update_buttons(
 fn set_mode(
     set_mode: On<Fire<SetMode>>,
     mut family_mode: ResMut<NextState<FamilyMode>>,
-    mode_buttons: Query<&FamilyModeButton>,
+    buttons: Query<&FamilyModeButton>,
 ) {
-    let mode = **mode_buttons.get(set_mode.context).unwrap();
+    let mode = **buttons.get(set_mode.context).unwrap();
     family_mode.as_mut().set_if_neq(mode);
 }
 

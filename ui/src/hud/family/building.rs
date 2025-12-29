@@ -20,16 +20,16 @@ fn spawn(mut commands: Commands) {
         },
         DespawnOnExit(FamilyMode::Building),
         children![
-            ModeButton(BuildingMode::Objects),
-            ModeButton(BuildingMode::Walls),
+            BuildingModeButton(BuildingMode::Objects),
+            BuildingModeButton(BuildingMode::Walls),
         ],
     ));
 }
 
 fn init_button(
-    insert: On<Insert, ModeButton>,
+    insert: On<Insert, BuildingModeButton>,
     asset_server: Res<AssetServer>,
-    mut mode_buttons: Query<(&mut ImageNode, &ModeButton)>,
+    mut mode_buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
 ) {
     let (mut node, &mode_button) = mode_buttons.get_mut(insert.entity).unwrap();
     let image = match *mode_button {
@@ -41,7 +41,7 @@ fn init_button(
 
 fn update_buttons(
     building_mode: Res<State<BuildingMode>>,
-    mut mode_nodes: Query<(&mut ImageNode, &ModeButton)>,
+    mut mode_nodes: Query<(&mut ImageNode, &BuildingModeButton)>,
 ) {
     for (mut node, &button_mode) in &mut mode_nodes {
         if *button_mode == **building_mode {
@@ -55,7 +55,7 @@ fn update_buttons(
 fn set_mode(
     mut click: On<Pointer<Click>>,
     mut building_mode: ResMut<NextState<BuildingMode>>,
-    mode_buttons: Query<&ModeButton>,
+    mode_buttons: Query<&BuildingModeButton>,
 ) {
     if let Ok(&mode_button) = mode_buttons.get(click.entity) {
         click.propagate(false);
@@ -65,4 +65,4 @@ fn set_mode(
 
 #[derive(Component, Deref, Clone, Copy)]
 #[require(ImageNode)]
-struct ModeButton(BuildingMode);
+struct BuildingModeButton(BuildingMode);

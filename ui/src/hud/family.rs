@@ -30,11 +30,11 @@ fn spawn(mut commands: Commands) {
         DespawnOnExit(GameState::InGame),
         children![
             (
-                ModeButton(FamilyMode::Building),
+                FamilyModeButton(FamilyMode::Building),
                 button_bindings!(SetMode[KeyCode::F2])
             ),
             (
-                ModeButton(FamilyMode::Life),
+                FamilyModeButton(FamilyMode::Life),
                 button_bindings!(SetMode[KeyCode::F1]),
             ),
         ],
@@ -42,9 +42,9 @@ fn spawn(mut commands: Commands) {
 }
 
 fn init_button(
-    insert: On<Insert, ModeButton>,
+    insert: On<Insert, FamilyModeButton>,
     asset_server: Res<AssetServer>,
-    mut mode_buttons: Query<(&mut ImageNode, &ModeButton)>,
+    mut mode_buttons: Query<(&mut ImageNode, &FamilyModeButton)>,
 ) {
     let (mut node, &mode_button) = mode_buttons.get_mut(insert.entity).unwrap();
     let image = match *mode_button {
@@ -56,7 +56,7 @@ fn init_button(
 
 fn update_buttons(
     family_mode: Res<State<FamilyMode>>,
-    mut mode_nodes: Query<(&mut ImageNode, &ModeButton)>,
+    mut mode_nodes: Query<(&mut ImageNode, &FamilyModeButton)>,
 ) {
     for (mut node, &button_mode) in &mut mode_nodes {
         if *button_mode == **family_mode {
@@ -70,14 +70,14 @@ fn update_buttons(
 fn set_mode(
     set_mode: On<Fire<SetMode>>,
     mut family_mode: ResMut<NextState<FamilyMode>>,
-    mode_buttons: Query<&ModeButton>,
+    mode_buttons: Query<&FamilyModeButton>,
 ) {
     let mode = **mode_buttons.get(set_mode.context).unwrap();
     family_mode.as_mut().set_if_neq(mode);
 }
 
 #[derive(Component, Deref, Clone, Copy)]
-struct ModeButton(FamilyMode);
+struct FamilyModeButton(FamilyMode);
 
 #[derive(InputAction)]
 #[action_output(bool)]

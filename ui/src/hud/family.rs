@@ -77,6 +77,7 @@ fn set_mode(
 }
 
 #[derive(Component, Deref, Clone, Copy)]
+#[component(immutable)]
 #[require(ImageNode, ActionButton)]
 struct FamilyModeButton(FamilyMode);
 

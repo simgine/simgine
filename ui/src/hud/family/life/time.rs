@@ -178,6 +178,7 @@ struct PauseButton;
 struct SpeedNode;
 
 #[derive(Component, Deref, Clone, Copy)]
+#[component(immutable)]
 #[require(ImageNode, ActionButton)]
 struct SpeedButton(GameSpeed);
 

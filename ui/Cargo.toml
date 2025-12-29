@@ -15,3 +15,6 @@ bevy = { workspace = true, features = [
 ] }
 bevy_enhanced_input.workspace = true
 simgine_core.workspace = true
+
+[lints]
+workspace = true

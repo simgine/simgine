@@ -21,3 +21,6 @@ bevy_enhanced_input.workspace = true
 ron.workspace = true
 serde.workspace = true
 walkdir.workspace = true
+
+[lints]
+workspace = true

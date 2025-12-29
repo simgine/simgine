@@ -3,15 +3,13 @@ mod objects;
 use bevy::{color::palettes::tailwind::BLUE_500, prelude::*};
 use simgine_core::{BuildingMode, FamilyMode};
 
-use objects::ObjectsNode;
-
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(objects::plugin)
         .add_observer(init_button)
         .add_observer(set_mode)
         .add_systems(OnEnter(FamilyMode::Building), spawn)
-        .add_systems(OnEnter(BuildingMode::Objects), update)
-        .add_systems(OnEnter(BuildingMode::Walls), update);
+        .add_systems(OnEnter(BuildingMode::Objects), update_buttons)
+        .add_systems(OnEnter(BuildingMode::Walls), update_buttons);
 }
 
 fn spawn(mut commands: Commands) {
@@ -32,7 +30,7 @@ fn spawn(mut commands: Commands) {
                     BuildingModeButton(BuildingMode::Walls),
                 ]
             ),
-            ObjectsNode,
+            objects::objects_node(),
         ],
     ));
 }
@@ -50,10 +48,9 @@ fn init_button(
     node.image = image;
 }
 
-fn update(
+fn update_buttons(
     building_mode: Res<State<BuildingMode>>,
     mut buttons: Query<(&mut ImageNode, &BuildingModeButton)>,
-    mut objects_visibility: Single<&mut Visibility, With<ObjectsNode>>,
 ) {
     for (mut node, &mode_button) in &mut buttons {
         if *mode_button == **building_mode {
@@ -61,11 +58,6 @@ fn update(
         } else {
             node.color = Color::WHITE;
         }
-    }
-
-    match **building_mode {
-        BuildingMode::Objects => **objects_visibility = Visibility::Visible,
-        BuildingMode::Walls => **objects_visibility = Visibility::Hidden,
     }
 }
 

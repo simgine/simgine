@@ -5,7 +5,7 @@ use bevy::{color::palettes::tailwind::GREEN_500, prelude::*};
 use bevy_enhanced_input::prelude::*;
 use simgine_core::{FamilyMode, GameState};
 
-use crate::{action_button::ActionButton, button_bindings};
+use crate::{button_action::ButtonAction, button_bindings};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(building::plugin)
@@ -78,7 +78,7 @@ fn set_mode(
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ImageNode, ActionButton)]
+#[require(ImageNode, ButtonAction)]
 struct FamilyModeButton(FamilyMode);
 
 #[derive(InputAction)]

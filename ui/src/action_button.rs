@@ -21,20 +21,17 @@ fn mock_action(
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 #[require(Button)]
 pub(crate) struct ActionButton;
 
 #[macro_export]
 macro_rules! button_bindings {
     ($action:ty [$($bindings:expr),*$(,)?]) => {
-        (
-            $crate::action_button::ActionButton,
-            ::bevy_enhanced_input::prelude::actions!($crate::action_button::ActionButton[(
-                ::bevy_enhanced_input::prelude::Action::<$action>::new(),
-                ::bevy_enhanced_input::prelude::Press::default(),
-                bindings![$($bindings),*],
-            )])
-        )
+        ::bevy_enhanced_input::prelude::actions!($crate::action_button::ActionButton[(
+            ::bevy_enhanced_input::prelude::Action::<$action>::new(),
+            ::bevy_enhanced_input::prelude::Press::default(),
+            bindings![$($bindings),*],
+        )])
     };
 }

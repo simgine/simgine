@@ -13,7 +13,7 @@ use simgine_core::{
     time::{Clock, Weekday},
 };
 
-use crate::button_bindings;
+use crate::{action_button::ActionButton, button_bindings};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(init_pause_button)
@@ -171,14 +171,14 @@ struct WeekdayLabel;
 struct ClockLabel;
 
 #[derive(Component)]
-#[require(ImageNode)]
+#[require(ImageNode, ActionButton)]
 struct PauseButton;
 
 #[derive(Component)]
 struct SpeedPanel;
 
 #[derive(Component, Deref, Clone, Copy)]
-#[require(ImageNode)]
+#[require(ImageNode, ActionButton)]
 struct SpeedButton(GameSpeed);
 
 #[derive(InputAction)]

@@ -1,4 +1,4 @@
-mod asset_manifest;
+pub mod asset_manifest;
 mod city;
 pub mod component_res;
 mod player_camera;

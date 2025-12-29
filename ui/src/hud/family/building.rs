@@ -1,27 +1,38 @@
+mod objects;
+
 use bevy::{color::palettes::tailwind::BLUE_500, prelude::*};
 use simgine_core::{BuildingMode, FamilyMode};
 
+use objects::ObjectsNode;
+
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(init_button)
+    app.add_plugins(objects::plugin)
+        .add_observer(init_button)
         .add_observer(set_mode)
         .add_systems(OnEnter(FamilyMode::Building), spawn)
-        .add_systems(OnEnter(BuildingMode::Objects), update_buttons)
-        .add_systems(OnEnter(BuildingMode::Walls), update_buttons);
+        .add_systems(OnEnter(BuildingMode::Objects), update)
+        .add_systems(OnEnter(BuildingMode::Walls), update);
 }
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
+            flex_direction: FlexDirection::Column,
             left: px(16.0),
             top: px(16.0),
-            height: px(50),
             ..Default::default()
         },
         DespawnOnExit(FamilyMode::Building),
         children![
-            BuildingModeButton(BuildingMode::Objects),
-            BuildingModeButton(BuildingMode::Walls),
+            (
+                Node::default(),
+                children![
+                    BuildingModeButton(BuildingMode::Objects),
+                    BuildingModeButton(BuildingMode::Walls),
+                ]
+            ),
+            ObjectsNode,
         ],
     ));
 }
@@ -39,9 +50,10 @@ fn init_button(
     node.image = image;
 }
 
-fn update_buttons(
+fn update(
     building_mode: Res<State<BuildingMode>>,
     mut mode_nodes: Query<(&mut ImageNode, &BuildingModeButton)>,
+    mut objects_visibility: Single<&mut Visibility, With<ObjectsNode>>,
 ) {
     for (mut node, &button_mode) in &mut mode_nodes {
         if *button_mode == **building_mode {
@@ -49,6 +61,11 @@ fn update_buttons(
         } else {
             node.color = Color::WHITE;
         }
+    }
+
+    match **building_mode {
+        BuildingMode::Objects => **objects_visibility = Visibility::Visible,
+        BuildingMode::Walls => **objects_visibility = Visibility::Hidden,
     }
 }
 

@@ -613,7 +613,7 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input"
 version = "0.21.0-rc.1"
-source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#ed0b1c7aa7154558ef510d47d521220ba02ae79c"
+source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#04b6da7e51b3919e01482dafd9e17a240916d1c5"
 dependencies = [
  "bevy",
  "bevy_enhanced_input_macros",
@@ -626,7 +626,7 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input_macros"
 version = "0.21.0-rc.1"
-source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#ed0b1c7aa7154558ef510d47d521220ba02ae79c"
+source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#04b6da7e51b3919e01482dafd9e17a240916d1c5"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -3,7 +3,7 @@ use simgine_core::asset_manifest::{ObjectCategory, ObjectManifest};
 
 use crate::widget::button::{
     icon::ButtonIcon,
-    toggle::{Exclusive, Toggled},
+    toggled::{Exclusive, Toggled},
 };
 
 pub(super) fn plugin(app: &mut App) {

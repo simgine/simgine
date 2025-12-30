@@ -12,7 +12,7 @@ use crate::{
         button::{
             action::{Activate, ButtonContext},
             icon::ButtonIcon,
-            toggle::{Exclusive, Toggled},
+            toggled::{Exclusive, Toggled},
         },
     },
 };

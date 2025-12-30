@@ -21,7 +21,7 @@ use crate::{
             ButtonStyle,
             action::{Activate, ButtonContext},
             icon::ButtonIcon,
-            toggle::{Exclusive, Toggled},
+            toggled::{Exclusive, Toggled},
         },
     },
 };

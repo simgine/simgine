@@ -1,16 +1,16 @@
 pub(crate) mod action;
 pub(crate) mod icon;
-pub(crate) mod toggle;
+pub(crate) mod toggled;
 
 use bevy::{
     color::palettes::tailwind::{BLUE_50, BLUE_400, BLUE_500},
     prelude::*,
 };
 
-use toggle::Toggled;
+use toggled::Toggled;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins((action::plugin, icon::plugin, toggle::plugin));
+    app.add_plugins((action::plugin, icon::plugin, toggled::plugin));
 }
 
 #[derive(Component, Clone, Copy)]

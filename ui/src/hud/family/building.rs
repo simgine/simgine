@@ -7,7 +7,7 @@ use crate::widget::{
     SCREEN_OFFSET,
     button::{
         icon::ButtonIcon,
-        toggle::{Exclusive, Toggled},
+        toggled::{Exclusive, Toggled},
     },
 };
 

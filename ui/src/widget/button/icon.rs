@@ -1,6 +1,6 @@
 use bevy::{asset::AssetPath, prelude::*, ui::UiSystems};
 
-use super::{ButtonStyle, toggle::Toggled};
+use super::{ButtonStyle, toggled::Toggled};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(load_icon)

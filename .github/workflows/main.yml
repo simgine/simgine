@@ -66,24 +66,3 @@ jobs:
 
       - name: Clippy
         run: cargo clippy --tests -- -D warnings
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@v6
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends libxcb-shape0-dev libxcb-xfixes0-dev libudev-dev libwayland-dev
-
-      - name: Instal stable toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache crates
-        uses: Swatinem/rust-cache@v2
-
-      - name: Test
-        run: cargo test

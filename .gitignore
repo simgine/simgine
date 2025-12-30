@@ -3,3 +3,6 @@ target
 
 # Temporarely ignore assets because we haven't decided on the style yet.
 app/assets/base/objects
+
+# Editors
+.zed

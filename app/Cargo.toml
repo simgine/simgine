@@ -21,7 +21,7 @@ simgine_ui.workspace = true
 
 [features]
 default = ["debug"]
-debug = ["bevy/debug"]
+debug = ["bevy/debug", "bevy/dynamic_linking"]
 
 [lints]
 workspace = true

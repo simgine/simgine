@@ -15,6 +15,7 @@ fn toggle(
             return;
         }
 
+        debug!("button `{}` toggled to `{}`", click.entity, !*toggled);
         commands.entity(click.entity).insert(toggled.flip());
     }
 }
@@ -33,6 +34,7 @@ fn ensure_single(
         return;
     }
 
+    debug!("untoggling neighbors for `{}`", insert.entity);
     let neighbors = children.get(child_of.0).unwrap();
     for (other_entity, _, other_toggle) in buttons.iter_many(neighbors) {
         if entity == other_entity {
@@ -40,12 +42,13 @@ fn ensure_single(
         }
 
         if **other_toggle {
+            trace!("untoggling `{other_entity}`");
             commands.entity(other_entity).insert(Toggled(false));
         }
     }
 }
 
-#[derive(Component, Deref, Default, Clone, Copy)]
+#[derive(Component, Deref, Debug, Default, Clone, Copy)]
 #[component(immutable)]
 #[require(Button)]
 pub(crate) struct Toggled(pub(crate) bool);

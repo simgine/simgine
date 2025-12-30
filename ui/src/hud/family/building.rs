@@ -18,6 +18,8 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
+    trace!("spawning building mode node");
+
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
@@ -53,6 +55,7 @@ fn set_mode(
     buttons: Query<&BuildingModeButton>,
 ) {
     if let Ok(&mode) = buttons.get(click.entity) {
+        info!("changing building mode to `{:?}`", *mode);
         click.propagate(false);
         building_mode.as_mut().set_if_neq(*mode);
     }

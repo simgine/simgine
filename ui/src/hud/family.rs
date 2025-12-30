@@ -25,6 +25,8 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
+    trace!("spawning family mode node");
+
     commands.spawn((
         Node {
             position_type: PositionType::Absolute,
@@ -57,6 +59,7 @@ fn set_mode(
     buttons: Query<&FamilyModeButton>,
 ) {
     if let Ok(&mode) = buttons.get(activate.context) {
+        info!("changing family mode to `{:?}`", *mode);
         family_mode.as_mut().set_if_neq(*mode);
     }
 }

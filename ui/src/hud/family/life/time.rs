@@ -37,6 +37,8 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
+    trace!("spawning time node");
+
     commands.spawn((
         Node {
             flex_direction: FlexDirection::Column,

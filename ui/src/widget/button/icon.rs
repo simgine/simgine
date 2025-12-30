@@ -13,12 +13,14 @@ fn load_icon(
     mut buttons: Query<(&mut ImageNode, &ButtonIcon)>,
 ) {
     let (mut node, icon) = buttons.get_mut(insert.entity).unwrap();
+    trace!("loading icon '{}' for `{}`", insert.entity, **icon);
     node.image = asset_server.load(&**icon);
 }
 
 fn update_style(
     mut buttons: Query<
         (
+            Entity,
             &Interaction,
             &mut ImageNode,
             Option<&ButtonStyle>,
@@ -30,7 +32,8 @@ fn update_style(
         ),
     >,
 ) {
-    for (interaction, mut node, style_override, toggle) in &mut buttons {
+    for (entity, interaction, mut node, style_override, toggle) in &mut buttons {
+        trace!("changing style for `{entity}` based on `{interaction:?}` and `{toggle:?}`");
         let style = style_override.copied().unwrap_or_default();
         node.color = style.get_color(interaction, toggle);
     }

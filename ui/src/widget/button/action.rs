@@ -14,6 +14,7 @@ fn activate(
     if let Ok(actions) = buttons.get(click.entity)
         && let Some(&action) = actions.first()
     {
+        debug!("firing action for `{}`", click.entity);
         click.propagate(false);
         commands
             .entity(action)

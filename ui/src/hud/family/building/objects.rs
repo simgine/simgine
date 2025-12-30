@@ -10,12 +10,12 @@ use crate::widget::button::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(spawn_object_buttons)
+    app.add_observer(spawn_grid_buttons)
         .add_systems(OnEnter(BuildingMode::Objects), show)
         .add_systems(OnExit(BuildingMode::Objects), hide);
 }
 
-fn spawn_object_buttons(
+fn spawn_grid_buttons(
     add: On<Add, ObjectsGrid>,
     mut commands: Commands,
     objects: Res<Assets<ObjectManifest>>,

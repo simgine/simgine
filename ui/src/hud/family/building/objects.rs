@@ -1,5 +1,8 @@
 use bevy::prelude::*;
-use simgine_core::asset_manifest::{ObjectCategory, ObjectManifest};
+use simgine_core::{
+    BuildingMode,
+    asset_manifest::{ObjectCategory, ObjectManifest},
+};
 
 use crate::widget::button::{
     icon::ButtonIcon,
@@ -7,7 +10,9 @@ use crate::widget::button::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(spawn_object_buttons);
+    app.add_observer(spawn_object_buttons)
+        .add_systems(OnEnter(BuildingMode::Objects), show)
+        .add_systems(OnExit(BuildingMode::Objects), hide);
 }
 
 fn spawn_object_buttons(
@@ -28,6 +33,14 @@ fn spawn_object_buttons(
             ));
         }
     });
+}
+
+fn show(mut visibility: Single<&mut Visibility, With<ObjectsNode>>) {
+    **visibility = Visibility::Inherited;
+}
+
+fn hide(mut visibility: Single<&mut Visibility, With<ObjectsNode>>) {
+    **visibility = Visibility::Hidden;
 }
 
 pub(super) fn objects_node() -> impl Bundle {

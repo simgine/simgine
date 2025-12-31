@@ -32,10 +32,10 @@ fn update_style(
         ),
     >,
 ) {
-    for (entity, interaction, mut node, style_override, toggle) in &mut buttons {
-        trace!("changing style for `{entity}` based on `{interaction:?}` and `{toggle:?}`");
+    for (entity, interaction, mut node, style_override, toggled) in &mut buttons {
+        trace!("changing style for `{entity}` based on `{interaction:?}` and `{toggled:?}`");
         let style = style_override.copied().unwrap_or_default();
-        node.color = style.get_color(interaction, toggle);
+        node.color = style.get_color(interaction, toggled);
     }
 }
 

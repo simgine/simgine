@@ -127,8 +127,8 @@ fn update_pause_button(
     pause_button: Single<(Entity, &Toggled), With<PauseButton>>,
     paused: Single<&Paused>,
 ) {
-    let (entity, &toggle) = pause_button.into_inner();
-    if *toggle != ***paused {
+    let (entity, &toggled) = pause_button.into_inner();
+    if *toggled != ***paused {
         commands.entity(entity).insert(Toggled(***paused));
     }
 }

@@ -1,22 +1,31 @@
-use bevy::prelude::*;
+use bevy::{ecs::query::QueryFilter, prelude::*};
+use bevy_enhanced_input::prelude::*;
+
+use crate::widget::button::action::ButtonContext;
+
+use super::action::Activate;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(toggle).add_observer(ensure_single);
+    app.add_observer(toggle::<Pointer<Click>, Without<ButtonContext>>) // Buttons with context activate on click.
+        .add_observer(toggle::<Fire<Activate>, ()>)
+        .add_observer(ensure_single);
 }
 
-fn toggle(
-    click: On<Pointer<Click>>,
+fn toggle<E: EntityEvent, F: QueryFilter>(
+    event: On<E>,
     mut commands: Commands,
-    buttons: Query<(&Toggled, Has<Exclusive>)>,
+    buttons: Query<(&Toggled, Has<Exclusive>), F>,
 ) {
-    if let Ok((&toggled, exclusive)) = buttons.get(click.entity) {
+    let button = event.event_target();
+    if let Ok((&toggled, exclusive)) = buttons.get(button) {
         if exclusive && *toggled {
             // Exclusive buttons cannot be untoggled.
             return;
         }
 
-        debug!("button `{}` toggled to `{}`", click.entity, !*toggled);
-        commands.entity(click.entity).insert(toggled.flip());
+        let flipped = toggled.flip();
+        debug!("toggling `{button}` to `{}`", *flipped);
+        commands.entity(button).insert(flipped);
     }
 }
 

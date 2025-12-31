@@ -139,10 +139,10 @@ fn update_speed_button(
     game_speed: Single<&GameSpeed>,
     buttons: Query<(Entity, &Toggled, &SpeedButton)>,
 ) {
-    if let Some((entity, &toggled, _)) = buttons.iter().find(|&(.., s)| **s == **game_speed) {
-        if !*toggled {
-            commands.entity(entity).insert(Toggled(true));
-        }
+    if let Some((entity, &toggled, _)) = buttons.iter().find(|&(.., s)| **s == **game_speed)
+        && !*toggled
+    {
+        commands.entity(entity).insert(Toggled(true));
     }
 }
 

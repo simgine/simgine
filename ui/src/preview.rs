@@ -66,7 +66,7 @@ fn wait_for_request(
         .get(*preview)
         .expect("manifests should be preloaded");
     debug!("spawning scene '{:?}'", manifest.scene);
-    let scene = asset_server.load(manifest.scene.clone()).into();
+    let scene = asset_server.load(manifest.scene.clone());
 
     commands.entity(target).insert(PreviewProcessed);
     commands.spawn((

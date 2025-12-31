@@ -4,9 +4,12 @@ use simgine_core::{
     asset_manifest::{ObjectCategory, ObjectManifest},
 };
 
-use crate::widget::button::{
-    icon::ButtonIcon,
-    toggled::{Exclusive, Toggled},
+use crate::{
+    preview::Preview,
+    widget::button::{
+        icon::ButtonIcon,
+        toggled::{Exclusive, Toggled},
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -23,8 +26,9 @@ fn spawn_grid_buttons(
     trace!("spawning grid buttons");
 
     commands.entity(add.entity).with_children(|parent| {
-        for _ in 0..objects.len() {
+        for (id, _) in objects.iter() {
             parent.spawn((
+                Preview(id),
                 Node {
                     height: px(128),
                     width: px(98),

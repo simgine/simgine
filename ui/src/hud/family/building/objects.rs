@@ -36,8 +36,8 @@ fn spawn_grid_buttons(
                 BoxShadow::from(ShadowStyle {
                     color: Color::BLACK.with_alpha(0.5),
                     blur_radius: px(2),
-                    x_offset: px(8),
-                    y_offset: px(8),
+                    x_offset: px(5),
+                    y_offset: px(5),
                     ..Default::default()
                 }),
                 BackgroundColor(Color::WHITE),

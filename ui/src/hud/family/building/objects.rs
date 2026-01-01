@@ -41,7 +41,9 @@ fn spawn_grid_buttons(
                     y_offset: px(5),
                     ..Default::default()
                 }),
-                BackgroundColor(Color::WHITE),
+                ButtonStyle::default(),
+                Toggled(false),
+                Exclusive,
                 children![(
                     Preview(id),
                     Node {

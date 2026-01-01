@@ -16,15 +16,21 @@ fn update_style(
             Entity,
             &Interaction,
             &ButtonStyle,
-            &mut ImageNode,
+            &mut BackgroundColor,
+            Option<&mut ImageNode>,
             Option<&Toggled>,
         ),
         Or<(Changed<Interaction>, Changed<Toggled>)>,
     >,
 ) {
-    for (entity, interaction, style, mut node, toggled) in &mut buttons {
+    for (entity, interaction, style, mut background, node, toggled) in &mut buttons {
         trace!("changing style for `{entity}` based on `{interaction:?}` and `{toggled:?}`");
-        node.color = style.get_color(interaction, toggled);
+        let color = style.get_color(interaction, toggled);
+        if let Some(mut node) = node {
+            node.color = color
+        } else {
+            *background = color.into();
+        }
     }
 }
 

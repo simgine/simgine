@@ -12,6 +12,7 @@ use crate::{
         button::{
             action::{Activate, ButtonContext},
             icon::ButtonIcon,
+            style::ButtonStyle,
             toggled::{Exclusive, Toggled},
         },
     },
@@ -66,5 +67,5 @@ fn set_mode(
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ButtonContext, Exclusive)]
+#[require(ButtonContext, ButtonStyle, Exclusive)]
 struct FamilyModeButton(FamilyMode);

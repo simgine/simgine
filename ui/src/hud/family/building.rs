@@ -7,6 +7,7 @@ use crate::widget::{
     SCREEN_OFFSET,
     button::{
         icon::ButtonIcon,
+        style::ButtonStyle,
         toggled::{Exclusive, Toggled},
     },
 };
@@ -63,5 +64,5 @@ fn set_mode(
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(Exclusive)]
+#[require(Exclusive, ButtonStyle)]
 struct BuildingModeButton(BuildingMode);

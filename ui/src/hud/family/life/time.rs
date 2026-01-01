@@ -18,9 +18,9 @@ use crate::{
     widget::{
         SCREEN_OFFSET,
         button::{
-            ButtonStyle,
             action::{Activate, ButtonContext},
             icon::ButtonIcon,
+            style::ButtonStyle,
             toggled::{Exclusive, Toggled},
         },
     },
@@ -179,5 +179,5 @@ struct SpeedNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ButtonContext, Exclusive)]
+#[require(ButtonContext, ButtonStyle, Exclusive)]
 struct SpeedButton(GameSpeed);

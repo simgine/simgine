@@ -8,6 +8,7 @@ use crate::{
     preview::Preview,
     widget::button::{
         icon::ButtonIcon,
+        style::ButtonStyle,
         toggled::{Exclusive, Toggled},
     },
 };
@@ -104,7 +105,7 @@ struct ObjectsNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(Exclusive)]
+#[require(Exclusive, ButtonStyle)]
 struct CategoryButton(CategoryFilter);
 
 impl<T: Into<CategoryFilter>> From<T> for CategoryButton {

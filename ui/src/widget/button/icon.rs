@@ -1,10 +1,7 @@
-use bevy::{asset::AssetPath, prelude::*, ui::UiSystems};
-
-use super::{ButtonStyle, toggled::Toggled};
+use bevy::{asset::AssetPath, prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(load_icon)
-        .add_systems(PreUpdate, update_style.after(UiSystems::Focus));
+    app.add_observer(load_icon);
 }
 
 fn load_icon(
@@ -15,28 +12,6 @@ fn load_icon(
     let (mut node, icon) = buttons.get_mut(insert.entity).unwrap();
     trace!("loading icon '{}' for `{}`", insert.entity, **icon);
     node.image = asset_server.load(&**icon);
-}
-
-fn update_style(
-    mut buttons: Query<
-        (
-            Entity,
-            &Interaction,
-            &mut ImageNode,
-            Option<&ButtonStyle>,
-            Option<&Toggled>,
-        ),
-        (
-            Or<(Changed<Interaction>, Changed<Toggled>)>,
-            With<ButtonIcon>,
-        ),
-    >,
-) {
-    for (entity, interaction, mut node, style_override, toggled) in &mut buttons {
-        trace!("changing style for `{entity}` based on `{interaction:?}` and `{toggled:?}`");
-        let style = style_override.copied().unwrap_or_default();
-        node.color = style.get_color(interaction, toggled);
-    }
 }
 
 #[derive(Component, Deref)]

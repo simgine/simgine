@@ -28,14 +28,28 @@ fn spawn_grid_buttons(
     commands.entity(add.entity).with_children(|parent| {
         for (id, _) in objects.iter() {
             parent.spawn((
-                Preview(id),
                 Node {
-                    height: px(128),
-                    width: px(98),
-                    border_radius: BorderRadius::all(px(8)),
+                    padding: UiRect::all(px(5)),
+                    border_radius: BorderRadius::all(px(13)),
                     ..Default::default()
                 },
+                BoxShadow::from(ShadowStyle {
+                    color: Color::BLACK.with_alpha(0.5),
+                    blur_radius: px(2),
+                    x_offset: px(8),
+                    y_offset: px(8),
+                    ..Default::default()
+                }),
                 BackgroundColor(Color::WHITE),
+                children![(
+                    Preview(id),
+                    Node {
+                        height: px(128),
+                        width: px(98),
+                        border_radius: BorderRadius::all(px(8)),
+                        ..Default::default()
+                    },
+                )],
             ));
         }
     });

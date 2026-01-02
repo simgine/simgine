@@ -3,7 +3,7 @@ mod life;
 
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
-use simgine_core::{FamilyMode, GameState};
+use simgine_core::state::{FamilyMode, GameState};
 
 use crate::{
     button_bindings,

@@ -8,7 +8,7 @@ use bevy::{
 use serde::{Deserialize, de::DeserializeSeed};
 use walkdir::WalkDir;
 
-use crate::GameState;
+use crate::state::GameState;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_asset::<ObjectManifest>()

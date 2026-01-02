@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use simgine_core::{
-    BuildingMode,
     asset_manifest::{ObjectCategory, ObjectManifest},
+    state::BuildingMode,
 };
 
 use crate::{

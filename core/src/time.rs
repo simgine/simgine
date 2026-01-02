@@ -6,8 +6,8 @@ use std::{
 use bevy::prelude::*;
 
 use crate::{
-    GameState,
     component_res::{ComponentResExt, InsertComponentResExt},
+    state::GameState,
 };
 
 pub(super) fn plugin(app: &mut App) {

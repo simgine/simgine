@@ -3,7 +3,7 @@ use std::f32::consts::{FRAC_PI_2, TAU};
 use bevy::{light::light_consts::lux, prelude::*};
 
 use crate::{
-    GameState,
+    state::GameState,
     time::{Clock, MinuteCarry, SECS_PER_DAY},
 };
 

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{GameState, component_res::ComponentResExt};
+use crate::{component_res::ComponentResExt, state::GameState};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_resource_component::<GameSpeed>()

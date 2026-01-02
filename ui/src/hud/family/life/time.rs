@@ -7,9 +7,9 @@ use bevy::{
 };
 use bevy_enhanced_input::prelude::*;
 use simgine_core::{
-    FamilyMode,
     component_res::InsertComponentResExt,
     speed::{GameSpeed, Paused},
+    state::FamilyMode,
     time::{Clock, Weekday},
 };
 

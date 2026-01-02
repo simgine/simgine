@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::GameState;
+use crate::state::GameState;
 
 const HALF_CITY_SIZE: f32 = 250.0;
 

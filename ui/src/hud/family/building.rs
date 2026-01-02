@@ -1,7 +1,7 @@
 mod objects;
 
 use bevy::prelude::*;
-use simgine_core::{BuildingMode, FamilyMode};
+use simgine_core::state::{BuildingMode, FamilyMode};
 
 use crate::widget::{
     SCREEN_OFFSET,

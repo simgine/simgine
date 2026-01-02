@@ -6,9 +6,7 @@ use simgine_core::{BuildingMode, FamilyMode};
 use crate::widget::{
     SCREEN_OFFSET,
     button::{
-        icon::ButtonIcon,
-        style::ButtonStyle,
-        toggled::{Exclusive, Toggled},
+        exclusive_group::ExclusiveGroup, icon::ButtonIcon, style::ButtonStyle, toggled::Toggled,
     },
 };
 
@@ -33,6 +31,7 @@ fn spawn(mut commands: Commands) {
         children![
             (
                 Node::default(),
+                ExclusiveGroup::default(),
                 children![
                     (
                         ButtonIcon::new("base/ui/icons/objects_mode.png"),
@@ -64,5 +63,5 @@ fn set_mode(
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(Exclusive, ButtonStyle)]
+#[require(ButtonStyle, Toggled)]
 struct BuildingModeButton(BuildingMode);

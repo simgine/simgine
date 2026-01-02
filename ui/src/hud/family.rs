@@ -11,9 +11,10 @@ use crate::{
         SCREEN_OFFSET,
         button::{
             action::{Activate, ButtonContext},
+            exclusive_group::ExclusiveGroup,
             icon::ButtonIcon,
             style::ButtonStyle,
-            toggled::{Exclusive, Toggled},
+            toggled::Toggled,
         },
     },
 };
@@ -38,6 +39,7 @@ fn spawn(mut commands: Commands) {
             ..Default::default()
         },
         DespawnOnExit(GameState::InGame),
+        ExclusiveGroup::default(),
         children![
             (
                 ButtonIcon::new("base/ui/icons/life_mode.png"),
@@ -67,5 +69,5 @@ fn set_mode(
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ButtonContext, ButtonStyle, Exclusive)]
+#[require(ButtonContext, ButtonStyle, Toggled)]
 struct FamilyModeButton(FamilyMode);

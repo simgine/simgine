@@ -19,9 +19,10 @@ use crate::{
         SCREEN_OFFSET,
         button::{
             action::{Activate, ButtonContext},
+            exclusive_group::ExclusiveGroup,
             icon::ButtonIcon,
             style::ButtonStyle,
-            toggled::{Exclusive, Toggled},
+            toggled::Toggled,
         },
     },
 };
@@ -57,20 +58,26 @@ fn spawn(mut commands: Commands) {
                     children![
                         (PauseButton, button_bindings![KeyCode::Digit0]),
                         (
-                            ButtonIcon::new("base/ui/icons/normal_speed.png"),
-                            SpeedButton(GameSpeed::Normal),
-                            button_bindings![KeyCode::Digit1]
-                        ),
-                        (
-                            ButtonIcon::new("base/ui/icons/fast_speed.png"),
-                            SpeedButton(GameSpeed::Fast),
-                            button_bindings![KeyCode::Digit2]
-                        ),
-                        (
-                            ButtonIcon::new("base/ui/icons/ultra_speed.png"),
-                            SpeedButton(GameSpeed::Ultra),
-                            button_bindings![KeyCode::Digit3]
-                        ),
+                            Node::default(),
+                            ExclusiveGroup::default(),
+                            children![
+                                (
+                                    ButtonIcon::new("base/ui/icons/normal_speed.png"),
+                                    SpeedButton(GameSpeed::Normal),
+                                    button_bindings![KeyCode::Digit1]
+                                ),
+                                (
+                                    ButtonIcon::new("base/ui/icons/fast_speed.png"),
+                                    SpeedButton(GameSpeed::Fast),
+                                    button_bindings![KeyCode::Digit2]
+                                ),
+                                (
+                                    ButtonIcon::new("base/ui/icons/ultra_speed.png"),
+                                    SpeedButton(GameSpeed::Ultra),
+                                    button_bindings![KeyCode::Digit3]
+                                ),
+                            ]
+                        )
                     ],
                 ))
                 .insert(SpeedNode); // Workaround to react on insertion after hierarchy spawn.
@@ -179,5 +186,5 @@ struct SpeedNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ButtonContext, ButtonStyle, Exclusive)]
+#[require(ButtonContext, ButtonStyle, Toggled)]
 struct SpeedButton(GameSpeed);

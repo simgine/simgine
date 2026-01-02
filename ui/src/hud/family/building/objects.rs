@@ -7,9 +7,7 @@ use simgine_core::{
 use crate::{
     preview::Preview,
     widget::button::{
-        icon::ButtonIcon,
-        style::ButtonStyle,
-        toggled::{Exclusive, Toggled},
+        exclusive_group::ExclusiveGroup, icon::ButtonIcon, style::ButtonStyle, toggled::Toggled,
     },
 };
 
@@ -43,7 +41,6 @@ fn spawn_grid_buttons(
                 }),
                 ButtonStyle::default(),
                 Toggled(false),
-                Exclusive,
                 children![(
                     Preview(id),
                     Node {
@@ -76,6 +73,7 @@ pub(super) fn objects_node() -> impl Bundle {
         children![
             (
                 Node::default(),
+                ExclusiveGroup::default(),
                 children![
                     (
                         ButtonIcon::new("base/ui/icons/all_objects.png"),
@@ -89,6 +87,7 @@ pub(super) fn objects_node() -> impl Bundle {
                 ],
             ),
             (
+                ExclusiveGroup::default(),
                 ObjectsGrid,
                 Node {
                     display: Display::Grid,
@@ -107,7 +106,7 @@ struct ObjectsNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(Exclusive, ButtonStyle)]
+#[require(ButtonStyle, Toggled)]
 struct CategoryButton(CategoryFilter);
 
 impl<T: Into<CategoryFilter>> From<T> for CategoryButton {

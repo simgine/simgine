@@ -21,10 +21,8 @@ fn spawn(mut commands: Commands) {
 
     commands.spawn((
         Node {
-            position_type: PositionType::Absolute,
             flex_direction: FlexDirection::Column,
-            left: SCREEN_OFFSET,
-            top: SCREEN_OFFSET,
+            margin: UiRect::all(SCREEN_OFFSET),
             ..Default::default()
         },
         DespawnOnExit(FamilyMode::Building),

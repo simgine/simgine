@@ -31,26 +31,24 @@ fn spawn(mut commands: Commands) {
 
     commands.spawn((
         Node {
-            position_type: PositionType::Absolute,
-            flex_direction: FlexDirection::RowReverse,
-            right: SCREEN_OFFSET,
-            top: SCREEN_OFFSET,
-            height: px(50.0),
+            justify_self: JustifySelf::End,
+            align_items: AlignItems::FlexStart,
+            margin: UiRect::all(SCREEN_OFFSET),
             ..Default::default()
         },
         DespawnOnExit(GameState::InGame),
         ExclusiveGroup::default(),
         children![
             (
-                ButtonIcon::new("base/ui/icons/life_mode.png"),
-                FamilyModeButton(FamilyMode::Building),
-                button_bindings![KeyCode::F2]
-            ),
-            (
                 ButtonIcon::new("base/ui/icons/building_mode.png"),
                 Toggled(true),
                 FamilyModeButton(FamilyMode::Life),
                 button_bindings![KeyCode::F1],
+            ),
+            (
+                ButtonIcon::new("base/ui/icons/life_mode.png"),
+                FamilyModeButton(FamilyMode::Building),
+                button_bindings![KeyCode::F2]
             ),
         ],
     ));

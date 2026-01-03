@@ -58,12 +58,12 @@ fn spawn(mut commands: Commands) {
 
 fn set_mode(
     activate: On<Fire<Activate>>,
-    mut family_mode: ResMut<NextState<FamilyMode>>,
+    mut commands: Commands,
     buttons: Query<&FamilyModeButton>,
 ) {
     if let Ok(&mode) = buttons.get(activate.context) {
         info!("changing family mode to `{:?}`", *mode);
-        family_mode.as_mut().set_if_neq(*mode);
+        commands.set_state_if_neq(*mode);
     }
 }
 

@@ -51,13 +51,13 @@ fn spawn(mut commands: Commands) {
 
 fn set_mode(
     mut click: On<Pointer<Click>>,
-    mut building_mode: ResMut<NextState<BuildingMode>>,
+    mut commands: Commands,
     buttons: Query<&BuildingModeButton>,
 ) {
     if let Ok(&mode) = buttons.get(click.entity) {
         info!("changing building mode to `{:?}`", *mode);
         click.propagate(false);
-        building_mode.as_mut().set_if_neq(*mode);
+        commands.set_state_if_neq(*mode);
     }
 }
 

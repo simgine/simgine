@@ -1,6 +1,7 @@
 pub mod asset_manifest;
 mod city;
 pub mod component_res;
+pub mod error_event;
 pub mod game_paths;
 mod player_camera;
 mod sky;

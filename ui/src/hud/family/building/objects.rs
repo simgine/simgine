@@ -6,8 +6,14 @@ use simgine_core::{
 
 use crate::{
     preview::Preview,
-    widget::button::{
-        exclusive_group::ExclusiveGroup, icon::ButtonIcon, style::ButtonStyle, toggled::Toggled,
+    widget::{
+        button::{
+            exclusive_group::ExclusiveGroup, icon::ButtonIcon, style::ButtonStyle, toggled::Toggled,
+        },
+        theme::{
+            INNER_RADIUS, OUTER_RADIUS, PREVIEW_COLUMNS, PREVIEW_GAP, PREVIEW_HEIGHT,
+            PREVIEW_PADDING, PREVIEW_WIDTH, SHADOW,
+        },
     },
 };
 
@@ -28,25 +34,19 @@ fn spawn_grid_buttons(
         for (id, _) in objects.iter() {
             parent.spawn((
                 Node {
-                    padding: UiRect::all(px(5)),
-                    border_radius: BorderRadius::all(px(13)),
+                    padding: PREVIEW_PADDING,
+                    border_radius: OUTER_RADIUS,
                     ..Default::default()
                 },
-                BoxShadow::from(ShadowStyle {
-                    color: Color::BLACK.with_alpha(0.5),
-                    blur_radius: px(2),
-                    x_offset: px(5),
-                    y_offset: px(5),
-                    ..Default::default()
-                }),
+                BoxShadow::from(SHADOW),
                 ButtonStyle::default(),
                 Toggled(false),
                 children![(
                     Preview(id),
                     Node {
-                        height: px(128),
-                        width: px(98),
-                        border_radius: BorderRadius::all(px(8)),
+                        height: PREVIEW_HEIGHT,
+                        width: PREVIEW_WIDTH,
+                        border_radius: INNER_RADIUS,
                         ..Default::default()
                     },
                 )],
@@ -91,9 +91,9 @@ pub(super) fn objects_node() -> impl Bundle {
                 ObjectsGrid,
                 Node {
                     display: Display::Grid,
-                    column_gap: px(8),
-                    row_gap: px(8),
-                    grid_template_columns: vec![GridTrack::auto(); 3],
+                    column_gap: PREVIEW_GAP,
+                    row_gap: PREVIEW_GAP,
+                    grid_template_columns: vec![GridTrack::auto(); PREVIEW_COLUMNS],
                     ..Default::default()
                 },
             )

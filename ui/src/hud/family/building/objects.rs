@@ -12,7 +12,7 @@ use crate::{
         },
         theme::{
             INNER_RADIUS, OUTER_RADIUS, PREVIEW_COLUMNS, PREVIEW_GAP, PREVIEW_HEIGHT,
-            PREVIEW_PADDING, PREVIEW_WIDTH, SHADOW,
+            PREVIEW_WIDTH, RADIUS_GAP, SHADOW,
         },
     },
 };
@@ -34,7 +34,7 @@ fn spawn_grid_buttons(
         for (id, _) in objects.iter() {
             parent.spawn((
                 Node {
-                    padding: PREVIEW_PADDING,
+                    padding: RADIUS_GAP,
                     border_radius: OUTER_RADIUS,
                     ..Default::default()
                 },

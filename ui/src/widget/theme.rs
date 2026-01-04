@@ -18,7 +18,7 @@ pub(crate) const SHADOW: ShadowStyle = ShadowStyle {
 
 pub(crate) const PREVIEW_HEIGHT: Val = Val::Px(128.0);
 pub(crate) const PREVIEW_WIDTH: Val = Val::Px(98.0);
-pub(crate) const PREVIEW_GAP: Val = Val::Px(5.0);
+pub(crate) const PREVIEW_GAP: Val = Val::Px(8.0);
 pub(crate) const PREVIEW_COLUMNS: usize = 3;
 pub(crate) const PREVIEW_PADDING: UiRect = UiRect::all(Val::Px(5.0)); // For previews border simulated by outer node because `ImageNode` draws over borders.
 

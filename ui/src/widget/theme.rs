@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-pub(crate) const SCREEN_OFFSET: Val = PADDING;
+pub(crate) const SCREEN_OFFSET: UiRect = UiRect::all(PADDING);
 pub(crate) const PADDING: Val = Val::Px(16.0);
 pub(crate) const GAP: Val = Val::Px(14.0);
 pub(crate) const SHADOW: ShadowStyle = ShadowStyle {

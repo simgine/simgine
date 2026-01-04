@@ -22,7 +22,7 @@ fn spawn(mut commands: Commands) {
     commands.spawn((
         Node {
             flex_direction: FlexDirection::Column,
-            margin: UiRect::all(SCREEN_OFFSET),
+            margin: SCREEN_OFFSET,
             ..Default::default()
         },
         DespawnOnExit(FamilyMode::Building),

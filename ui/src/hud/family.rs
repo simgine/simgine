@@ -33,7 +33,7 @@ fn spawn(mut commands: Commands) {
         Node {
             justify_self: JustifySelf::End,
             align_items: AlignItems::FlexStart,
-            margin: UiRect::all(SCREEN_OFFSET),
+            margin: SCREEN_OFFSET,
             ..Default::default()
         },
         DespawnOnExit(GameState::InGame),

@@ -8,7 +8,7 @@ use simgine_core::state::{FamilyMode, GameState};
 use crate::{
     button_bindings,
     widget::{
-        SCREEN_OFFSET,
+        theme::SCREEN_OFFSET,
         button::{
             action::{Activate, ButtonContext},
             exclusive_group::ExclusiveGroup,

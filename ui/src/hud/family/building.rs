@@ -4,10 +4,10 @@ use bevy::prelude::*;
 use simgine_core::state::{BuildingMode, FamilyMode};
 
 use crate::widget::{
-    SCREEN_OFFSET,
     button::{
         exclusive_group::ExclusiveGroup, icon::ButtonIcon, style::ButtonStyle, toggled::Toggled,
     },
+    theme::SCREEN_OFFSET,
 };
 
 pub(super) fn plugin(app: &mut App) {

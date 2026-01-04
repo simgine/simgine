@@ -16,7 +16,7 @@ use simgine_core::{
 use crate::{
     button_bindings,
     widget::{
-        SCREEN_OFFSET,
+        theme::SCREEN_OFFSET,
         button::{
             action::{Activate, ButtonContext},
             exclusive_group::ExclusiveGroup,

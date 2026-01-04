@@ -1,5 +1,5 @@
 use bevy::{
-    color::palettes::tailwind::{BLUE_50, BLUE_400, BLUE_500},
+    color::palettes::tailwind::{BLUE_400, BLUE_500, NEUTRAL_200},
     prelude::*,
     ui::UiSystems,
 };
@@ -17,17 +17,20 @@ fn update_style(
             &Interaction,
             &ButtonStyle,
             &mut BackgroundColor,
+            Option<&mut TextColor>,
             Option<&mut ImageNode>,
             Option<&Toggled>,
         ),
         Or<(Changed<Interaction>, Changed<Toggled>)>,
     >,
 ) {
-    for (entity, interaction, style, mut background, node, toggled) in &mut buttons {
+    for (entity, interaction, style, mut background, text_color, node, toggled) in &mut buttons {
         trace!("changing style for `{entity}` based on `{interaction:?}` and `{toggled:?}`");
         let color = style.get_color(interaction, toggled);
         if let Some(mut node) = node {
             node.color = color
+        } else if let Some(mut text_color) = text_color {
+            *text_color = color.into();
         } else {
             *background = color.into();
         }
@@ -60,7 +63,7 @@ impl Default for ButtonStyle {
         Self {
             hovered_pressed: BLUE_400.into(),
             pressed: BLUE_500.into(),
-            hovered: BLUE_50.into(),
+            hovered: NEUTRAL_200.into(),
             none: Color::WHITE,
         }
     }

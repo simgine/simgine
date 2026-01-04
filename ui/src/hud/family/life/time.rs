@@ -23,7 +23,7 @@ use crate::{
             style::ButtonStyle,
             toggled::Toggled,
         },
-        theme::SCREEN_OFFSET,
+        theme::{LARGE_TEXT, SCREEN_OFFSET, SMALL_TEXT},
     },
 };
 
@@ -152,17 +152,11 @@ fn update_speed_button(
 }
 
 #[derive(Component)]
-#[require(
-    Text,
-    TextFont { font_size: 20.0, ..Default::default() },
-)]
+#[require(Text, TextFont::from_font_size(SMALL_TEXT))]
 struct WeekdayLabel;
 
 #[derive(Component)]
-#[require(
-    Text,
-    TextFont { font_size: 28.0, ..Default::default() },
-)]
+#[require(Text, TextFont::from_font_size(LARGE_TEXT))]
 struct ClockLabel;
 
 #[derive(Component)]

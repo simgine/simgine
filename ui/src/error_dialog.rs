@@ -13,9 +13,9 @@ fn spawn(error: On<ErrorEvent>, mut commands: Commands) {
         Dialog,
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             let dialog = parent.target_entity();
-            parent.spawn((Text::new("Error"), DialogTitle));
+            parent.spawn((DialogTitle, Text::new("Error")));
             parent.spawn(Text::new(message));
-            parent.spawn((Text::new("Ok"), DialogButton)).observe(
+            parent.spawn((DialogButton, Text::new("Ok"))).observe(
                 move |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.entity(dialog).despawn();
                 },

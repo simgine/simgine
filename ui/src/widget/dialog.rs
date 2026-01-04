@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
+use crate::widget::theme::LARGE_TEXT;
+
 use super::{
     button::style::ButtonStyle,
-    theme::{GAP, OUTER_RADIUS, PADDING},
+    theme::{GAP, NORMAL_TEXT, OUTER_RADIUS, PADDING},
 };
 
 #[derive(Component)]
@@ -28,19 +30,10 @@ pub(crate) struct Dialog;
         align_self: AlignSelf::Start,
         ..Default::default()
     },
-    TextFont {
-        font_size: 26.0,
-        ..Default::default()
-    },
+    TextFont::from_font_size(LARGE_TEXT),
 )]
 pub(crate) struct DialogTitle;
 
 #[derive(Component)]
-#[require(
-    ButtonStyle::default(),
-    TextFont {
-        font_size: 24.0,
-        ..Default::default()
-    },
-)]
+#[require(ButtonStyle::default(), TextFont::from_font_size(NORMAL_TEXT))]
 pub(crate) struct DialogButton;

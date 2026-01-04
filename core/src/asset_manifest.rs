@@ -30,7 +30,7 @@ fn wait_for_loading(
         .all(|handle| asset_server.is_loaded(handle))
     {
         info!("finished loading asset manifests");
-        commands.set_state(GameState::InGame);
+        commands.set_state(GameState::Menu);
     }
 }
 

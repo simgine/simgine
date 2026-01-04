@@ -1,5 +1,6 @@
 mod error_dialog;
 mod hud;
+mod menu;
 mod preview;
 mod widget;
 
@@ -12,6 +13,7 @@ impl Plugin for SimgineUiPlugin {
         app.add_plugins((
             error_dialog::plugin,
             hud::plugin,
+            menu::plugin,
             preview::plugin,
             widget::plugin,
         ));

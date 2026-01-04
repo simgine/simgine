@@ -1,5 +1,5 @@
 use bevy::{
-    color::palettes::tailwind::{BLUE_400, BLUE_500, NEUTRAL_200},
+    color::palettes::tailwind::{BLUE_400, BLUE_500, NEUTRAL_200, NEUTRAL_600},
     prelude::*,
     ui::UiSystems,
 };
@@ -47,6 +47,21 @@ pub(crate) struct ButtonStyle {
 }
 
 impl ButtonStyle {
+    pub(crate) const WHITE: ButtonStyle = ButtonStyle {
+        hovered_pressed: Color::Srgba(BLUE_400),
+        pressed: Color::Srgba(BLUE_500),
+        hovered: Color::Srgba(NEUTRAL_200),
+        none: Color::WHITE,
+    };
+
+    pub(crate) const BLACK: ButtonStyle = ButtonStyle {
+        hovered: Color::Srgba(NEUTRAL_600),
+        none: Color::BLACK,
+        ..Self::WHITE
+    };
+}
+
+impl ButtonStyle {
     fn get_color(&self, interaction: &Interaction, toggled: Option<&Toggled>) -> Color {
         let toggled = toggled.map(|toggled| toggled.0).unwrap_or_default();
         match (interaction, toggled) {
@@ -60,11 +75,6 @@ impl ButtonStyle {
 
 impl Default for ButtonStyle {
     fn default() -> Self {
-        Self {
-            hovered_pressed: BLUE_400.into(),
-            pressed: BLUE_500.into(),
-            hovered: NEUTRAL_200.into(),
-            none: Color::WHITE,
-        }
+        Self::WHITE
     }
 }

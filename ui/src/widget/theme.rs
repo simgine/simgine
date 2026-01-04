@@ -24,3 +24,4 @@ pub(crate) const PREVIEW_COLUMNS: usize = 3;
 pub(crate) const SMALL_TEXT: f32 = 20.0;
 pub(crate) const NORMAL_TEXT: f32 = 24.0;
 pub(crate) const LARGE_TEXT: f32 = 28.0;
+pub(crate) const HUGE_TEXT: f32 = 32.0;

@@ -41,5 +41,5 @@ fn spawn(mut commands: Commands) {
 }
 
 #[derive(Component)]
-#[require(TextFont::from_font_size(HUGE_TEXT), ButtonStyle)]
+#[require(ButtonStyle, TextFont::from_font_size(HUGE_TEXT))]
 struct MainMenuButton;

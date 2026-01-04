@@ -28,6 +28,10 @@ fn spawn(mut commands: Commands) {
         DespawnOnExit(MenuState::WorldBrowser),
         children![
             (
+                Node {
+                    align_self: AlignSelf::Center,
+                    ..Default::default()
+                },
                 Text::new("World browser"),
                 TextFont::from_font_size(HUGE_TEXT),
             ),

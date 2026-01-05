@@ -24,6 +24,33 @@ impl GamePaths {
         path
     }
 
+    /// Returns iterator over world names and their paths.
+    pub fn iter_worlds(&self) -> Result<impl Iterator<Item = (String, PathBuf)>> {
+        let entries = self
+            .worlds
+            .read_dir()
+            .map_err(|e| format!("unable to read {:?}: {e}", self.worlds))?;
+
+        let iter = entries.filter_map(Result::ok).filter_map(|entry| {
+            let file_type = entry.file_type().ok()?;
+            if !file_type.is_file() {
+                return None;
+            }
+
+            let path = entry.path();
+            let extension = path.extension()?;
+            if extension != WORLD_EXTENSION {
+                return None;
+            }
+
+            let name = path.file_stem()?.to_str()?.to_string();
+
+            Some((name, path))
+        });
+
+        Ok(iter)
+    }
+
     pub fn world_names(&self) -> Result<Vec<String>> {
         let entries = self
             .worlds

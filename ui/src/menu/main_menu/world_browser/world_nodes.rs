@@ -1,3 +1,5 @@
+use std::{fs, path::PathBuf};
+
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use simgine_core::{error_event::error_event, game_paths::GamePaths, state::GameState};
 
@@ -15,10 +17,10 @@ fn spawn_world_nodes(
     mut commands: Commands,
     game_paths: Res<GamePaths>,
 ) -> Result<()> {
-    let world_names = game_paths.world_names()?;
+    let worlds_iter = game_paths.iter_worlds()?;
 
     commands.entity(insert.entity).with_children(|parent| {
-        for name in world_names {
+        for (name, path) in worlds_iter {
             parent.spawn((
                 Node {
                     padding: RADIUS_GAP,
@@ -26,6 +28,7 @@ fn spawn_world_nodes(
                     column_gap: GAP,
                     ..Default::default()
                 },
+                WorldNode { path },
                 BackgroundColor(Color::WHITE),
                 BoxShadow::from(SHADOW),
                 children![
@@ -61,13 +64,33 @@ fn spawn_world_nodes(
                                 },
                             );
                             parent.spawn((WorldButton, Text::new("Host")));
-                            parent.spawn((WorldButton, Text::new("Delete")));
+                            parent
+                                .spawn((WorldButton, Text::new("Delete")))
+                                .observe(delete_world.pipe(error_event));
                         })),
                     )
                 ],
             ));
         }
     });
+
+    Ok(())
+}
+
+fn delete_world(
+    click: On<Pointer<Click>>,
+    mut commands: Commands,
+    buttons: Query<&ChildOf>,
+    nodes: Query<(Entity, &WorldNode)>,
+) -> Result<()> {
+    let (entity, node) = nodes
+        .iter_many(buttons.iter_ancestors(click.entity))
+        .next()
+        .expect("world buttons should have ancestors");
+
+    info!("removing {:?}", node.path);
+    commands.entity(entity).despawn();
+    fs::remove_file(&node.path)?;
 
     Ok(())
 }
@@ -92,3 +115,8 @@ pub(super) struct WorldNodes;
     ButtonStyle::BLACK
 )]
 struct WorldButton;
+
+#[derive(Component)]
+struct WorldNode {
+    path: PathBuf,
+}

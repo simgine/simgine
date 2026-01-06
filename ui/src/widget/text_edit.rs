@@ -1,15 +1,14 @@
-use bevy::{input_focus::InputFocus, prelude::*};
-use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputSystem, TextInputTextFont};
+use bevy::{input_focus::InputFocus, prelude::*, ui::UiSystems};
+use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputTextFont};
 
-use crate::widget::theme::{ACTIVE, INACTIVE, NORMAL_TEXT, OUTER_RADIUS, RADIUS_GAP};
+use crate::widget::theme::{
+    ACTIVE, HOWERED, HOWERED_ACTIVE, INACTIVE, NORMAL_TEXT, OUTER_RADIUS, RADIUS_GAP,
+};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(update_focus).add_systems(
-        Update,
-        update_style
-            .before(TextInputSystem)
-            .run_if(resource_changed::<InputFocus>),
-    );
+    app.add_observer(activate)
+        .add_observer(update_focus)
+        .add_systems(PreUpdate, update_style.after(UiSystems::Focus));
 }
 
 #[derive(Component)]
@@ -28,31 +27,54 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) struct TextEdit;
 
 fn update_style(
-    focus: Res<InputFocus>,
-    mut text_inputs: Query<(Entity, &mut TextInputInactive, &mut BorderColor)>,
+    mut text_edits: Query<
+        (&Interaction, &TextInputInactive, &mut BorderColor),
+        Or<(Changed<Interaction>, Changed<TextInputInactive>)>,
+    >,
 ) {
-    for (entity, mut inactive, mut border_color) in &mut text_inputs {
-        if focus.0 == Some(entity) {
-            inactive.0 = false;
-            *border_color = ACTIVE.into();
-        } else {
-            inactive.0 = true;
-            *border_color = INACTIVE.into();
-        }
+    for (interaction, inactive, mut border_color) in &mut text_edits {
+        *border_color = match (interaction, inactive.0) {
+            (Interaction::Pressed, _) | (Interaction::None, false) => ACTIVE.into(),
+            (Interaction::Hovered, false) => HOWERED_ACTIVE.into(),
+            (Interaction::Hovered, true) => HOWERED.into(),
+            (Interaction::None, true) => INACTIVE.into(),
+        };
+    }
+}
+
+fn activate(
+    mut trigger: On<Pointer<Click>>,
+    mut commands: Commands,
+    text_edits: Query<&TextInputInactive>,
+) {
+    let Ok(inactive) = text_edits.get(trigger.entity) else {
+        return;
+    };
+
+    trigger.propagate(false);
+    if inactive.0 {
+        commands
+            .entity(trigger.entity)
+            .insert(TextInputInactive(false));
     }
 }
 
 fn update_focus(
-    mut trigger: On<Pointer<Click>>,
+    trigger: On<Insert, TextInputInactive>,
     mut focus: ResMut<InputFocus>,
-    text_edits: Query<(), With<TextEdit>>,
+    mut text_edits: Query<&mut TextInputInactive>,
 ) {
-    if text_edits.get(trigger.entity).is_ok() {
-        trigger.propagate(false);
-        if focus.get().is_none_or(|e| e != trigger.entity) {
-            focus.set(trigger.entity);
-        }
-    } else if focus.get().is_some() {
-        focus.set(trigger.entity);
+    let inactive = text_edits.get(trigger.entity).unwrap();
+    if inactive.0 {
+        return;
     }
+
+    if let Some(previous) = focus.get()
+        && let Ok(mut inactive) = text_edits.get_mut(previous)
+    {
+        inactive.0 = true;
+    }
+
+    debug!("activating `{}`", trigger.entity);
+    focus.set(trigger.entity);
 }

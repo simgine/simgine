@@ -21,6 +21,7 @@ bevy_replicon = "0.38.0-rc.1"
 bevy_replicon_renet = { git = "https://github.com/simgine/bevy_replicon_renet", branch = "bevy-0.18" }
 simgine_core = { path = "core" }
 simgine_ui = { path = "ui" }
+clap = { version = "4.5", features = ["derive"] }
 ron = "0.12"
 serde = "1.0"
 walkdir = "2.5"

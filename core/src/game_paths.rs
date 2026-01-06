@@ -15,8 +15,14 @@ pub struct GamePaths {
 }
 
 impl GamePaths {
-    /// Returns iterator over world files.
-    pub fn iter_worlds(&self) -> Result<impl Iterator<Item = PathBuf>> {
+    pub(crate) fn world_path(&self, name: &str) -> PathBuf {
+        let mut path = self.worlds.join(name);
+        path.set_extension(WORLD_EXTENSION);
+        path
+    }
+
+    /// Returns iterator over world names.
+    pub fn iter_worlds(&self) -> Result<impl Iterator<Item = String>> {
         let entries = self
             .worlds
             .read_dir()
@@ -34,7 +40,9 @@ impl GamePaths {
                 return None;
             }
 
-            Some(path)
+            let name = path.file_stem()?.to_str()?.to_string();
+
+            Some(name)
         });
 
         Ok(iter)

@@ -1,7 +1,9 @@
-use std::{ffi::OsStr, fs, path::PathBuf};
-
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use simgine_core::{error_event::trigger_error, game_paths::GamePaths, world::LoadWorld};
+use simgine_core::{
+    error_event::trigger_error,
+    game_paths::GamePaths,
+    world::{LoadWorld, RemoveWorld},
+};
 
 use crate::widget::{
     button::style::ButtonStyle,
@@ -20,13 +22,7 @@ fn spawn_world_nodes(
     let worlds_iter = game_paths.iter_worlds()?;
 
     commands.entity(insert.entity).with_children(|parent| {
-        for world_path in worlds_iter {
-            let name = world_path
-                .file_stem()
-                .and_then(OsStr::to_str)
-                .unwrap_or("New world")
-                .to_string();
-
+        for name in worlds_iter {
             parent.spawn((
                 Node {
                     padding: RADIUS_GAP,
@@ -34,13 +30,10 @@ fn spawn_world_nodes(
                     column_gap: GAP,
                     ..Default::default()
                 },
-                WorldNode {
-                    path: world_path.clone(),
-                },
                 BackgroundColor(Color::WHITE),
                 BoxShadow::from(SHADOW),
-                children![
-                    (
+                Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                    parent.spawn((
                         BackgroundColor(Color::BLACK),
                         Node {
                             width: px(150),
@@ -48,58 +41,52 @@ fn spawn_world_nodes(
                             border_radius: INNER_RADIUS,
                             ..Default::default()
                         },
-                    ),
-                    (
-                        Text::new(name),
-                        TextFont::from_font_size(SMALL_TEXT),
-                        TextColor(Color::BLACK),
-                        Node {
-                            justify_self: JustifySelf::Center,
-                            width: px(128),
-                            ..Default::default()
-                        },
-                    ),
-                    (
+                    ));
+                    let label = parent
+                        .spawn((
+                            Text::new(name),
+                            TextFont::from_font_size(SMALL_TEXT),
+                            TextColor(Color::BLACK),
+                            Node {
+                                justify_self: JustifySelf::Center,
+                                width: px(128),
+                                ..Default::default()
+                            },
+                        ))
+                        .id();
+                    parent.spawn((
                         Node {
                             align_self: AlignSelf::Center,
                             flex_direction: FlexDirection::Column,
                             ..Default::default()
                         },
-                        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                        Children::spawn(SpawnWith(move |parent: &mut RelatedSpawner<_>| {
                             parent.spawn((WorldButton, Text::new("Play"))).observe(
-                                move |_on: On<Pointer<Click>>, mut commands: Commands| {
+                                move |_on: On<Pointer<Click>>,
+                                      mut commands: Commands,
+                                      labels: Query<&Text>| {
+                                    let text = labels.get(label).unwrap();
                                     commands.trigger(LoadWorld {
-                                        path: world_path.clone(),
+                                        name: text.to_string(),
                                     });
                                 },
                             );
-                            parent
-                                .spawn((WorldButton, Text::new("Delete")))
-                                .observe(delete_world.pipe(trigger_error));
+                            parent.spawn((WorldButton, Text::new("Delete"))).observe(
+                                move |_on: On<Pointer<Click>>,
+                                      mut commands: Commands,
+                                      labels: Query<&Text>| {
+                                    let text = labels.get(label).unwrap();
+                                    commands.trigger(RemoveWorld {
+                                        name: text.to_string(),
+                                    });
+                                },
+                            );
                         })),
-                    )
-                ],
+                    ));
+                })),
             ));
         }
     });
-
-    Ok(())
-}
-
-fn delete_world(
-    click: On<Pointer<Click>>,
-    mut commands: Commands,
-    buttons: Query<&ChildOf>,
-    nodes: Query<(Entity, &WorldNode)>,
-) -> Result<()> {
-    let (entity, node) = nodes
-        .iter_many(buttons.iter_ancestors(click.entity))
-        .next()
-        .expect("world buttons should have ancestors");
-
-    info!("removing {:?}", node.path);
-    commands.entity(entity).despawn();
-    fs::remove_file(&node.path)?;
 
     Ok(())
 }
@@ -124,8 +111,3 @@ pub(super) struct WorldNodes;
     ButtonStyle::BLACK
 )]
 struct WorldButton;
-
-#[derive(Component)]
-struct WorldNode {
-    path: PathBuf,
-}

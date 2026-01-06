@@ -18,6 +18,8 @@ bevy = { workspace = true, features = [
   "bevy_log",
 ] }
 bevy_enhanced_input.workspace = true
+bevy_replicon.workspace = true
+bevy_replicon_renet.workspace = true
 ron.workspace = true
 serde.workspace = true
 walkdir.workspace = true

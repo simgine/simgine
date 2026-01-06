@@ -1,0 +1,93 @@
+use std::{
+    net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket},
+    time::SystemTime,
+};
+
+use bevy::prelude::*;
+use bevy_replicon::prelude::*;
+use bevy_replicon_renet::{
+    RenetChannelsExt, RenetClient, RenetServer,
+    netcode::{
+        ClientAuthentication, NetcodeClientTransport, NetcodeServerTransport, ServerAuthentication,
+        ServerConfig,
+    },
+    renet::ConnectionConfig,
+};
+
+use crate::error_event::error_event;
+
+pub(super) fn plugin(app: &mut App) {
+    app.add_observer(host.pipe(error_event))
+        .add_observer(connect.pipe(error_event));
+}
+
+const PROTOCOL_ID: u64 = 8;
+
+fn host(host: On<Host>, mut commands: Commands, channels: Res<RepliconChannels>) -> Result<()> {
+    info!("hosting on port {}", host.port);
+
+    let current_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
+    let public_addr = SocketAddr::new(Ipv4Addr::LOCALHOST.into(), host.port);
+    let socket = UdpSocket::bind(public_addr)?;
+    let server_config = ServerConfig {
+        current_time,
+        max_clients: 1,
+        protocol_id: PROTOCOL_ID,
+        authentication: ServerAuthentication::Unsecure,
+        public_addresses: vec![public_addr],
+    };
+    let transport = NetcodeServerTransport::new(server_config, socket)?;
+
+    let server = RenetServer::new(ConnectionConfig {
+        server_channels_config: channels.server_configs(),
+        client_channels_config: channels.client_configs(),
+        ..Default::default()
+    });
+
+    commands.insert_resource(transport);
+    commands.insert_resource(server);
+
+    Ok(())
+}
+
+fn connect(
+    connect: On<Connect>,
+    mut commands: Commands,
+    channels: Res<RepliconChannels>,
+) -> Result<()> {
+    info!("connecting to {}:{}", connect.ip, connect.port);
+
+    let current_time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
+    let client_id = current_time.as_millis() as u64;
+    let server_addr = SocketAddr::new(connect.ip, connect.port);
+    let socket = UdpSocket::bind((connect.ip, 0))?;
+    let authentication = ClientAuthentication::Unsecure {
+        client_id,
+        protocol_id: PROTOCOL_ID,
+        server_addr,
+        user_data: None,
+    };
+    let transport = NetcodeClientTransport::new(current_time, authentication, socket)?;
+
+    let client = RenetClient::new(ConnectionConfig {
+        server_channels_config: channels.server_configs(),
+        client_channels_config: channels.client_configs(),
+        ..Default::default()
+    });
+
+    commands.insert_resource(transport);
+    commands.insert_resource(client);
+
+    Ok(())
+}
+
+#[derive(Event)]
+pub struct Host {
+    pub port: u16,
+}
+
+#[derive(Event)]
+pub struct Connect {
+    pub ip: IpAddr,
+    pub port: u16,
+}

@@ -3,6 +3,7 @@ mod city;
 pub mod component_res;
 pub mod error_event;
 pub mod game_paths;
+pub mod network;
 mod player_camera;
 mod sky;
 pub mod speed;
@@ -22,6 +23,7 @@ impl Plugin for SimgineCorePlugin {
             time::plugin,
             component_res::plugin,
             game_paths::plugin,
+            network::plugin,
             player_camera::plugin,
             sky::plugin,
             speed::plugin,

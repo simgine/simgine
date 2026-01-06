@@ -17,6 +17,8 @@ publish = false
 bevy = { version = "0.18.0-rc.1", default-features = false }
 bevy_enhanced_input = { git = "https://github.com/simgine/bevy_enhanced_input", branch = "time-kind-default" }
 bevy_simple_text_input = { git = "https://github.com/simgine/bevy_simple_text_input", branch = "bevy-0.18" }
+bevy_replicon = "0.38.0-rc.1"
+bevy_replicon_renet = { git = "https://github.com/simgine/bevy_replicon_renet", branch = "bevy-0.18" }
 simgine_core = { path = "core" }
 simgine_ui = { path = "ui" }
 ron = "0.12"

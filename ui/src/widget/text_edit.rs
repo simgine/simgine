@@ -1,11 +1,7 @@
-use bevy::{
-    color::palettes::tailwind::{BLUE_500, NEUTRAL_600},
-    input_focus::InputFocus,
-    prelude::*,
-};
+use bevy::{input_focus::InputFocus, prelude::*};
 use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputSystem, TextInputTextFont};
 
-use crate::widget::theme::{NORMAL_TEXT, OUTER_RADIUS, RADIUS_GAP};
+use crate::widget::theme::{ACTIVE, INACTIVE, NORMAL_TEXT, OUTER_RADIUS, RADIUS_GAP};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(update_focus).add_systems(
@@ -38,10 +34,10 @@ fn update_style(
     for (entity, mut inactive, mut border_color) in &mut text_inputs {
         if focus.0 == Some(entity) {
             inactive.0 = false;
-            *border_color = BLUE_500.into();
+            *border_color = ACTIVE.into();
         } else {
             inactive.0 = true;
-            *border_color = NEUTRAL_600.into();
+            *border_color = INACTIVE.into();
         }
     }
 }

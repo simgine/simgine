@@ -1,8 +1,6 @@
-use bevy::{
-    color::palettes::tailwind::{BLUE_400, BLUE_500, NEUTRAL_200, NEUTRAL_600},
-    prelude::*,
-    ui::UiSystems,
-};
+use bevy::{prelude::*, ui::UiSystems};
+
+use crate::widget::theme::{ACTIVE, HOWERED, HOWERED_ACTIVE, HOWERED_BLACK};
 
 use super::toggled::Toggled;
 
@@ -48,14 +46,14 @@ pub(crate) struct ButtonStyle {
 
 impl ButtonStyle {
     pub(crate) const WHITE: ButtonStyle = ButtonStyle {
-        hovered_pressed: Color::Srgba(BLUE_400),
-        pressed: Color::Srgba(BLUE_500),
-        hovered: Color::Srgba(NEUTRAL_200),
+        hovered_pressed: Color::Srgba(HOWERED_ACTIVE),
+        pressed: Color::Srgba(ACTIVE),
+        hovered: Color::Srgba(HOWERED),
         none: Color::WHITE,
     };
 
     pub(crate) const BLACK: ButtonStyle = ButtonStyle {
-        hovered: Color::Srgba(NEUTRAL_600),
+        hovered: Color::Srgba(HOWERED_BLACK),
         none: Color::BLACK,
         ..Self::WHITE
     };

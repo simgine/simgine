@@ -1,4 +1,13 @@
-use bevy::prelude::*;
+use bevy::{
+    color::palettes::tailwind::{BLUE_400, BLUE_500, NEUTRAL_200, NEUTRAL_600},
+    prelude::*,
+};
+
+pub(crate) const ACTIVE: Srgba = BLUE_500;
+pub(crate) const HOWERED_ACTIVE: Srgba = BLUE_400;
+pub(crate) const HOWERED: Srgba = NEUTRAL_200;
+pub(crate) const HOWERED_BLACK: Srgba = NEUTRAL_600;
+pub(crate) const INACTIVE: Srgba = NEUTRAL_600;
 
 pub(crate) const SCREEN_OFFSET: UiRect = UiRect::all(PADDING);
 pub(crate) const PADDING: Val = Val::Px(16.0);

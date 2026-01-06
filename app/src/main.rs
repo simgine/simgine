@@ -1,5 +1,6 @@
-use bevy::{prelude::*, render::RenderPlugin};
+use bevy::{input_focus::InputDispatchPlugin, prelude::*, render::RenderPlugin};
 use bevy_enhanced_input::EnhancedInputPlugin;
+use bevy_simple_text_input::TextInputPlugin;
 use simgine_core::SimgineCorePlugin;
 use simgine_ui::SimgineUiPlugin;
 
@@ -19,6 +20,8 @@ fn main() {
                 ..Default::default()
             }),
         EnhancedInputPlugin,
+        InputDispatchPlugin,
+        TextInputPlugin,
         SimgineCorePlugin,
         SimgineUiPlugin,
     ));

@@ -1,7 +1,7 @@
 use std::{fs, path::PathBuf};
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use simgine_core::{error_event::error_event, game_paths::GamePaths, state::GameState};
+use simgine_core::{error_event::trigger_error, game_paths::GamePaths, state::GameState};
 
 use crate::widget::{
     button::style::ButtonStyle,
@@ -9,7 +9,7 @@ use crate::widget::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(spawn_world_nodes.pipe(error_event));
+    app.add_observer(spawn_world_nodes.pipe(trigger_error));
 }
 
 fn spawn_world_nodes(
@@ -66,7 +66,7 @@ fn spawn_world_nodes(
                             parent.spawn((WorldButton, Text::new("Host")));
                             parent
                                 .spawn((WorldButton, Text::new("Delete")))
-                                .observe(delete_world.pipe(error_event));
+                                .observe(delete_world.pipe(trigger_error));
                         })),
                     )
                 ],

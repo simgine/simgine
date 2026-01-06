@@ -14,11 +14,11 @@ use bevy_replicon_renet::{
     renet::ConnectionConfig,
 };
 
-use crate::error_event::error_event;
+use crate::error_event::trigger_error;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(host.pipe(error_event))
-        .add_observer(connect.pipe(error_event));
+    app.add_observer(host.pipe(trigger_error))
+        .add_observer(connect.pipe(trigger_error));
 }
 
 const PROTOCOL_ID: u64 = 8;

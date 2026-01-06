@@ -3,7 +3,7 @@ use std::fmt::{self, Display, Formatter};
 use bevy::prelude::*;
 
 /// System adapter that logs errors and sends [`ErrorEvent`] event.
-pub fn error_event(In(result): In<Result<()>>, mut commands: Commands) {
+pub fn trigger_error(In(result): In<Result<()>>, mut commands: Commands) {
     if let Err(error) = result {
         error!("{error:#}");
         commands.trigger(ErrorEvent(error));

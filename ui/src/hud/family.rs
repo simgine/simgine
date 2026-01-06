@@ -23,7 +23,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_plugins(building::plugin)
         .add_plugins(life::plugin)
         .add_observer(set_mode)
-        .add_systems(OnEnter(GameState::InGame), spawn);
+        .add_systems(OnEnter(GameState::World), spawn);
 }
 
 fn spawn(mut commands: Commands) {
@@ -36,7 +36,7 @@ fn spawn(mut commands: Commands) {
             margin: SCREEN_OFFSET,
             ..Default::default()
         },
-        DespawnOnExit(GameState::InGame),
+        DespawnOnExit(GameState::World),
         ExclusiveGroup::default(),
         children![
             (

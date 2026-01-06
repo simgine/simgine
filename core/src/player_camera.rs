@@ -17,8 +17,8 @@ pub(super) fn plugin(app: &mut App) {
         .add_observer(pan)
         .add_observer(zoom)
         .add_observer(rotate)
-        .add_systems(OnEnter(GameState::InGame), spawn)
-        .add_systems(Update, apply_transform.run_if(in_state(GameState::InGame)));
+        .add_systems(OnEnter(GameState::World), spawn)
+        .add_systems(Update, apply_transform.run_if(in_state(GameState::World)));
 }
 
 fn spawn(mut commands: Commands, earthlike: Res<EarthlikeAtmosphere>) {
@@ -27,7 +27,7 @@ fn spawn(mut commands: Commands, earthlike: Res<EarthlikeAtmosphere>) {
     commands.spawn((
         PlayerCamera,
         earthlike.get(),
-        DespawnOnExit(GameState::InGame),
+        DespawnOnExit(GameState::World),
         Actions::<PlayerCamera>::spawn(SpawnWith(|context: &mut ActionSpawner<_>| {
             let enable_rotation = context
                 .spawn((

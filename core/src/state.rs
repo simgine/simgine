@@ -13,11 +13,11 @@ pub enum GameState {
     #[default]
     ManifestsLoading,
     Menu,
-    InGame,
+    World,
 }
 
 #[derive(SubStates, Default, Debug, PartialEq, Eq, Hash, Clone, Copy)]
-#[source(GameState = GameState::InGame)]
+#[source(GameState = GameState::World)]
 #[states(state_scoped = true)]
 pub enum FamilyMode {
     #[default]

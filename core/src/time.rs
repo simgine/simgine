@@ -13,8 +13,8 @@ use crate::{
 pub(super) fn plugin(app: &mut App) {
     app.register_resource_component::<Weekday>()
         .register_resource_component::<Clock>()
-        .add_systems(OnEnter(GameState::InGame), spawn)
-        .add_systems(PreUpdate, tick.run_if(in_state(GameState::InGame)));
+        .add_systems(OnEnter(GameState::World), spawn)
+        .add_systems(PreUpdate, tick.run_if(in_state(GameState::World)));
 }
 
 fn spawn(mut commands: Commands) {
@@ -23,7 +23,7 @@ fn spawn(mut commands: Commands) {
         MinuteCarry::default(),
         Weekday::default(),
         Clock::default(),
-        DespawnOnExit(GameState::InGame),
+        DespawnOnExit(GameState::World),
     ));
 }
 

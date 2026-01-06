@@ -60,7 +60,7 @@ fn spawn_world_nodes(
                         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
                             parent.spawn((WorldButton, Text::new("Play"))).observe(
                                 |_on: On<Pointer<Click>>, mut commands: Commands| {
-                                    commands.set_state(GameState::InGame);
+                                    commands.set_state(GameState::World);
                                 },
                             );
                             parent.spawn((WorldButton, Text::new("Host")));

@@ -7,14 +7,14 @@ pub(super) fn plugin(app: &mut App) {
         .register_resource_component::<Paused>()
         .add_observer(set_speed)
         .add_observer(pause_unpause)
-        .add_systems(OnEnter(GameState::InGame), spawn);
+        .add_systems(OnEnter(GameState::World), spawn);
 }
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
         GameSpeed::default(),
         Paused::default(),
-        DespawnOnExit(GameState::InGame),
+        DespawnOnExit(GameState::World),
     ));
 }
 

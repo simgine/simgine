@@ -95,7 +95,7 @@ fn create_dialog() -> impl Bundle {
                     );
                     parent.spawn((DialogButton, Text::new("Create"))).observe(
                         move |_on: On<Pointer<Click>>, mut commands: Commands| {
-                            commands.set_state(GameState::InGame);
+                            commands.set_state(GameState::World);
                         },
                     );
                 });

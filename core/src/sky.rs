@@ -8,8 +8,8 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(GameState::InGame), spawn)
-        .add_systems(Update, move_planets.run_if(in_state(GameState::InGame)));
+    app.add_systems(OnEnter(GameState::World), spawn)
+        .add_systems(Update, move_planets.run_if(in_state(GameState::World)));
 }
 
 fn spawn(mut commands: Commands) {

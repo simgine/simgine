@@ -1,7 +1,7 @@
-use std::{fs, path::PathBuf};
+use std::{ffi::OsStr, fs, path::PathBuf};
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use simgine_core::{error_event::trigger_error, game_paths::GamePaths, state::GameState};
+use simgine_core::{error_event::trigger_error, game_paths::GamePaths, world::LoadWorld};
 
 use crate::widget::{
     button::style::ButtonStyle,
@@ -20,7 +20,13 @@ fn spawn_world_nodes(
     let worlds_iter = game_paths.iter_worlds()?;
 
     commands.entity(insert.entity).with_children(|parent| {
-        for (name, path) in worlds_iter {
+        for world_path in worlds_iter {
+            let name = world_path
+                .file_stem()
+                .and_then(OsStr::to_str)
+                .unwrap_or("New world")
+                .to_string();
+
             parent.spawn((
                 Node {
                     padding: RADIUS_GAP,
@@ -28,7 +34,9 @@ fn spawn_world_nodes(
                     column_gap: GAP,
                     ..Default::default()
                 },
-                WorldNode { path },
+                WorldNode {
+                    path: world_path.clone(),
+                },
                 BackgroundColor(Color::WHITE),
                 BoxShadow::from(SHADOW),
                 children![
@@ -59,11 +67,12 @@ fn spawn_world_nodes(
                         },
                         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
                             parent.spawn((WorldButton, Text::new("Play"))).observe(
-                                |_on: On<Pointer<Click>>, mut commands: Commands| {
-                                    commands.set_state(GameState::World);
+                                move |_on: On<Pointer<Click>>, mut commands: Commands| {
+                                    commands.trigger(LoadWorld {
+                                        path: world_path.clone(),
+                                    });
                                 },
                             );
-                            parent.spawn((WorldButton, Text::new("Host")));
                             parent
                                 .spawn((WorldButton, Text::new("Delete")))
                                 .observe(delete_world.pipe(trigger_error));

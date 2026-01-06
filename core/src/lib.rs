@@ -9,6 +9,7 @@ mod sky;
 pub mod speed;
 pub mod state;
 pub mod time;
+pub mod world;
 
 use bevy::prelude::*;
 
@@ -27,6 +28,7 @@ impl Plugin for SimgineCorePlugin {
             player_camera::plugin,
             sky::plugin,
             speed::plugin,
+            world::plugin,
         ));
     }
 }

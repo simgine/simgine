@@ -7,7 +7,7 @@ use super::{
     theme::{GAP, NORMAL_TEXT, OUTER_RADIUS, PADDING},
 };
 
-#[derive(Component)]
+#[derive(Component, Default)]
 #[require(
     Node {
         flex_direction: FlexDirection::Column,
@@ -16,7 +16,6 @@ use super::{
         padding: UiRect::all(PADDING),
         row_gap: GAP,
         border_radius: OUTER_RADIUS,
-        min_width: Val::Px(400.0),
         ..Default::default()
     },
     BackgroundColor(Color::BLACK),
@@ -31,7 +30,7 @@ pub(crate) struct DialogTitle;
 #[require(TextFont::from_font_size(SMALL_TEXT))]
 pub(crate) struct DialogText;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 #[require(
     Node {
         align_self: AlignSelf::Center,

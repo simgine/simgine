@@ -17,6 +17,8 @@ bevy = { workspace = true, features = [
 ] }
 bevy_enhanced_input.workspace = true
 bevy_simple_text_input.workspace = true
+bevy_replicon.workspace = true
+bevy_replicon_renet.workspace = true
 simgine_core.workspace = true
 simgine_ui.workspace = true
 clap.workspace = true

@@ -683,7 +683,7 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input"
 version = "0.21.0-rc.1"
-source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#04b6da7e51b3919e01482dafd9e17a240916d1c5"
+source = "git+https://github.com/simgine/bevy_enhanced_input?branch=context-ordering#b4d5f376d820d55e2db45d5ba8003cc72d7950c9"
 dependencies = [
  "bevy",
  "bevy_enhanced_input_macros",
@@ -696,7 +696,7 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input_macros"
 version = "0.21.0-rc.1"
-source = "git+https://github.com/simgine/bevy_enhanced_input?branch=time-kind-default#04b6da7e51b3919e01482dafd9e17a240916d1c5"
+source = "git+https://github.com/simgine/bevy_enhanced_input?branch=context-ordering#b4d5f376d820d55e2db45d5ba8003cc72d7950c9"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4109,6 +4109,8 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_enhanced_input",
+ "bevy_replicon",
+ "bevy_replicon_renet",
  "bevy_simple_text_input",
  "clap",
  "simgine_core",
@@ -4135,6 +4137,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_enhanced_input",
+ "bevy_replicon",
  "bevy_simple_text_input",
  "simgine_core",
 ]

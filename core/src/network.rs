@@ -17,10 +17,11 @@ use bevy_replicon_renet::{
 use crate::error_event::trigger_error;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(host.pipe(trigger_error))
+    app.add_observer(host.pipe(trigger_error)).add_observer(stop_server)
         .add_observer(connect.pipe(trigger_error));
 }
 
+pub const DEFAULT_PORT: u16 = 4761;
 const PROTOCOL_ID: u64 = 8;
 
 fn host(host: On<Host>, mut commands: Commands, channels: Res<RepliconChannels>) -> Result<()> {
@@ -48,6 +49,13 @@ fn host(host: On<Host>, mut commands: Commands, channels: Res<RepliconChannels>)
     commands.insert_resource(server);
 
     Ok(())
+}
+
+fn stop_server(_on: On<StopServer>, mut commands: Commands, mut server: ResMut<RenetServer>) {
+    info!("stopping server");
+    server.disconnect_all();
+    commands.remove_resource::<RenetServer>();
+    commands.remove_resource::<NetcodeServerTransport>();
 }
 
 fn connect(
@@ -85,6 +93,9 @@ fn connect(
 pub struct Host {
     pub port: u16,
 }
+
+#[derive(Event)]
+pub struct StopServer;
 
 #[derive(Event)]
 pub struct Connect {

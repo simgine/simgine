@@ -2,6 +2,8 @@ mod cli;
 
 use bevy::{input_focus::InputDispatchPlugin, prelude::*, render::RenderPlugin};
 use bevy_enhanced_input::EnhancedInputPlugin;
+use bevy_replicon::prelude::*;
+use bevy_replicon_renet::RepliconRenetPlugins;
 use bevy_simple_text_input::TextInputPlugin;
 use simgine_core::SimgineCorePlugin;
 use simgine_ui::SimgineUiPlugin;
@@ -23,6 +25,8 @@ fn main() {
             }),
         EnhancedInputPlugin,
         InputDispatchPlugin,
+        RepliconPlugins,
+        RepliconRenetPlugins,
         TextInputPlugin,
         SimgineCorePlugin,
         SimgineUiPlugin,

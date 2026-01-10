@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_enhanced_input::prelude::{*, Release};
+use bevy_enhanced_input::prelude::{Release, *};
 
 use crate::widget::theme::{LARGE_TEXT, SMALL_TEXT};
 
@@ -9,17 +9,19 @@ use super::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(add_close_action).add_observer(close).add_input_context::<Dialog>();
+    app.add_observer(add_close_action)
+        .add_observer(close)
+        .add_input_context::<Dialog>();
 }
 
 fn add_close_action(insert: On<Insert, Dialog>, mut commands: Commands) {
-    commands.entity(insert.entity).insert(
-        actions!(Dialog[(
+    commands.entity(insert.entity).insert(actions!(
+        Dialog[(
             Action::<CloseDialog>::new(),
             Release::default(),
             bindings![KeyCode::Escape]
-        )]),
-    );
+        )]
+    ));
 }
 
 fn close(close: On<Fire<CloseDialog>>, mut commands: Commands) {

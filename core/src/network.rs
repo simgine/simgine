@@ -17,7 +17,8 @@ use bevy_replicon_renet::{
 use crate::error_event::trigger_error;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(host.pipe(trigger_error)).add_observer(stop_server)
+    app.add_observer(host.pipe(trigger_error))
+        .add_observer(stop_server)
         .add_observer(connect.pipe(trigger_error));
 }
 

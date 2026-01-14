@@ -4,7 +4,7 @@ use bevy::{
     anti_alias::taa::TemporalAntiAliasing,
     camera::Exposure,
     light::AtmosphereEnvironmentMapLight,
-    pbr::{EarthlikeAtmosphere, ScreenSpaceAmbientOcclusion},
+    pbr::{Atmosphere, ScatteringMedium, ScreenSpaceAmbientOcclusion},
     post_process::bloom::Bloom,
     prelude::*,
 };
@@ -21,12 +21,12 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(Update, apply_transform.run_if(in_state(GameState::World)));
 }
 
-fn spawn(mut commands: Commands, earthlike: Res<EarthlikeAtmosphere>) {
+fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
     debug!("spawning camera");
 
     commands.spawn((
         PlayerCamera,
-        earthlike.get(),
+        Atmosphere::earthlike(scattering_mediums.add(ScatteringMedium::default())),
         DespawnOnExit(GameState::World),
         Actions::<PlayerCamera>::spawn(SpawnWith(|context: &mut ActionSpawner<_>| {
             let enable_rotation = context

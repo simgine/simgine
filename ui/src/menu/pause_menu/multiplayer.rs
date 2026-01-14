@@ -56,11 +56,11 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                           -> Result<()> {
                         match **server_state {
                             ServerState::Stopped => {
-                                let port = edit_values.get(port_edit).unwrap();
-                                let port: u16 = port
+                                let text = edit_values.get(port_edit).unwrap();
+                                let port: u16 = text
                                     .0
                                     .parse()
-                                    .map_err(|e| format!("invalid port {}: {e}", port.0))?;
+                                    .map_err(|e| format!("invalid port {}: {e}", text.0))?;
                                 commands.trigger(Host { port })
                             }
                             ServerState::Running => commands.trigger(StopServer),

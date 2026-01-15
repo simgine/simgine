@@ -5,7 +5,7 @@ use simgine_core::state::{GameState, MenuState};
 
 use crate::widget::{
     button::style::ButtonStyle,
-    dialog::{Dialog, DialogButton, DialogTitle},
+    dialog::{Dialog, DialogButton, DialogCloseButton, DialogTitle},
     text_edit::TextEdit,
     theme::{GAP, HUGE_TEXT, LARGE_TEXT, SCREEN_OFFSET},
 };
@@ -77,29 +77,25 @@ fn spawn(mut commands: Commands) {
 fn create_dialog() -> impl Bundle {
     (
         Dialog,
-        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            let dialog = parent.target_entity();
-            parent.spawn((DialogTitle, Text::new("Create world")));
-            parent.spawn(TextEdit);
-            parent
-                .spawn(Node {
+        children![
+            (DialogTitle, Text::new("Create world")),
+            TextEdit,
+            (
+                Node {
                     align_self: AlignSelf::Center,
                     column_gap: GAP,
                     ..Default::default()
-                })
-                .with_children(|parent: &mut RelatedSpawner<_>| {
-                    parent.spawn((DialogButton, Text::new("Cancel"))).observe(
-                        move |_on: On<Pointer<Click>>, mut commands: Commands| {
-                            commands.entity(dialog).despawn();
-                        },
-                    );
+                },
+                Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                    parent.spawn((DialogCloseButton, Text::new("Cancel")));
                     parent.spawn((DialogButton, Text::new("Create"))).observe(
                         move |_on: On<Pointer<Click>>, mut commands: Commands| {
                             commands.set_state(GameState::World);
                         },
                     );
-                });
-        })),
+                })),
+            )
+        ],
     )
 }
 

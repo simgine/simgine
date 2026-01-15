@@ -36,6 +36,7 @@ macro_rules! button_bindings {
         ::bevy_enhanced_input::prelude::actions!($crate::widget::button::action::ButtonContext[(
             ::bevy_enhanced_input::prelude::Action::<$crate::widget::button::action::Activate>::new(),
             ::bevy_enhanced_input::prelude::Press::default(),
+            ::bevy_enhanced_input::prelude::ActionSettings { require_reset: true, ..Default::default() },
             ::bevy_enhanced_input::prelude::bindings![$($bindings),*],
         )])
     };

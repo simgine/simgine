@@ -1,31 +1,39 @@
 use bevy::prelude::*;
-use bevy_enhanced_input::prelude::{Release, *};
-
-use crate::widget::theme::{LARGE_TEXT, SMALL_TEXT};
+use bevy_enhanced_input::prelude::*;
 
 use super::{
-    button::style::ButtonStyle,
-    theme::{GAP, NORMAL_TEXT, OUTER_RADIUS, PADDING},
+    button::{action::ButtonContext, style::ButtonStyle},
+    theme::{GAP, LARGE_TEXT, NORMAL_TEXT, OUTER_RADIUS, PADDING, SMALL_TEXT},
 };
+use crate::{button_bindings, widget::button::action::Activate};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(add_close_action)
-        .add_observer(close)
-        .add_input_context::<Dialog>();
+    app.add_observer(add_close_action);
 }
 
-fn add_close_action(insert: On<Insert, Dialog>, mut commands: Commands) {
-    commands.entity(insert.entity).insert(actions!(
-        Dialog[(
-            Action::<CloseDialog>::new(),
-            Release::default(),
-            bindings![KeyCode::Escape]
-        )]
-    ));
-}
+fn add_close_action(insert: On<Insert, DialogCloseButton>, mut commands: Commands) {
+    commands
+        .entity(insert.entity)
+        .insert(button_bindings![KeyCode::Escape])
+        .observe(
+            |activate: On<Fire<Activate>>,
+             mut commands: Commands,
+             parents: Query<&ChildOf>,
+             dialogs: Query<Entity, With<Dialog>>| {
+                let Some(dialog) = dialogs
+                    .iter_many(parents.iter_ancestors(activate.context))
+                    .next()
+                else {
+                    warn!(
+                        "ignoring activation without a dialog for `{}`",
+                        activate.context
+                    );
+                    return;
+                };
 
-fn close(close: On<Fire<CloseDialog>>, mut commands: Commands) {
-    commands.entity(close.context).despawn();
+                commands.entity(dialog).despawn();
+            },
+        );
 }
 
 #[derive(Component, Default)]
@@ -40,7 +48,6 @@ fn close(close: On<Fire<CloseDialog>>, mut commands: Commands) {
         ..Default::default()
     },
     BackgroundColor(Color::BLACK),
-    ContextPriority::<Self>::new(1),
 )]
 pub(crate) struct Dialog;
 
@@ -63,6 +70,6 @@ pub(crate) struct DialogText;
 )]
 pub(crate) struct DialogButton;
 
-#[derive(InputAction)]
-#[action_output(bool)]
-pub(crate) struct CloseDialog;
+#[derive(Component, Default)]
+#[require(DialogButton, ButtonContext)]
+pub(crate) struct DialogCloseButton;

@@ -9,7 +9,7 @@ use simgine_core::{
 
 use crate::widget::{
     button::style::ButtonStyle,
-    dialog::{Dialog, DialogButton, DialogTitle},
+    dialog::{Dialog, DialogCloseButton, DialogTitle},
     text_edit::TextEdit,
     theme::{GAP, NORMAL_TEXT},
 };
@@ -35,10 +35,9 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
     (
         Dialog,
         DespawnOnExit(GameState::World),
-        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            let dialog = parent.target_entity();
-            parent.spawn((DialogTitle, Text::new("Multiplayer")));
-            parent.spawn((
+        children![
+            (DialogTitle, Text::new("Multiplayer")),
+            (
                 Node {
                     column_gap: GAP,
                     align_items: AlignItems::Center,
@@ -72,13 +71,9 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                         .spawn(StartStopButton)
                         .observe(start_stop.pipe(trigger_error));
                 })),
-            ));
-            parent.spawn((DialogButton, Text::new("Close"))).observe(
-                move |_on: On<Pointer<Click>>, mut commands: Commands| {
-                    commands.entity(dialog).despawn();
-                },
-            );
-        })),
+            ),
+            (DialogCloseButton, Text::new("Close"))
+        ],
     )
 }
 

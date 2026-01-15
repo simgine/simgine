@@ -8,7 +8,7 @@ use crate::{
     menu::pause_menu::multiplayer::multiplayer_menu,
     widget::{
         button::style::ButtonStyle,
-        dialog::{Dialog, DialogButton, DialogTitle},
+        dialog::{Dialog, DialogButton, DialogCloseButton, DialogTitle},
     },
 };
 
@@ -40,13 +40,8 @@ fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
         PauseMenu::default(),
         DespawnOnExit(GameState::World),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            let dialog = parent.target_entity();
             parent.spawn((DialogTitle, Text::new("Menu")));
-            parent
-                .spawn((PauseMenuButton, Text::new("Resume")))
-                .observe(move |_on: On<Pointer<Click>>, mut commands: Commands| {
-                    commands.entity(dialog).despawn();
-                });
+            parent.spawn((PauseMenuButton, DialogCloseButton, Text::new("Resume")));
             parent
                 .spawn((PauseMenuButton, Text::new("Multiplayer")))
                 .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {

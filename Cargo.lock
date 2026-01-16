@@ -682,8 +682,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_enhanced_input"
-version = "0.22.0"
-source = "git+https://github.com/simgine/bevy_enhanced_input?branch=fix-inversed-context-order#c3875c5ad22d0ff17878e690ddfb4adf2350c274"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "765ad34b2e6ebbeb7c8ff13283bdf5ace7254f7be0c259ac31aa95477c8bf543"
 dependencies = [
  "bevy",
  "bevy_enhanced_input_macros",
@@ -696,7 +697,8 @@ dependencies = [
 [[package]]
 name = "bevy_enhanced_input_macros"
 version = "0.22.0"
-source = "git+https://github.com/simgine/bevy_enhanced_input?branch=fix-inversed-context-order#c3875c5ad22d0ff17878e690ddfb4adf2350c274"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4680cc23f335f1b768caf91a94b1aa1d786149788644043fe8d49e5708b5cbcc"
 dependencies = [
  "proc-macro2",
  "quote",

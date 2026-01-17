@@ -8,10 +8,10 @@ use super::{
 use crate::{button_bindings, widget::button::action::Activate};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(add_close_action);
+    app.add_observer(add_close_bindings);
 }
 
-fn add_close_action(insert: On<Insert, DialogCloseButton>, mut commands: Commands) {
+fn add_close_bindings(insert: On<Insert, DialogCloseButton>, mut commands: Commands) {
     commands
         .entity(insert.entity)
         .insert(button_bindings![KeyCode::Escape])

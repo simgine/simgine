@@ -1,8 +1,5 @@
 use bevy::prelude::*;
-use simgine_core::{
-    asset_manifest::{ObjectCategory, ObjectManifest},
-    state::BuildingMode,
-};
+use simgine_core::{asset_manifest::ObjectManifest, state::BuildingMode};
 
 use crate::{
     preview::Preview,
@@ -78,12 +75,8 @@ pub(super) fn objects_node() -> impl Bundle {
                     (
                         ButtonIcon::new("base/ui/icons/all_objects.png"),
                         Toggled(true),
-                        CategoryButton::from(CategoryFilter::AllObjects)
                     ),
-                    (
-                        ButtonIcon::new("base/ui/icons/furniture.png"),
-                        CategoryButton::from(ObjectCategory::Furniture),
-                    )
+                    (ButtonIcon::new("base/ui/icons/furniture.png"))
                 ],
             ),
             (
@@ -104,29 +97,5 @@ pub(super) fn objects_node() -> impl Bundle {
 #[derive(Component)]
 struct ObjectsNode;
 
-#[derive(Component, Deref, Clone, Copy)]
-#[component(immutable)]
-#[require(ButtonStyle, Toggled)]
-struct CategoryButton(CategoryFilter);
-
-impl<T: Into<CategoryFilter>> From<T> for CategoryButton {
-    fn from(value: T) -> Self {
-        Self(value.into())
-    }
-}
-
 #[derive(Component)]
 struct ObjectsGrid;
-
-#[derive(Default, PartialEq, Clone, Copy)]
-enum CategoryFilter {
-    #[default]
-    AllObjects,
-    Category(ObjectCategory),
-}
-
-impl From<ObjectCategory> for CategoryFilter {
-    fn from(value: ObjectCategory) -> Self {
-        Self::Category(value)
-    }
-}

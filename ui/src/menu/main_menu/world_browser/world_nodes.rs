@@ -1,9 +1,7 @@
+use std::fs;
+
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use simgine_core::{
-    error_event::trigger_error,
-    game_paths::GamePaths,
-    world::{LoadWorld, RemoveWorld},
-};
+use simgine_core::{error_event::trigger_error, game_paths::GamePaths, world::LoadWorld};
 
 use crate::widget::{
     button::style::ButtonStyle,
@@ -33,6 +31,7 @@ fn spawn_world_nodes(
                 BackgroundColor(Color::WHITE),
                 BoxShadow::from(SHADOW),
                 Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                    let world_node = parent.target_entity();
                     parent.spawn((
                         BackgroundColor(Color::BLACK),
                         Node {
@@ -42,7 +41,7 @@ fn spawn_world_nodes(
                             ..Default::default()
                         },
                     ));
-                    let label = parent
+                    let world_label = parent
                         .spawn((
                             Text::new(name),
                             TextFont::from_font_size(SMALL_TEXT),
@@ -65,22 +64,27 @@ fn spawn_world_nodes(
                                 move |_on: On<Pointer<Click>>,
                                       mut commands: Commands,
                                       labels: Query<&Text>| {
-                                    let text = labels.get(label).unwrap();
+                                    let text = labels.get(world_label).unwrap();
                                     commands.trigger(LoadWorld {
                                         name: text.to_string(),
                                     });
                                 },
                             );
-                            parent.spawn((WorldButton, Text::new("Delete"))).observe(
-                                move |_on: On<Pointer<Click>>,
-                                      mut commands: Commands,
-                                      labels: Query<&Text>| {
-                                    let text = labels.get(label).unwrap();
-                                    commands.trigger(RemoveWorld {
-                                        name: text.to_string(),
-                                    });
-                                },
-                            );
+                            let remove_world = move |_on: On<Pointer<Click>>,
+                                                     mut commands: Commands,
+                                                     game_paths: Res<GamePaths>,
+                                                     labels: Query<&Text>|
+                                  -> Result<()> {
+                                let text = labels.get(world_label).unwrap();
+                                let path = game_paths.world_path(&text);
+                                info!("removing {path:?}");
+                                fs::remove_file(path)?;
+                                commands.entity(world_node).despawn();
+                                Ok(())
+                            };
+                            parent
+                                .spawn((WorldButton, Text::new("Delete")))
+                                .observe(remove_world.pipe(trigger_error));
                         })),
                     ));
                 })),

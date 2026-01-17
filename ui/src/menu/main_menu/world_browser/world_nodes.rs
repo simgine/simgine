@@ -74,7 +74,7 @@ fn spawn_world_nodes(
                                                      labels: Query<&Text>|
                                   -> Result<()> {
                                 let text = labels.get(world_label).unwrap();
-                                let path = game_paths.world_path(&text);
+                                let path = game_paths.world_path(text);
                                 info!("removing {path:?}");
                                 trash::delete(path)?;
                                 commands.entity(world_node).despawn();

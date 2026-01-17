@@ -17,6 +17,7 @@ bevy_enhanced_input.workspace = true
 bevy_replicon.workspace = true
 bevy_simple_text_input.workspace = true
 simgine_core.workspace = true
+trash.workspace = true
 
 [lints]
 workspace = true

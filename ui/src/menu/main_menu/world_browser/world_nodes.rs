@@ -1,5 +1,3 @@
-use std::fs;
-
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use simgine_core::{error_event::trigger_error, game_paths::GamePaths, world::LoadWorld};
 
@@ -78,7 +76,7 @@ fn spawn_world_nodes(
                                 let text = labels.get(world_label).unwrap();
                                 let path = game_paths.world_path(&text);
                                 info!("removing {path:?}");
-                                fs::remove_file(path)?;
+                                trash::delete(path)?;
                                 commands.entity(world_node).despawn();
                                 Ok(())
                             };

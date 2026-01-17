@@ -1,13 +1,20 @@
 mod world_nodes;
 
+use std::net::SocketAddr;
+
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use simgine_core::state::{GameState, MenuState};
+use bevy_simple_text_input::TextInputValue;
+use simgine_core::{
+    error_event::trigger_error,
+    network::{Connect, DEFAULT_PORT},
+    state::{GameState, MenuState},
+};
 
 use crate::widget::{
     button::style::ButtonStyle,
     dialog::{Dialog, DialogButton, DialogCloseButton, DialogTitle},
     text_edit::TextEdit,
-    theme::{GAP, HUGE_TEXT, LARGE_TEXT, SCREEN_OFFSET},
+    theme::{GAP, HUGE_TEXT, LARGE_TEXT, NORMAL_TEXT, SCREEN_OFFSET},
 };
 use world_nodes::WorldNodes;
 
@@ -70,6 +77,11 @@ fn spawn(mut commands: Commands) {
                 .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.spawn(create_dialog());
                 });
+            parent
+                .spawn((WorldBrowserButton, Text::new("Join")))
+                .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
+                    commands.spawn(join_dialog());
+                });
         })),
     ));
 }
@@ -96,6 +108,51 @@ fn create_dialog() -> impl Bundle {
                 })),
             )
         ],
+    )
+}
+
+fn join_dialog() -> impl Bundle {
+    (
+        Dialog,
+        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+            parent.spawn((DialogTitle, Text::new("Join game")));
+            parent.spawn((Text::new("Address"), TextFont::from_font_size(NORMAL_TEXT)));
+            let addr_edit = parent
+                .spawn((
+                    TextEdit,
+                    TextInputValue(format!("127.0.0.1:{DEFAULT_PORT}")),
+                ))
+                .id();
+            let connect = move |_on: On<Pointer<Click>>,
+                                mut commands: Commands,
+                                edit_values: Query<&TextInputValue>|
+                  -> Result<()> {
+                let text = edit_values.get(addr_edit).unwrap();
+                let addr: SocketAddr = text
+                    .0
+                    .parse()
+                    .map_err(|e| format!("invalid address {}: {e}", text.0))?;
+                commands.trigger(Connect {
+                    ip: addr.ip(),
+                    port: addr.port(),
+                });
+
+                Ok(())
+            };
+
+            parent
+                .spawn(Node {
+                    align_self: AlignSelf::Center,
+                    column_gap: GAP,
+                    ..Default::default()
+                })
+                .with_children(|parent: &mut RelatedSpawner<_>| {
+                    parent.spawn((DialogCloseButton, Text::new("Cancel")));
+                    parent
+                        .spawn((DialogButton, Text::new("Connect")))
+                        .observe(connect.pipe(trigger_error));
+                });
+        })),
     )
 }
 

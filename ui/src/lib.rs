@@ -1,3 +1,4 @@
+mod connection_dialog;
 mod error_dialog;
 mod hud;
 mod menu;
@@ -11,6 +12,7 @@ pub struct SimgineUiPlugin;
 impl Plugin for SimgineUiPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((
+            connection_dialog::plugin,
             error_dialog::plugin,
             hud::plugin,
             menu::plugin,

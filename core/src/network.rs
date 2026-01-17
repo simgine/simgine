@@ -19,7 +19,8 @@ use crate::error_event::trigger_error;
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(host.pipe(trigger_error))
         .add_observer(stop_server)
-        .add_observer(connect.pipe(trigger_error));
+        .add_observer(connect.pipe(trigger_error))
+        .add_observer(disconnect);
 }
 
 pub const DEFAULT_PORT: u16 = 4761;
@@ -90,6 +91,17 @@ fn connect(
     Ok(())
 }
 
+fn disconnect(
+    _on: On<Disconnect>,
+    mut commands: Commands,
+    mut transport: ResMut<NetcodeClientTransport>,
+) {
+    info!("disconnecting");
+    transport.disconnect();
+    commands.remove_resource::<NetcodeClientTransport>();
+    commands.remove_resource::<RenetClient>();
+}
+
 #[derive(Event)]
 pub struct Host {
     pub port: u16,
@@ -103,3 +115,6 @@ pub struct Connect {
     pub ip: IpAddr,
     pub port: u16,
 }
+
+#[derive(Event)]
+pub struct Disconnect;

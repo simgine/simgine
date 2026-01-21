@@ -1,6 +1,12 @@
+use std::net::{IpAddr, Ipv4Addr};
+
 use bevy::prelude::*;
 use clap::{Parser, Subcommand};
-use simgine_core::{state::GameState, world::LoadWorld};
+use simgine_core::{
+    network::{Connect, DEFAULT_PORT, Host},
+    state::GameState,
+    world::LoadWorld,
+};
 
 /// Logic for command line interface.
 ///
@@ -18,6 +24,11 @@ fn apply_command(mut commands: Commands, mut cli: ResMut<Cli>) {
 
     match command {
         GameCommand::Load { name } => commands.trigger(LoadWorld { name }),
+        GameCommand::Host { name, port } => {
+            commands.trigger(LoadWorld { name });
+            commands.trigger(Host { port })
+        }
+        GameCommand::Join { ip, port } => commands.trigger(Connect { ip, port }),
     }
 }
 
@@ -37,5 +48,25 @@ impl Default for Cli {
 
 #[derive(Subcommand, Clone)]
 enum GameCommand {
-    Load { name: String },
+    Load {
+        /// World name to load.
+        name: String,
+    },
+    Host {
+        /// World name to load.
+        name: String,
+
+        /// Port to use.
+        #[clap(short, long, default_value_t = DEFAULT_PORT)]
+        port: u16,
+    },
+    Join {
+        /// Server IP address.
+        #[clap(short, long, default_value_t = Ipv4Addr::LOCALHOST.into())]
+        ip: IpAddr,
+
+        /// Server port.
+        #[clap(short, long, default_value_t = DEFAULT_PORT)]
+        port: u16,
+    },
 }

@@ -1235,8 +1235,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_renet"
-version = "3.0.0"
-source = "git+https://github.com/simgine/renet?branch=bevy-0.18#77a0eef34537003565170483f8585c222ac7ecd2"
+version = "4.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "095a90286e81f24b9c44d3ab605486f70f2a30a906a737d24b817e4b07b238f7"
 dependencies = [
  "bevy_app",
  "bevy_derive",
@@ -1268,8 +1269,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon_renet"
-version = "0.13.0"
-source = "git+https://github.com/simgine/bevy_replicon_renet?branch=bevy-0.18#d5ed8fe673d9bb61ea73bbb7cdde5c7d55c75337"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d9714c08e418ec322ae9316ee5332bfe07547ad78f85b54d035c23956073367"
 dependencies = [
  "bevy",
  "bevy_renet",
@@ -3907,8 +3909,9 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 
 [[package]]
 name = "renet"
-version = "1.2.0"
-source = "git+https://github.com/simgine/renet?branch=bevy-0.18#77a0eef34537003565170483f8585c222ac7ecd2"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8535f2f4b5afe5e31fc37be4b8a1f167e61177f356b1c6ee8456b7045d6c74c0"
 dependencies = [
  "bytes",
  "log",
@@ -3917,8 +3920,9 @@ dependencies = [
 
 [[package]]
 name = "renet_netcode"
-version = "1.2.0"
-source = "git+https://github.com/simgine/renet?branch=bevy-0.18#77a0eef34537003565170483f8585c222ac7ecd2"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9479f1355a92d5aa04a0339ad341878fa572492cb9be09db7b34954bdb13a30"
 dependencies = [
  "log",
  "renet",
@@ -3927,8 +3931,9 @@ dependencies = [
 
 [[package]]
 name = "renetcode"
-version = "1.0.0"
-source = "git+https://github.com/simgine/renet?branch=bevy-0.18#77a0eef34537003565170483f8585c222ac7ecd2"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76bed9d6d190d20804b5645511932fef803145520ef4eb76d5e4b5a841980eac"
 dependencies = [
  "chacha20poly1305",
  "log",

@@ -89,6 +89,7 @@ fn spawn(mut commands: Commands) {
 fn create_dialog() -> impl Bundle {
     (
         Dialog,
+        DespawnOnExit(MenuState::WorldBrowser),
         children![
             (DialogTitle, Text::new("Create world")),
             TextEdit,
@@ -114,6 +115,7 @@ fn create_dialog() -> impl Bundle {
 fn join_dialog() -> impl Bundle {
     (
         Dialog,
+        DespawnOnExit(MenuState::WorldBrowser),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             parent.spawn((DialogTitle, Text::new("Join game")));
             parent.spawn((Text::new("Address"), TextFont::from_font_size(NORMAL_TEXT)));

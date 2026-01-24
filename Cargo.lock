@@ -1249,9 +1249,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon"
-version = "0.38.0"
+version = "0.38.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b82e2b46cf127e7dc2129331416875a284b8758a4c0b5c155d8f372be95cc61"
+checksum = "aee12260a021e0d9e4437ba9a325deb4ca05c98ef29d670fc63b366799ecaad0"
 dependencies = [
  "bevy",
  "bitflags 2.10.0",
@@ -2644,7 +2644,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 1.0.69",
- "windows 0.58.0",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -3910,8 +3910,7 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 [[package]]
 name = "renet"
 version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8535f2f4b5afe5e31fc37be4b8a1f167e61177f356b1c6ee8456b7045d6c74c0"
+source = "git+https://github.com/simgine/renet?branch=real-time#b59ff028422718fccdb411ff45adaeb159233b30"
 dependencies = [
  "bytes",
  "log",

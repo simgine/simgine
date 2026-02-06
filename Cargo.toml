@@ -16,7 +16,7 @@ publish = false
 [workspace.dependencies]
 bevy = { version = "0.18", default-features = false }
 bevy_enhanced_input = "0.22"
-bevy_simple_text_input = "0.13"
+bevy_simple_text_input = "0.14"
 bevy_replicon = "0.38.0"
 bevy_replicon_renet = "0.14"
 simgine_core = { path = "core" }

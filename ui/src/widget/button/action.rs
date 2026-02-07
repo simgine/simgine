@@ -9,16 +9,14 @@ pub(super) fn plugin(app: &mut App) {
 fn activate(
     mut click: On<Pointer<Click>>,
     mut commands: Commands,
-    buttons: Query<&Actions<ButtonContext>, With<ButtonContext>>,
+    buttons: Query<(), With<ButtonContext>>,
 ) {
-    if let Ok(actions) = buttons.get(click.entity)
-        && let Some(&action) = actions.first()
-    {
+    if buttons.get(click.entity).is_ok() {
         debug!("firing action for `{}`", click.entity);
         click.propagate(false);
         commands
-            .entity(action)
-            .insert(ActionMock::once(ActionState::Fired, true));
+            .entity(click.entity)
+            .mock_once::<ButtonContext, Activate>(ActionState::Fired, true);
     }
 }
 
@@ -36,7 +34,7 @@ macro_rules! button_bindings {
         ::bevy_enhanced_input::prelude::actions!($crate::widget::button::action::ButtonContext[(
             ::bevy_enhanced_input::prelude::Action::<$crate::widget::button::action::Activate>::new(),
             ::bevy_enhanced_input::prelude::Press::default(),
-            ::bevy_enhanced_input::prelude::ActionSettings { require_reset: true, ..Default::default() },
+            ::bevy_enhanced_input::prelude::ActionSettings { require_reset: true, consume_input: true, ..Default::default() },
             ::bevy_enhanced_input::prelude::bindings![$($bindings),*],
         )])
     };

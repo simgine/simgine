@@ -1,10 +1,10 @@
 use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr, UdpSocket},
-    time::SystemTime,
+    time::{Duration, SystemTime},
 };
 
-use bevy::prelude::*;
-use bevy_replicon::prelude::*;
+use bevy::{prelude::*, time::common_conditions::*};
+use bevy_replicon::{prelude::*, server};
 use bevy_replicon_renet::{
     RenetChannelsExt, RenetClient, RenetServer,
     netcode::{
@@ -20,7 +20,11 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(host.pipe(trigger_error))
         .add_observer(stop_server)
         .add_observer(connect.pipe(trigger_error))
-        .add_observer(disconnect);
+        .add_observer(disconnect)
+        .add_systems(
+            PostUpdate,
+            server::increment_tick.run_if(on_real_timer(Duration::from_secs_f32(0.5))),
+        );
 }
 
 pub const DEFAULT_PORT: u16 = 4761;

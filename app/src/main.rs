@@ -25,7 +25,10 @@ fn main() {
             }),
         EnhancedInputPlugin,
         InputDispatchPlugin,
-        RepliconPlugins,
+        RepliconPlugins.set(ServerPlugin {
+            tick_schedule: None,
+            ..Default::default()
+        }),
         RepliconRenetPlugins,
         TextInputPlugin,
         SimgineCorePlugin,

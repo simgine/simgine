@@ -127,9 +127,9 @@ fn join_dialog() -> impl Bundle {
                 .id();
             let connect = move |_on: On<Pointer<Click>>,
                                 mut commands: Commands,
-                                edit_values: Query<&TextInputValue>|
+                                input_values: Query<&TextInputValue>|
                   -> Result<()> {
-                let text = edit_values.get(addr_edit).unwrap();
+                let text = input_values.get(addr_edit).unwrap();
                 let addr: SocketAddr = text
                     .0
                     .parse()

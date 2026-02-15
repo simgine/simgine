@@ -51,11 +51,11 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                     let start_stop = move |_on: On<Pointer<Click>>,
                                            mut commands: Commands,
                                            server_state: Res<State<ServerState>>,
-                                           edit_values: Query<&TextInputValue>|
+                                           input_values: Query<&TextInputValue>|
                           -> Result<()> {
                         match **server_state {
                             ServerState::Stopped => {
-                                let text = edit_values.get(port_edit).unwrap();
+                                let text = input_values.get(port_edit).unwrap();
                                 let port: u16 = text
                                     .0
                                     .parse()

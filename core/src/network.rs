@@ -23,7 +23,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_observer(disconnect)
         .add_systems(
             PostUpdate,
-            server::increment_tick.run_if(on_real_timer(Duration::from_secs_f32(0.5))),
+            server::increment_tick.run_if(on_real_timer(Duration::from_secs_f32(0.1))),
         );
 }
 

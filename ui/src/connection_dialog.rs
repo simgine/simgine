@@ -1,7 +1,7 @@
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use bevy_enhanced_input::prelude::*;
 use bevy_replicon::prelude::ClientState;
-use simgine_core::network::Disconnect;
+use simgine_core::{network::Disconnect, state::GameState};
 
 use crate::widget::{
     button::action::Activate,
@@ -15,7 +15,9 @@ pub(super) fn plugin(app: &mut App) {
 fn spawn(mut commands: Commands) {
     commands.spawn((
         Dialog,
-        DespawnOnExit(ClientState::Connecting),
+        // Despawn only after the first replication message with the world is received.
+        DespawnOnEnter(GameState::World),
+        DespawnOnEnter(ClientState::Disconnected),
         Children::spawn(SpawnWith(move |parent: &mut RelatedSpawner<_>| {
             parent.spawn((DialogTitle, Text::new("Connecting to server")));
             parent

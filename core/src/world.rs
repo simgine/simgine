@@ -94,4 +94,4 @@ pub struct LoadWorld {
 #[derive(Component, Deref, Reflect, Serialize, Deserialize)]
 #[require(Replicated, DespawnOnExit::<GameState>(GameState::World))]
 #[reflect(Component)]
-struct WorldName(String);
+pub struct WorldName(String);

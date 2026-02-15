@@ -2,7 +2,9 @@ mod multiplayer;
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use bevy_enhanced_input::prelude::{Release, *};
-use simgine_core::{component_res::InsertComponentResExt, speed::Paused, state::GameState};
+use simgine_core::{
+    component_res::InsertComponentResExt, speed::Paused, state::GameState, world::SaveWorld,
+};
 
 use crate::{
     menu::pause_menu::multiplayer::multiplayer_menu,
@@ -38,8 +40,15 @@ fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
     commands.spawn((
         PauseMenu::default(),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+            let dialog = parent.target_entity();
             parent.spawn((DialogTitle, Text::new("Menu")));
             parent.spawn((PauseMenuButton, DialogCloseButton, Text::new("Resume")));
+            parent.spawn((PauseMenuButton, Text::new("Save"))).observe(
+                move |_on: On<Pointer<Click>>, mut commands: Commands| {
+                    commands.trigger(SaveWorld);
+                    commands.entity(dialog).despawn();
+                },
+            );
             parent
                 .spawn((PauseMenuButton, Text::new("Multiplayer")))
                 .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {

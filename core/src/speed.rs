@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{component_res::ComponentResExt, state::GameState};
+use crate::{component_res::ComponentResExt, state::GameState, world::CreateWorld};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_resource_component::<GameSpeed>()
@@ -11,13 +11,10 @@ pub(super) fn plugin(app: &mut App) {
         .replicate::<Paused>()
         .add_observer(set_speed)
         .add_observer(pause_unpause)
-        .add_systems(
-            OnEnter(GameState::World),
-            spawn.run_if(not(in_state(ClientState::Connected))),
-        );
+        .add_observer(spawn);
 }
 
-fn spawn(mut commands: Commands) {
+fn spawn(_on: On<CreateWorld>, mut commands: Commands) {
     commands.spawn(GameSpeed::default());
     commands.spawn(Paused::default());
 }
@@ -49,13 +46,14 @@ fn pause_unpause(
     }
 }
 
-#[derive(Component, Deref, DerefMut, Serialize, Deserialize)]
+#[derive(Component, Deref, DerefMut, Reflect, Serialize, Deserialize)]
 #[require(
     Name::new("Paused"),
     Replicated,
     DespawnOnExit::<_>(GameState::World)
 )]
 #[component(immutable)]
+#[reflect(Component)]
 pub struct Paused(pub bool);
 
 impl Paused {
@@ -70,13 +68,14 @@ impl Default for Paused {
     }
 }
 
-#[derive(Component, Default, Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
+#[derive(Component, Reflect, Default, Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
 #[require(
     Name::new("Game speed"),
     Replicated,
     DespawnOnExit::<_>(GameState::World)
 )]
 #[component(immutable)]
+#[reflect(Component)]
 pub enum GameSpeed {
     #[default]
     Normal,

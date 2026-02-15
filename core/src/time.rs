@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     component_res::{ComponentResExt, InsertComponentResExt},
     state::GameState,
+    world::CreateWorld,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -17,10 +18,7 @@ pub(super) fn plugin(app: &mut App) {
         .register_resource_component::<Clock>()
         .replicate::<Clock>()
         .replicate::<Weekday>()
-        .add_systems(
-            OnEnter(GameState::World),
-            spawn.run_if(not(in_state(ClientState::Connected))),
-        )
+        .add_observer(spawn)
         .add_systems(
             PreUpdate,
             tick.run_if(in_state(GameState::World))
@@ -28,7 +26,7 @@ pub(super) fn plugin(app: &mut App) {
         );
 }
 
-fn spawn(mut commands: Commands) {
+fn spawn(_on: On<CreateWorld>, mut commands: Commands) {
     commands.spawn(Clock::default());
     commands.spawn(Weekday::default());
 }
@@ -81,13 +79,14 @@ fn tick(
 #[derive(Component, Default, Deref, DerefMut)]
 pub(crate) struct MinuteCarry(Duration);
 
-#[derive(Component, Default, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
+#[derive(Component, Reflect, Default, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[require(
     Name::new("Weekday"),
     Replicated,
     DespawnOnExit::<_>(GameState::World)
 )]
 #[component(immutable)]
+#[reflect(Component)]
 pub enum Weekday {
     #[default]
     Mon,
@@ -129,7 +128,7 @@ impl Display for Weekday {
     }
 }
 
-#[derive(Component, Serialize, Deserialize, PartialEq, Clone, Copy)]
+#[derive(Component, Reflect, Serialize, Deserialize, PartialEq, Clone, Copy)]
 #[require(
     Name::new("Clock"),
     Replicated,
@@ -137,6 +136,7 @@ impl Display for Weekday {
     DespawnOnExit::<_>(GameState::World)
 )]
 #[component(immutable)]
+#[reflect(Component)]
 pub struct Clock {
     hour: u8,
     minute: u8,

@@ -7,7 +7,8 @@ use bevy_simple_text_input::TextInputValue;
 use simgine_core::{
     error_event::trigger_error,
     network::{Connect, DEFAULT_PORT},
-    state::{GameState, MenuState},
+    state::MenuState,
+    world::CreateWorld,
 };
 
 use crate::widget::{
@@ -90,25 +91,30 @@ fn create_dialog() -> impl Bundle {
     (
         Dialog,
         DespawnOnExit(MenuState::WorldBrowser),
-        children![
-            (DialogTitle, Text::new("Create world")),
-            TextEdit,
-            (
+        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+            parent.spawn((DialogTitle, Text::new("Create world")));
+            let name_edit = parent.spawn(TextEdit).id();
+            parent.spawn((
                 Node {
                     align_self: AlignSelf::Center,
                     column_gap: GAP,
                     ..Default::default()
                 },
-                Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                Children::spawn(SpawnWith(move |parent: &mut RelatedSpawner<_>| {
                     parent.spawn((DialogCloseButton, Text::new("Cancel")));
                     parent.spawn((DialogButton, Text::new("Create"))).observe(
-                        move |_on: On<Pointer<Click>>, mut commands: Commands| {
-                            commands.set_state(GameState::World);
+                        move |_on: On<Pointer<Click>>,
+                              mut commands: Commands,
+                              input_values: Query<&TextInputValue>| {
+                            let name = input_values.get(name_edit).unwrap();
+                            commands.trigger(CreateWorld {
+                                name: name.0.clone(),
+                            });
                         },
                     );
                 })),
-            )
-        ],
+            ));
+        })),
     )
 }
 

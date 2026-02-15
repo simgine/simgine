@@ -27,7 +27,6 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
     commands.spawn((
         PlayerCamera,
         Atmosphere::earthlike(scattering_mediums.add(ScatteringMedium::default())),
-        DespawnOnExit(GameState::World),
         Actions::<PlayerCamera>::spawn(SpawnWith(|context: &mut ActionSpawner<_>| {
             let enable_rotation = context
                 .spawn((
@@ -136,7 +135,8 @@ fn apply_transform(camera: Single<(&mut Transform, &OrbitOrigin, &OrbitRotation,
     Bloom::NATURAL,
     Exposure { ev100: 13.0 }, // Compensate for atmosphere.
     AtmosphereEnvironmentMapLight,
-    ScreenSpaceAmbientOcclusion
+    ScreenSpaceAmbientOcclusion,
+    DespawnOnExit::<_>(GameState::World),
 )]
 struct PlayerCamera;
 

@@ -11,11 +11,8 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
-    commands.spawn((
-        GameSpeed::default(),
-        Paused::default(),
-        DespawnOnExit(GameState::World),
-    ));
+    commands.spawn(GameSpeed::default());
+    commands.spawn(Paused::default());
 }
 
 fn set_speed(
@@ -46,6 +43,7 @@ fn pause_unpause(
 }
 
 #[derive(Component, Deref, DerefMut)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 #[component(immutable)]
 pub struct Paused(pub bool);
 
@@ -62,6 +60,7 @@ impl Default for Paused {
 }
 
 #[derive(Component, Default, Debug, PartialEq, Clone, Copy)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 #[component(immutable)]
 pub enum GameSpeed {
     #[default]

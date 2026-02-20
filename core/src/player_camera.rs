@@ -44,8 +44,9 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
             context.spawn((
                 Action::<Pan>::new(),
                 DeadZone::default(),
-                Scale::splat(0.7),
                 SmoothNudge::default(),
+                DeltaScale::default(),
+                Scale::splat(100.0),
                 Bindings::spawn((
                     Cardinal::wasd_keys(),
                     Axial::left_stick(),
@@ -53,15 +54,15 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
                         Binding::mouse_motion(),
                         Chord::single(enable_pan),
                         Negate::y(),
-                        Scale::splat(0.003),
                     )),
                 )),
             ));
 
             context.spawn((
                 Action::<Rotate>::new(),
-                Scale::splat(0.05),
                 SmoothNudge::default(),
+                DeltaScale::default(),
+                Scale::splat(2.0),
                 Bindings::spawn((
                     Bidirectional::new(KeyCode::Period, KeyCode::Comma),
                     Axial::right_stick(),
@@ -69,7 +70,6 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
                         Binding::mouse_motion(),
                         Chord::single(enable_rotation),
                         Negate::all(),
-                        Scale::splat(0.08),
                     )),
                 )),
             ));
@@ -77,10 +77,11 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
             context.spawn((
                 Action::<Zoom>::new(),
                 SmoothNudge::default(),
+                DeltaScale::default(),
+                Scale::splat(100.0),
                 Bindings::spawn((
                     Bidirectional::new(KeyCode::Equal, KeyCode::Minus),
-                    Bidirectional::new(GamepadAxis::RightZ, GamepadAxis::LeftZ)
-                        .with(Scale::splat(0.1)),
+                    Bidirectional::new(GamepadAxis::RightZ, GamepadAxis::LeftZ),
                     Spawn((Binding::mouse_wheel(), SwizzleAxis::YXZ)),
                 )),
             ));

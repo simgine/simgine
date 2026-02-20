@@ -16,7 +16,7 @@ fn activate(
         click.propagate(false);
         commands
             .entity(click.entity)
-            .mock_once::<ButtonContext, Activate>(ActionState::Fired, true);
+            .mock_once::<ButtonContext, Activate>(TriggerState::Fired, true);
     }
 }
 

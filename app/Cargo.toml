@@ -9,6 +9,7 @@ publish.workspace = true
 
 [dependencies]
 bevy = { workspace = true, features = [
+  "bevy_gilrs",
   "default_app",
   "wayland",
   "multi_threaded",

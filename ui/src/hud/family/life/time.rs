@@ -6,9 +6,9 @@ use bevy::{
     prelude::*,
 };
 use bevy_enhanced_input::prelude::*;
+use bevy_replicon::prelude::ClientTriggerExt;
 use simgine_core::{
-    component_res::InsertComponentResExt,
-    speed::{GameSpeed, Paused},
+    speed::{GameSpeed, Paused, SetPaused, SetSpeed},
     state::FamilyMode,
     time::{Clock, Weekday},
 };
@@ -30,10 +30,8 @@ use crate::{
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(update_weekday)
         .add_observer(update_clock)
-        .add_observer(toggle_pause)
-        .add_observer(set_speed)
         .add_observer(update_pause_button)
-        .add_observer(update_speed_button)
+        .add_observer(update_speed_buttons)
         .add_systems(OnEnter(FamilyMode::Life), spawn);
 }
 
@@ -47,39 +45,60 @@ fn spawn(mut commands: Commands) {
             ..Default::default()
         },
         DespawnOnExit(FamilyMode::Life),
-        Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            parent.spawn(WeekdayLabel);
-            parent.spawn(ClockLabel);
-            parent
-                .spawn((
-                    Node::default(),
-                    children![
-                        (PauseButton, button_bindings![KeyCode::Digit0]),
-                        (
+        children![
+            WeekdayLabel,
+            ClockLabel,
+            (
+                Node::default(),
+                Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                    parent
+                        .spawn((PauseButton, button_bindings![KeyCode::Digit0]))
+                        .observe(
+                            |_on: On<Fire<Activate>>,
+                             mut commands: Commands,
+                             paused: Single<&Paused>| {
+                                commands.client_trigger(SetPaused(!***paused));
+                            },
+                        );
+
+                    parent
+                        .spawn((
                             Node::default(),
                             ExclusiveGroup::default(),
-                            children![
-                                (
-                                    ButtonIcon::new("base/ui/icons/normal_speed.png"),
-                                    SpeedButton(GameSpeed::Normal),
-                                    button_bindings![KeyCode::Digit1]
-                                ),
-                                (
-                                    ButtonIcon::new("base/ui/icons/fast_speed.png"),
-                                    SpeedButton(GameSpeed::Fast),
-                                    button_bindings![KeyCode::Digit2]
-                                ),
-                                (
-                                    ButtonIcon::new("base/ui/icons/ultra_speed.png"),
-                                    SpeedButton(GameSpeed::Ultra),
-                                    button_bindings![KeyCode::Digit3]
-                                ),
-                            ]
-                        )
-                    ],
-                ))
-                .insert(SpeedNode); // Workaround to react on insertion after hierarchy spawn.
-        })),
+                            Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
+                                parent
+                                    .spawn((
+                                        SpeedButton(GameSpeed::Normal),
+                                        ButtonIcon::new("base/ui/icons/normal_speed.png"),
+                                        button_bindings![KeyCode::Digit1],
+                                    ))
+                                    .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                                        commands.client_trigger(SetSpeed(GameSpeed::Normal));
+                                    });
+                                parent
+                                    .spawn((
+                                        SpeedButton(GameSpeed::Fast),
+                                        ButtonIcon::new("base/ui/icons/fast_speed.png"),
+                                        button_bindings![KeyCode::Digit2],
+                                    ))
+                                    .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                                        commands.client_trigger(SetSpeed(GameSpeed::Fast));
+                                    });
+                                parent
+                                    .spawn((
+                                        SpeedButton(GameSpeed::Ultra),
+                                        ButtonIcon::new("base/ui/icons/ultra_speed.png"),
+                                        button_bindings![KeyCode::Digit3],
+                                    ))
+                                    .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                                        commands.client_trigger(SetSpeed(GameSpeed::Ultra));
+                                    });
+                            })),
+                        ))
+                        .insert(SpeedNode); // Workaround to react on insertion after hierarchy spawn.
+                })),
+            ),
+        ],
     ));
 }
 
@@ -101,31 +120,6 @@ fn update_clock(
     write!(text, "{}", *clock).unwrap();
 }
 
-fn toggle_pause(
-    activate: On<Fire<Activate>>,
-    mut commands: Commands,
-    buttons: Query<(), With<PauseButton>>,
-    paused: Single<&Paused>,
-) {
-    if buttons.get(activate.context).is_ok() {
-        commands.insert_component_resource(paused.toggled());
-    }
-}
-
-fn set_speed(
-    activate: On<Fire<Activate>>,
-    mut commands: Commands,
-    paused: Single<&Paused>,
-    mut buttons: Query<&SpeedButton>,
-) {
-    if let Ok(&speed) = buttons.get_mut(activate.context) {
-        commands.insert_component_resource(*speed);
-        if ***paused {
-            commands.insert_component_resource(Paused(false));
-        }
-    }
-}
-
 fn update_pause_button(
     _on: On<Insert, (Paused, PauseButton)>,
     mut commands: Commands,
@@ -138,7 +132,7 @@ fn update_pause_button(
     }
 }
 
-fn update_speed_button(
+fn update_speed_buttons(
     _on: On<Insert, (GameSpeed, SpeedNode)>,
     mut commands: Commands,
     game_speed: Single<&GameSpeed>,

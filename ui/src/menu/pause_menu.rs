@@ -2,8 +2,11 @@ mod multiplayer;
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use bevy_enhanced_input::prelude::{Release, *};
+use bevy_replicon::prelude::*;
 use simgine_core::{
-    component_res::InsertComponentResExt, speed::Paused, state::GameState, world::SaveWorld,
+    speed::{Paused, SetPaused},
+    state::GameState,
+    world::SaveWorld,
 };
 
 use crate::{
@@ -76,13 +79,13 @@ fn pause(
 ) {
     if !***paused {
         pause_menu.unpause_on_hide = true;
-        commands.insert_component_resource(Paused(true));
+        commands.client_trigger(SetPaused(true));
     }
 }
 
 fn unpause(_on: On<Remove, PauseMenu>, mut commands: Commands, pause_menu: Single<&PauseMenu>) {
     if pause_menu.unpause_on_hide {
-        commands.insert_component_resource(Paused(false));
+        commands.client_trigger(SetPaused(false));
     }
 }
 

@@ -139,7 +139,7 @@ fn apply_transform(camera: Single<(&mut Transform, &OrbitOrigin, &OrbitRotation,
     ScreenSpaceAmbientOcclusion,
     DespawnOnExit::<_>(GameState::World),
 )]
-struct PlayerCamera;
+pub(crate) struct PlayerCamera;
 
 /// The origin of a camera.
 #[derive(Component, Default, Deref, DerefMut)]

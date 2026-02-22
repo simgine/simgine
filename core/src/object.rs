@@ -1,3 +1,5 @@
+mod cursor_follower;
+
 use bevy::{asset::AssetPath, ecs::reflect::ReflectCommandExt, prelude::*};
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -5,7 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::{asset_manifest::ObjectManifest, state::GameState};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(init)
+    app.add_plugins(cursor_follower::plugin)
+        .add_observer(init)
         .add_systems(OnEnter(GameState::World), spawn);
 }
 

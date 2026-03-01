@@ -1266,8 +1266,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon"
-version = "0.38.2"
-source = "git+https://github.com/simgine/bevy_replicon#557f056af37345c46d5c050a25fa1d7433933814"
+version = "0.39.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bea47169c9f377c4c5c9040f25140c1f4661094e53f1418aa32063c00c4e63fe"
 dependencies = [
  "bevy",
  "bitflags 2.10.0",
@@ -1285,9 +1286,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon_renet"
-version = "0.14.0"
+version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2d9714c08e418ec322ae9316ee5332bfe07547ad78f85b54d035c23956073367"
+checksum = "d98680a12d9506c014031194679c3b483c7dcadaf1189b9f6f62eb0a40ffe1a0"
 dependencies = [
  "bevy",
  "bevy_renet",
@@ -2620,7 +2621,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.56.0",
+ "windows 0.61.3",
 ]
 
 [[package]]
@@ -5708,3 +5709,8 @@ name = "zmij"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9747e91771f56fd7893e1164abd78febd14a670ceec257caad15e051de35f06"
+
+[[patch.unused]]
+name = "bevy_replicon"
+version = "0.38.2"
+source = "git+https://github.com/simgine/bevy_replicon#557f056af37345c46d5c050a25fa1d7433933814"

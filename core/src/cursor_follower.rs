@@ -30,7 +30,7 @@ fn update_position(
     transform.translation = point + follower.offset;
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub(crate) struct CursorFollower {
     pub(crate) offset: Vec3,
 }

@@ -5709,8 +5709,3 @@ name = "zmij"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9747e91771f56fd7893e1164abd78febd14a670ceec257caad15e051de35f06"
-
-[[patch.unused]]
-name = "bevy_replicon"
-version = "0.38.2"
-source = "git+https://github.com/simgine/bevy_replicon#557f056af37345c46d5c050a25fa1d7433933814"

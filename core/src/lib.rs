@@ -1,6 +1,7 @@
 pub mod asset_manifest;
 mod city;
 pub mod component_res;
+mod cursor_follower;
 pub mod error_event;
 pub mod game_paths;
 pub mod network;
@@ -24,6 +25,7 @@ impl Plugin for SimgineCorePlugin {
             city::plugin,
             time::plugin,
             component_res::plugin,
+            cursor_follower::plugin,
             game_paths::plugin,
             network::plugin,
             object::plugin,

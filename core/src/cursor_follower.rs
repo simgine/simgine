@@ -31,6 +31,6 @@ fn update_position(
 }
 
 #[derive(Component)]
-pub(super) struct CursorFollower {
-    pub(super) offset: Vec3,
+pub(crate) struct CursorFollower {
+    pub(crate) offset: Vec3,
 }

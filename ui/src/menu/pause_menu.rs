@@ -19,7 +19,7 @@ use crate::{
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(multiplayer::plugin)
-        .add_input_context::<PauseMenuController>()
+        .add_input_context::<PauseMenuContext>()
         .add_observer(open)
         .add_observer(pause)
         .add_observer(unpause)
@@ -28,9 +28,9 @@ pub(super) fn plugin(app: &mut App) {
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
-        PauseMenuController,
+        PauseMenuContext,
         actions!(
-            PauseMenuController[(
+            PauseMenuContext[(
                 Action::<OpenPauseMenu>::new(),
                 Release::default(),
                 bindings![KeyCode::Escape]
@@ -91,7 +91,7 @@ fn unpause(_on: On<Remove, PauseMenu>, mut commands: Commands, pause_menu: Singl
 
 #[derive(Component)]
 #[require(DespawnOnExit::<_>(GameState::World))]
-struct PauseMenuController;
+struct PauseMenuContext;
 
 #[derive(InputAction)]
 #[action_output(bool)]

@@ -1,19 +1,12 @@
 use bevy::prelude::*;
-use bevy_enhanced_input::prelude::*;
 
 use crate::player_camera::PlayerCamera;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_input_context::<CursorFollower>()
-        .add_observer(cancel)
-        .add_systems(
-            Update,
-            update_position.run_if(any_with_component::<CursorFollower>),
-        );
-}
-
-fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
-    commands.entity(cancel.context).despawn();
+    app.add_systems(
+        Update,
+        update_position.run_if(any_with_component::<CursorFollower>),
+    );
 }
 
 fn update_position(
@@ -37,42 +30,7 @@ fn update_position(
     transform.translation = point + follower.offset;
 }
 
-pub fn cursor_follower(offset: Vec3) -> impl Bundle {
-    (
-        CursorFollower { offset },
-        ContextPriority::<CursorFollower>::new(100),
-        actions!(CursorFollower[
-            (
-                Action::<Place>::new(),
-                ActionSettings {
-                    consume_input: true,
-                    require_reset: true,
-                    ..Default::default()
-                },
-                bindings![MouseButton::Left, GamepadButton::South]
-            ),
-            (
-                Action::<Cancel>::new(),
-                ActionSettings {
-                    consume_input: true,
-                    require_reset: true,
-                    ..Default::default()
-                },
-                bindings![KeyCode::Escape, GamepadButton::East]
-            )
-        ]),
-    )
-}
-
 #[derive(Component, Default)]
-struct CursorFollower {
+pub(crate) struct CursorFollower {
     offset: Vec3,
 }
-
-#[derive(InputAction)]
-#[action_output(bool)]
-pub(crate) struct Place;
-
-#[derive(InputAction)]
-#[action_output(bool)]
-struct Cancel;

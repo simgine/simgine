@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use simgine_core::{asset_manifest::ObjectManifest, state::BuildingMode};
+use simgine_core::{asset_manifest::ObjectManifest, object::placing, state::BuildingMode};
 
 use crate::{
     preview::Preview,
@@ -29,25 +29,29 @@ fn spawn_grid_buttons(
 
     commands.entity(add.entity).with_children(|parent| {
         for (id, _) in objects.iter() {
-            parent.spawn((
-                Node {
-                    padding: RADIUS_GAP,
-                    border_radius: OUTER_RADIUS,
-                    ..Default::default()
-                },
-                BoxShadow::from(SHADOW),
-                ButtonStyle::default(),
-                Toggled(false),
-                children![(
-                    Preview(id),
+            parent
+                .spawn((
                     Node {
-                        height: PREVIEW_HEIGHT,
-                        width: PREVIEW_WIDTH,
-                        border_radius: INNER_RADIUS,
+                        padding: RADIUS_GAP,
+                        border_radius: OUTER_RADIUS,
                         ..Default::default()
                     },
-                )],
-            ));
+                    BoxShadow::from(SHADOW),
+                    ButtonStyle::default(),
+                    Toggled(false),
+                    children![(
+                        Preview(id),
+                        Node {
+                            height: PREVIEW_HEIGHT,
+                            width: PREVIEW_WIDTH,
+                            border_radius: INNER_RADIUS,
+                            ..Default::default()
+                        },
+                    )],
+                ))
+                .observe(move |_on: On<Pointer<Click>>, mut commands: Commands| {
+                    commands.spawn(placing::placing_object(id));
+                });
         }
     });
 }

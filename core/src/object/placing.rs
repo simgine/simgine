@@ -1,18 +1,40 @@
-use bevy::{asset::AssetPath, prelude::*};
-use bevy_enhanced_input::prelude::*;
+use bevy::prelude::*;
+use bevy_enhanced_input::prelude::{Press, *};
 
-use crate::{cursor_follower::CursorFollower, object::Object};
+use crate::{asset_manifest::ObjectManifest, cursor_follower::CursorFollower};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<PlacingObject>()
+        .add_observer(init)
         .add_observer(place)
         .add_observer(cancel);
 }
 
-fn place(cancel: On<Fire<Place>>, mut commands: Commands, objects: Query<&Object>) {
+fn init(
+    insert: On<Insert, PlacingObject>,
+    asset_server: Res<AssetServer>,
+    objects_manifests: Res<Assets<ObjectManifest>>,
+    mut objects: Query<(&PlacingObject, &mut SceneRoot)>,
+) {
+    let (placing_object, mut scene_root) = objects.get_mut(insert.entity).unwrap();
+    let manifest = objects_manifests
+        .get(placing_object.id)
+        .expect("manifests should be preloaded");
+
+    **scene_root = asset_server.load(manifest.scene.clone());
+}
+
+fn place(
+    cancel: On<Fire<Place>>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    placing_object: Single<&PlacingObject>,
+) {
     commands.entity(cancel.context).despawn();
-    let object = objects.get(cancel.context).unwrap();
-    info!("placing '{}'", object.path);
+    let manifest_path = asset_server
+        .get_path(placing_object.id)
+        .expect("manifest should always come from file");
+    info!("placing '{manifest_path}'");
 }
 
 fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
@@ -20,15 +42,17 @@ fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
     commands.entity(cancel.context).despawn();
 }
 
-pub fn placing_object(path: AssetPath<'static>) -> impl Bundle {
+pub fn placing_object(id: AssetId<ObjectManifest>) -> impl Bundle {
     (
-        Object { path },
         CursorFollower::default(),
-        PlacingObject,
+        Name::new("Placing object"),
+        SceneRoot::default(),
+        PlacingObject { id },
         ContextPriority::<PlacingObject>::new(100),
         actions!(PlacingObject[
             (
                 Action::<Place>::new(),
+                Press::default(),
                 ActionSettings {
                     consume_input: true,
                     require_reset: true,
@@ -38,6 +62,7 @@ pub fn placing_object(path: AssetPath<'static>) -> impl Bundle {
             ),
             (
                 Action::<Cancel>::new(),
+                Press::default(),
                 ActionSettings {
                     consume_input: true,
                     require_reset: true,
@@ -50,7 +75,10 @@ pub fn placing_object(path: AssetPath<'static>) -> impl Bundle {
 }
 
 #[derive(Component)]
-struct PlacingObject;
+#[component(immutable)]
+struct PlacingObject {
+    id: AssetId<ObjectManifest>,
+}
 
 #[derive(InputAction)]
 #[action_output(bool)]

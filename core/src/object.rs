@@ -1,4 +1,4 @@
-mod placing;
+pub mod placing;
 
 use bevy::{asset::AssetPath, ecs::reflect::ReflectCommandExt, prelude::*};
 use bevy_replicon::prelude::*;

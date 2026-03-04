@@ -38,7 +38,20 @@ fn setup(mut commands: Commands) {
     const YAW: f32 = 35.0_f32.to_radians();
     const PITCH: f32 = 50.0_f32.to_radians();
 
-    commands.spawn(PreviewCamera);
+    commands.spawn((
+        Name::new("Preview camera"),
+        PreviewCamera,
+        PREVIEW_RENDER_LAYER,
+        Camera3d::default(),
+        RenderTarget::from(Handle::<Image>::default()),
+        Msaa::Sample8,
+        Camera {
+            order: -1,
+            is_active: false,
+            clear_color: ClearColorConfig::Custom(GRAY_400.into()),
+            ..Default::default()
+        },
+    ));
     commands.spawn((
         Name::new("Preview light"),
         PREVIEW_RENDER_LAYER,
@@ -220,19 +233,6 @@ struct PreviewProcessed;
 
 /// Marker for preview camera.
 #[derive(Component)]
-#[require(
-    Name::new("Preview camera"),
-    RenderLayers = PREVIEW_RENDER_LAYER,
-    Camera3d,
-    RenderTarget::from(Handle::<Image>::default()),
-    Msaa::Sample8,
-    Camera {
-        order: -1,
-        is_active: false,
-        clear_color: ClearColorConfig::Custom(GRAY_400.into()),
-        ..Default::default()
-    },
-)]
 struct PreviewCamera;
 
 /// Points to the entity for which the preview will be generated.

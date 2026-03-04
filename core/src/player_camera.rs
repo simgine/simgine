@@ -25,7 +25,19 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
     debug!("spawning camera");
 
     commands.spawn((
+        Name::new("Player camera"),
         PlayerCamera,
+        OrbitOrigin::default(),
+        OrbitRotation::default(),
+        SpringArm::default(),
+        Camera3d::default(),
+        Msaa::Off, // Required for TAA.
+        TemporalAntiAliasing::default(),
+        Bloom::NATURAL,
+        Exposure { ev100: 13.0 }, // Compensate for atmosphere.
+        AtmosphereEnvironmentMapLight::default(),
+        ScreenSpaceAmbientOcclusion::default(),
+        DespawnOnExit(GameState::World),
         Atmosphere::earthlike(scattering_mediums.add(ScatteringMedium::default())),
         Actions::<PlayerCamera>::spawn(SpawnWith(|context: &mut ActionSpawner<_>| {
             let enable_rotation = context
@@ -122,20 +134,6 @@ fn apply_transform(camera: Single<(&mut Transform, &OrbitOrigin, &OrbitRotation,
 }
 
 #[derive(Component)]
-#[require(
-    Name::new("Player camera"),
-    OrbitOrigin,
-    OrbitRotation,
-    SpringArm,
-    Camera3d,
-    Msaa::Off, // Required for TAA.
-    TemporalAntiAliasing,
-    Bloom::NATURAL,
-    Exposure { ev100: 13.0 }, // Compensate for atmosphere.
-    AtmosphereEnvironmentMapLight,
-    ScreenSpaceAmbientOcclusion,
-    DespawnOnExit::<_>(GameState::World),
-)]
 pub(crate) struct PlayerCamera;
 
 /// The origin of a camera.

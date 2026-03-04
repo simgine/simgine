@@ -29,6 +29,7 @@ pub(super) fn plugin(app: &mut App) {
 fn spawn(mut commands: Commands) {
     commands.spawn((
         PauseMenuContext,
+        DespawnOnExit(GameState::World),
         actions!(
             PauseMenuContext[(
                 Action::<OpenPauseMenu>::new(),
@@ -41,7 +42,10 @@ fn spawn(mut commands: Commands) {
 
 fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
     commands.spawn((
+        Name::new("Pause menu"),
         PauseMenu::default(),
+        Dialog,
+        DespawnOnExit(GameState::World),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             let dialog = parent.target_entity();
             parent.spawn((DialogTitle, Text::new("Menu")));
@@ -90,7 +94,6 @@ fn unpause(_on: On<Remove, PauseMenu>, mut commands: Commands, pause_menu: Singl
 }
 
 #[derive(Component)]
-#[require(DespawnOnExit::<_>(GameState::World))]
 struct PauseMenuContext;
 
 #[derive(InputAction)]
@@ -98,11 +101,6 @@ struct PauseMenuContext;
 struct OpenPauseMenu;
 
 #[derive(Component, Default)]
-#[require(
-    Name::new("Pause menu"),
-    Dialog,
-    DespawnOnExit::<_>(GameState::World),
-)]
 struct PauseMenu {
     unpause_on_hide: bool,
 }

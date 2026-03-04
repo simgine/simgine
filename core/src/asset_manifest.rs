@@ -157,7 +157,7 @@ pub enum ObjectCategory {
 
 #[derive(Deserialize, Reflect)]
 pub struct ManifestInfo {
-    pub name: String,
+    pub name: Name,
     pub author: String,
     pub license: String,
 }

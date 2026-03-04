@@ -35,6 +35,3 @@ doc_markdown = "warn"
 
 [profile.dev.package."*"]
 opt-level = 3
-
-[patch.crates-io]
-renet = { git = "https://github.com/simgine/renet", branch = "real-time" }

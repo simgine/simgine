@@ -1252,9 +1252,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_renet"
-version = "4.0.0"
+version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "095a90286e81f24b9c44d3ab605486f70f2a30a906a737d24b817e4b07b238f7"
+checksum = "1adf4d4212a12a4fb789bc7870bbbb82a474a32ace8e5e39a25de67c23f8ee13"
 dependencies = [
  "bevy_app",
  "bevy_derive",
@@ -4017,7 +4017,8 @@ checksum = "19b30a45b0cd0bcca8037f3d0dc3421eaf95327a17cad11964fb8179b4fc4832"
 [[package]]
 name = "renet"
 version = "2.0.0"
-source = "git+https://github.com/simgine/renet?branch=real-time#b59ff028422718fccdb411ff45adaeb159233b30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8535f2f4b5afe5e31fc37be4b8a1f167e61177f356b1c6ee8456b7045d6c74c0"
 dependencies = [
  "bytes",
  "log",

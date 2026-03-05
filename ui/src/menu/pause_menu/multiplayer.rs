@@ -68,7 +68,13 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                         Ok(())
                     };
                     parent
-                        .spawn(StartStopButton)
+                        .spawn((
+                            Button,
+                            StartStopButton,
+                            Text::default(),
+                            TextFont::from_font_size(NORMAL_TEXT),
+                            ButtonStyle::default(),
+                        ))
                         .observe(start_stop.pipe(trigger_error));
                 })),
             ),
@@ -78,5 +84,4 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
 }
 
 #[derive(Component)]
-#[require(ButtonStyle, Text, TextFont::from_font_size(NORMAL_TEXT))]
 struct StartStopButton;

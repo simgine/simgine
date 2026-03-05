@@ -42,8 +42,9 @@ fn spawn(mut commands: Commands) {
 
 fn button(text: &str) -> impl Bundle {
     (
+        Button,
         ButtonStyle::default(),
-        TextFont::from_font_size(HUGE_TEXT),
         Text::new(text),
+        TextFont::from_font_size(HUGE_TEXT),
     )
 }

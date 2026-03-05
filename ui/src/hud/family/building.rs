@@ -32,6 +32,7 @@ fn spawn(mut commands: Commands) {
                 Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
                     parent
                         .spawn((
+                            Button,
                             ButtonIcon::new("base/ui/icons/objects_mode.png"),
                             ButtonStyle::default(),
                             Toggled(true),
@@ -41,6 +42,7 @@ fn spawn(mut commands: Commands) {
                         });
                     parent
                         .spawn((
+                            Button,
                             ButtonIcon::new("base/ui/icons/walls_mode.png"),
                             ButtonStyle::default(),
                             Toggled(false),

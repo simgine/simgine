@@ -36,7 +36,7 @@ fn update_style(
 }
 
 #[derive(Component, Clone, Copy)]
-#[require(Button)]
+#[require(Interaction, BackgroundColor)]
 pub(crate) struct ButtonStyle {
     pub(crate) hovered_pressed: Color,
     pub(crate) pressed: Color,

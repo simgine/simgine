@@ -32,7 +32,6 @@ fn toggle<E: EntityEvent, F: QueryFilter>(
 
 #[derive(Component, Deref, Debug, Default, Clone, Copy)]
 #[component(immutable)]
-#[require(Button)]
 pub(crate) struct Toggled(pub(crate) bool);
 
 impl Toggled {

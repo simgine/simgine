@@ -16,7 +16,7 @@ fn load_icon(
 
 #[derive(Component, Deref)]
 #[component(immutable)]
-#[require(Button, ImageNode)]
+#[require(ImageNode)]
 pub(crate) struct ButtonIcon(pub(crate) AssetPath<'static>);
 
 impl ButtonIcon {

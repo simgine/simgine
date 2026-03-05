@@ -91,6 +91,7 @@ fn spawn(mut commands: Commands) {
 
 fn bottom_button(text: &str) -> impl Bundle {
     (
+        Button,
         Text::new(text),
         TextFont::from_font_size(LARGE_TEXT),
         ButtonStyle::default(),

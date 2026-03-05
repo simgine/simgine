@@ -58,7 +58,7 @@ fn spawn(
                             ..Default::default()
                         },
                         Children::spawn(SpawnWith(move |parent: &mut RelatedSpawner<_>| {
-                            parent.spawn((WorldButton, Text::new("Play"))).observe(
+                            parent.spawn(world_button("Play")).observe(
                                 move |_on: On<Pointer<Click>>,
                                       mut commands: Commands,
                                       labels: Query<&Text>| {
@@ -81,7 +81,7 @@ fn spawn(
                                 Ok(())
                             };
                             parent
-                                .spawn((WorldButton, Text::new("Delete")))
+                                .spawn(world_button("Delete"))
                                 .observe(remove_world.pipe(trigger_error));
                         })),
                     ));
@@ -93,23 +93,29 @@ fn spawn(
     Ok(())
 }
 
-#[derive(Component)]
-#[require(
-    Node {
-        row_gap: GAP,
-        flex_direction: FlexDirection::Column,
-        ..Default::default()
-    },
-)]
-pub(super) struct WorldNodes;
+pub(super) fn world_nodes() -> impl Bundle {
+    (
+        WorldNodes,
+        Node {
+            row_gap: GAP,
+            flex_direction: FlexDirection::Column,
+            ..Default::default()
+        },
+    )
+}
+
+fn world_button(text: &str) -> impl Bundle {
+    (
+        Button,
+        Text::new(text),
+        TextFont::from_font_size(SMALL_TEXT),
+        ButtonStyle::BLACK,
+        Node {
+            align_self: AlignSelf::End,
+            ..Default::default()
+        },
+    )
+}
 
 #[derive(Component)]
-#[require(
-    Node {
-        align_self: AlignSelf::End,
-        ..Default::default()
-    },
-    TextFont::from_font_size(SMALL_TEXT),
-    ButtonStyle::BLACK
-)]
-struct WorldButton;
+struct WorldNodes;

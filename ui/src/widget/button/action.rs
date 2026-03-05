@@ -21,7 +21,6 @@ fn activate(
 }
 
 #[derive(Component, Default)]
-#[require(Button)]
 pub(crate) struct ButtonContext;
 
 #[derive(InputAction)]

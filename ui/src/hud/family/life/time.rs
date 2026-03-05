@@ -46,13 +46,37 @@ fn spawn(mut commands: Commands) {
         },
         DespawnOnExit(FamilyMode::Life),
         children![
-            WeekdayLabel,
-            ClockLabel,
+            (
+                Name::new("Weekday"),
+                WeekdayLabel,
+                Text::default(),
+                TextFont::from_font_size(SMALL_TEXT)
+            ),
+            (
+                Name::new("Clock"),
+                ClockLabel,
+                Text::default(),
+                TextFont::from_font_size(LARGE_TEXT)
+            ),
             (
                 Node::default(),
                 Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
                     parent
-                        .spawn((PauseButton, button_bindings![KeyCode::Digit0]))
+                        .spawn((
+                            Name::new("Pause"),
+                            Button,
+                            PauseButton,
+                            ButtonIcon::new("base/ui/icons/pause.png"),
+                            ButtonStyle {
+                                hovered_pressed: RED_400.into(),
+                                pressed: RED_500.into(),
+                                hovered: RED_50.into(),
+                                ..Default::default()
+                            },
+                            Toggled::default(),
+                            ButtonContext,
+                            button_bindings![KeyCode::Digit0],
+                        ))
                         .observe(
                             |_on: On<Fire<Activate>>,
                              mut commands: Commands,
@@ -66,33 +90,21 @@ fn spawn(mut commands: Commands) {
                             Node::default(),
                             ExclusiveGroup::default(),
                             Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-                                parent
-                                    .spawn((
-                                        SpeedButton(GameSpeed::Normal),
-                                        ButtonIcon::new("base/ui/icons/normal_speed.png"),
-                                        button_bindings![KeyCode::Digit1],
-                                    ))
-                                    .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                                parent.spawn(speed_button(GameSpeed::Normal)).observe(
+                                    |_on: On<Fire<Activate>>, mut commands: Commands| {
                                         commands.client_trigger(SetSpeed(GameSpeed::Normal));
-                                    });
-                                parent
-                                    .spawn((
-                                        SpeedButton(GameSpeed::Fast),
-                                        ButtonIcon::new("base/ui/icons/fast_speed.png"),
-                                        button_bindings![KeyCode::Digit2],
-                                    ))
-                                    .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                                    },
+                                );
+                                parent.spawn(speed_button(GameSpeed::Fast)).observe(
+                                    |_on: On<Fire<Activate>>, mut commands: Commands| {
                                         commands.client_trigger(SetSpeed(GameSpeed::Fast));
-                                    });
-                                parent
-                                    .spawn((
-                                        SpeedButton(GameSpeed::Ultra),
-                                        ButtonIcon::new("base/ui/icons/ultra_speed.png"),
-                                        button_bindings![KeyCode::Digit3],
-                                    ))
-                                    .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                                    },
+                                );
+                                parent.spawn(speed_button(GameSpeed::Ultra)).observe(
+                                    |_on: On<Fire<Activate>>, mut commands: Commands| {
                                         commands.client_trigger(SetSpeed(GameSpeed::Ultra));
-                                    });
+                                    },
+                                );
                             })),
                         ))
                         .insert(SpeedNode); // Workaround to react on insertion after hierarchy spawn.
@@ -145,26 +157,32 @@ fn update_speed_buttons(
     }
 }
 
+fn speed_button(speed: GameSpeed) -> impl Bundle {
+    let (icon, key) = match speed {
+        GameSpeed::Normal => ("base/ui/icons/normal_speed.png", KeyCode::Digit1),
+        GameSpeed::Fast => ("base/ui/icons/fast_speed.png", KeyCode::Digit2),
+        GameSpeed::Ultra => ("base/ui/icons/fast_speed.png", KeyCode::Digit3),
+    };
+
+    (
+        Name::new(format!("{speed:?}")),
+        Button,
+        SpeedButton(speed),
+        ButtonIcon::new(icon),
+        ButtonStyle::default(),
+        Toggled::default(),
+        ButtonContext,
+        button_bindings![key],
+    )
+}
+
 #[derive(Component)]
-#[require(Text, TextFont::from_font_size(SMALL_TEXT))]
 struct WeekdayLabel;
 
 #[derive(Component)]
-#[require(Text, TextFont::from_font_size(LARGE_TEXT))]
 struct ClockLabel;
 
 #[derive(Component)]
-#[require(
-    ButtonContext,
-    ButtonIcon::new("base/ui/icons/pause.png"),
-    ButtonStyle {
-        hovered_pressed: RED_400.into(),
-        pressed: RED_500.into(),
-        hovered: RED_50.into(),
-        ..Default::default()
-    },
-    Toggled
-)]
 struct PauseButton;
 
 #[derive(Component)]
@@ -172,5 +190,4 @@ struct SpeedNode;
 
 #[derive(Component, Deref, Clone, Copy)]
 #[component(immutable)]
-#[require(ButtonContext, ButtonStyle, Toggled)]
 struct SpeedButton(GameSpeed);

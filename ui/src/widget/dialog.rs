@@ -68,6 +68,7 @@ pub(crate) fn dialog_close_button(text: &str) -> impl Bundle {
 
 pub(crate) fn dialog_button(text: &str) -> impl Bundle {
     (
+        Button,
         Text::new(text),
         TextFont::from_font_size(NORMAL_TEXT),
         ButtonStyle::default(),

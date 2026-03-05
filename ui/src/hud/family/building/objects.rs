@@ -31,6 +31,7 @@ fn spawn_grid_buttons(
         for (id, _) in objects.iter() {
             parent
                 .spawn((
+                    Button,
                     Node {
                         padding: RADIUS_GAP,
                         border_radius: OUTER_RADIUS,
@@ -77,10 +78,11 @@ pub(super) fn objects_node() -> impl Bundle {
                 ExclusiveGroup::default(),
                 children![
                     (
+                        Button,
                         ButtonIcon::new("base/ui/icons/all_objects.png"),
                         Toggled(true),
                     ),
-                    (ButtonIcon::new("base/ui/icons/furniture.png"))
+                    (Button, ButtonIcon::new("base/ui/icons/furniture.png"))
                 ],
             ),
             (

@@ -7,10 +7,10 @@ use crate::widget::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(spawn_world_nodes.pipe(trigger_error));
+    app.add_observer(spawn.pipe(trigger_error));
 }
 
-fn spawn_world_nodes(
+fn spawn(
     insert: On<Insert, WorldNodes>,
     mut commands: Commands,
     game_paths: Res<GamePaths>,

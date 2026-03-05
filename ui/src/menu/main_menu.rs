@@ -26,12 +26,12 @@ fn spawn(mut commands: Commands) {
             ..Default::default()
         },
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            parent.spawn((MainMenuButton, Text::new("Play"))).observe(
+            parent.spawn(button("Play")).observe(
                 |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.set_state(MenuState::WorldBrowser)
                 },
             );
-            parent.spawn((MainMenuButton, Text::new("Exit"))).observe(
+            parent.spawn(button("Exit")).observe(
                 |_on: On<Pointer<Click>>, mut exit: MessageWriter<AppExit>| {
                     exit.write(AppExit::Success);
                 },
@@ -40,6 +40,10 @@ fn spawn(mut commands: Commands) {
     ));
 }
 
-#[derive(Component)]
-#[require(ButtonStyle, TextFont::from_font_size(HUGE_TEXT))]
-struct MainMenuButton;
+fn button(text: &str) -> impl Bundle {
+    (
+        ButtonStyle::default(),
+        TextFont::from_font_size(HUGE_TEXT),
+        Text::new(text),
+    )
+}

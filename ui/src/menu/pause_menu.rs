@@ -49,24 +49,24 @@ fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             let dialog = parent.target_entity();
             parent.spawn((DialogTitle, Text::new("Menu")));
-            parent.spawn((PauseMenuButton, DialogCloseButton, Text::new("Resume")));
-            parent.spawn((PauseMenuButton, Text::new("Save"))).observe(
+            parent.spawn((button("Resume"), DialogCloseButton));
+            parent.spawn(button("Save")).observe(
                 move |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.trigger(SaveWorld);
                     commands.entity(dialog).despawn();
                 },
             );
-            parent
-                .spawn((PauseMenuButton, Text::new("Multiplayer")))
-                .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
+            parent.spawn(button("Multiplayer")).observe(
+                |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.spawn(multiplayer_menu());
-                });
-            parent
-                .spawn((PauseMenuButton, Text::new("Main menu")))
-                .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
+                },
+            );
+            parent.spawn(button("Main menu")).observe(
+                |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.set_state(GameState::Menu);
-                });
-            parent.spawn((PauseMenuButton, Text::new("Exit"))).observe(
+                },
+            );
+            parent.spawn(button("Exit")).observe(
                 |_on: On<Pointer<Click>>, mut exit: MessageWriter<AppExit>| {
                     exit.write(AppExit::Success);
                 },
@@ -93,6 +93,10 @@ fn unpause(_on: On<Remove, PauseMenu>, mut commands: Commands, pause_menu: Singl
     }
 }
 
+fn button(text: &str) -> impl Bundle {
+    (Text::new(text), DialogButton, ButtonStyle::default())
+}
+
 #[derive(Component)]
 struct PauseMenuContext;
 
@@ -104,7 +108,3 @@ struct OpenPauseMenu;
 struct PauseMenu {
     unpause_on_hide: bool,
 }
-
-#[derive(Component)]
-#[require(DialogButton, ButtonStyle)]
-struct PauseMenuButton;

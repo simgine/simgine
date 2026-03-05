@@ -56,11 +56,11 @@ fn spawn(mut commands: Commands) {
         },
         DespawnOnExit(MenuState::WorldBrowser),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            parent
-                .spawn((WorldBrowserButton, Text::new("Back")))
-                .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
+            parent.spawn(bottom_button("Back")).observe(
+                |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.set_state(MenuState::MainMenu)
-                });
+                },
+            );
         })),
     ));
     commands.spawn((
@@ -73,18 +73,26 @@ fn spawn(mut commands: Commands) {
         },
         DespawnOnExit(MenuState::WorldBrowser),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            parent
-                .spawn((WorldBrowserButton, Text::new("Create")))
-                .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
+            parent.spawn(bottom_button("Create")).observe(
+                |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.spawn(create_dialog());
-                });
-            parent
-                .spawn((WorldBrowserButton, Text::new("Join")))
-                .observe(|_on: On<Pointer<Click>>, mut commands: Commands| {
+                },
+            );
+            parent.spawn(bottom_button("Join")).observe(
+                |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.spawn(join_dialog());
-                });
+                },
+            );
         })),
     ));
+}
+
+fn bottom_button(text: &str) -> impl Bundle {
+    (
+        Text::new(text),
+        TextFont::from_font_size(LARGE_TEXT),
+        ButtonStyle::default(),
+    )
 }
 
 fn create_dialog() -> impl Bundle {
@@ -163,7 +171,3 @@ fn join_dialog() -> impl Bundle {
         })),
     )
 }
-
-#[derive(Component)]
-#[require(ButtonStyle, TextFont::from_font_size(LARGE_TEXT))]
-struct WorldBrowserButton;

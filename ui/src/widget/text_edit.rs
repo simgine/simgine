@@ -11,20 +11,20 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(PreUpdate, update_style.after(UiSystems::Focus));
 }
 
-#[derive(Component)]
-#[require(
-   Node {
-        align_self: AlignSelf::Center,
-        width: Val::Px(300.0),
-        border_radius: OUTER_RADIUS,
-        border: RADIUS_GAP,
-        padding: RADIUS_GAP,
-        ..Default::default()
-    },
-    TextInput,
-    TextInputTextFont(TextFont::from_font_size(NORMAL_TEXT)),
-)]
-pub(crate) struct TextEdit;
+pub(crate) fn text_edit() -> impl Bundle {
+    (
+        Node {
+            align_self: AlignSelf::Center,
+            width: Val::Px(300.0),
+            border_radius: OUTER_RADIUS,
+            border: RADIUS_GAP,
+            padding: RADIUS_GAP,
+            ..Default::default()
+        },
+        TextInput,
+        TextInputTextFont(TextFont::from_font_size(NORMAL_TEXT)),
+    )
+}
 
 fn update_style(
     mut text_edits: Query<

@@ -11,10 +11,7 @@ use simgine_core::{
 
 use crate::{
     menu::pause_menu::multiplayer::multiplayer_menu,
-    widget::{
-        button::style::ButtonStyle,
-        dialog::{Dialog, DialogButton, DialogCloseButton, DialogTitle},
-    },
+    widget::dialog::{dialog, dialog_button, dialog_close_button, dialog_title},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -44,29 +41,29 @@ fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
     commands.spawn((
         Name::new("Pause menu"),
         PauseMenu::default(),
-        Dialog,
+        dialog(),
         DespawnOnExit(GameState::World),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             let dialog = parent.target_entity();
-            parent.spawn((DialogTitle, Text::new("Menu")));
-            parent.spawn((button("Resume"), DialogCloseButton));
-            parent.spawn(button("Save")).observe(
+            parent.spawn(dialog_title("Menu"));
+            parent.spawn(dialog_close_button("Resume"));
+            parent.spawn(dialog_button("Save")).observe(
                 move |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.trigger(SaveWorld);
                     commands.entity(dialog).despawn();
                 },
             );
-            parent.spawn(button("Multiplayer")).observe(
+            parent.spawn(dialog_button("Multiplayer")).observe(
                 |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.spawn(multiplayer_menu());
                 },
             );
-            parent.spawn(button("Main menu")).observe(
+            parent.spawn(dialog_button("Main menu")).observe(
                 |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.set_state(GameState::Menu);
                 },
             );
-            parent.spawn(button("Exit")).observe(
+            parent.spawn(dialog_button("Exit")).observe(
                 |_on: On<Pointer<Click>>, mut exit: MessageWriter<AppExit>| {
                     exit.write(AppExit::Success);
                 },
@@ -91,10 +88,6 @@ fn unpause(_on: On<Remove, PauseMenu>, mut commands: Commands, pause_menu: Singl
     if pause_menu.unpause_on_hide {
         commands.client_trigger(SetPaused(false));
     }
-}
-
-fn button(text: &str) -> impl Bundle {
-    (Text::new(text), DialogButton, ButtonStyle::default())
 }
 
 #[derive(Component)]

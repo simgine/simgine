@@ -11,13 +11,15 @@ use simgine_core::{
     world::CreateWorld,
 };
 
-use crate::widget::{
-    button::style::ButtonStyle,
-    dialog::{Dialog, DialogButton, DialogCloseButton, DialogTitle},
-    text_edit::TextEdit,
-    theme::{GAP, HUGE_TEXT, LARGE_TEXT, NORMAL_TEXT, SCREEN_OFFSET},
+use crate::{
+    menu::main_menu::world_browser::world_nodes::world_nodes,
+    widget::{
+        button::style::ButtonStyle,
+        dialog::{dialog, dialog_button, dialog_close_button, dialog_title},
+        text_edit::text_edit,
+        theme::{GAP, HUGE_TEXT, LARGE_TEXT, NORMAL_TEXT, SCREEN_OFFSET},
+    },
 };
-use world_nodes::WorldNodes;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(world_nodes::plugin)
@@ -45,7 +47,7 @@ fn spawn(mut commands: Commands) {
                 Text::new("World browser"),
                 TextFont::from_font_size(HUGE_TEXT),
             ),
-            WorldNodes,
+            world_nodes(),
         ],
     ));
     commands.spawn((
@@ -97,11 +99,11 @@ fn bottom_button(text: &str) -> impl Bundle {
 
 fn create_dialog() -> impl Bundle {
     (
-        Dialog,
+        dialog(),
         DespawnOnExit(MenuState::WorldBrowser),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            parent.spawn((DialogTitle, Text::new("Create world")));
-            let name_edit = parent.spawn(TextEdit).id();
+            parent.spawn(dialog_title("Create world"));
+            let name_edit = parent.spawn(text_edit()).id();
             parent.spawn((
                 Node {
                     align_self: AlignSelf::Center,
@@ -109,8 +111,8 @@ fn create_dialog() -> impl Bundle {
                     ..Default::default()
                 },
                 Children::spawn(SpawnWith(move |parent: &mut RelatedSpawner<_>| {
-                    parent.spawn((DialogCloseButton, Text::new("Cancel")));
-                    parent.spawn((DialogButton, Text::new("Create"))).observe(
+                    parent.spawn(dialog_close_button("Cancel"));
+                    parent.spawn(dialog_button("Create")).observe(
                         move |_on: On<Pointer<Click>>,
                               mut commands: Commands,
                               input_values: Query<&TextInputValue>| {
@@ -128,14 +130,14 @@ fn create_dialog() -> impl Bundle {
 
 fn join_dialog() -> impl Bundle {
     (
-        Dialog,
+        dialog(),
         DespawnOnExit(MenuState::WorldBrowser),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
-            parent.spawn((DialogTitle, Text::new("Join game")));
+            parent.spawn(dialog_title("Join game"));
             parent.spawn((Text::new("Address"), TextFont::from_font_size(NORMAL_TEXT)));
             let addr_edit = parent
                 .spawn((
-                    TextEdit,
+                    text_edit(),
                     TextInputValue(format!("127.0.0.1:{DEFAULT_PORT}")),
                 ))
                 .id();
@@ -163,9 +165,9 @@ fn join_dialog() -> impl Bundle {
                     ..Default::default()
                 })
                 .with_children(|parent: &mut RelatedSpawner<_>| {
-                    parent.spawn((DialogCloseButton, Text::new("Cancel")));
+                    parent.spawn(dialog_close_button("Cancel"));
                     parent
-                        .spawn((DialogButton, Text::new("Connect")))
+                        .spawn(dialog_button("Connect"))
                         .observe(connect.pipe(trigger_error));
                 });
         })),

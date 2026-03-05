@@ -9,8 +9,8 @@ use simgine_core::{
 
 use crate::widget::{
     button::style::ButtonStyle,
-    dialog::{Dialog, DialogCloseButton, DialogTitle},
-    text_edit::TextEdit,
+    dialog::{dialog, dialog_close_button, dialog_title},
+    text_edit::text_edit,
     theme::{GAP, NORMAL_TEXT},
 };
 
@@ -33,10 +33,10 @@ fn update_start_stop(
 
 pub(super) fn multiplayer_menu() -> impl Bundle {
     (
-        Dialog,
+        dialog(),
         DespawnOnExit(GameState::World),
         children![
-            (DialogTitle, Text::new("Multiplayer")),
+            dialog_title("Multiplayer"),
             (
                 Node {
                     column_gap: GAP,
@@ -46,7 +46,7 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                 Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
                     parent.spawn((Text::new("Port"), TextFont::from_font_size(NORMAL_TEXT)));
                     let port_edit = parent
-                        .spawn((TextEdit, TextInputValue(DEFAULT_PORT.to_string())))
+                        .spawn((text_edit(), TextInputValue(DEFAULT_PORT.to_string())))
                         .id();
                     let start_stop = move |_on: On<Pointer<Click>>,
                                            mut commands: Commands,
@@ -72,7 +72,7 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                         .observe(start_stop.pipe(trigger_error));
                 })),
             ),
-            (DialogCloseButton, Text::new("Close"))
+            dialog_close_button("Close")
         ],
     )
 }

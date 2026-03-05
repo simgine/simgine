@@ -5,7 +5,7 @@ use simgine_core::{network::Disconnect, state::GameState};
 
 use crate::widget::{
     button::action::Activate,
-    dialog::{Dialog, DialogCloseButton, DialogTitle},
+    dialog::{dialog, dialog_close_button, dialog_title},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -14,17 +14,15 @@ pub(super) fn plugin(app: &mut App) {
 
 fn spawn(mut commands: Commands) {
     commands.spawn((
-        Dialog,
+        dialog(),
         // Despawn only after the first replication message with the world is received.
         DespawnOnEnter(GameState::World),
         DespawnOnEnter(ClientState::Disconnected),
         Children::spawn(SpawnWith(move |parent: &mut RelatedSpawner<_>| {
-            parent.spawn((DialogTitle, Text::new("Connecting to server")));
-            parent
-                .spawn((DialogCloseButton, Text::new("Cancel")))
-                .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
-                    commands.trigger(Disconnect)
-                });
+            parent.spawn(dialog_title("Connecting to server"));
+            parent.spawn(dialog_close_button("Cancel")).observe(
+                |_on: On<Fire<Activate>>, mut commands: Commands| commands.trigger(Disconnect),
+            );
         })),
     ));
 }

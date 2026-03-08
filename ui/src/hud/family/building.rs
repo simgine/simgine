@@ -1,4 +1,5 @@
 mod objects;
+mod toolbar;
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use simgine_core::state::{BuildingMode, FamilyMode};
@@ -55,4 +56,6 @@ fn spawn(mut commands: Commands) {
             objects::objects_node(),
         ],
     ));
+
+    commands.spawn(toolbar::toolbar_node());
 }

@@ -42,8 +42,8 @@ fn spawn(mut commands: Commands) {
                 .spawn((
                     Button,
                     ButtonIcon::new("base/ui/icons/building_mode.png"),
-                    Toggled(true),
                     ButtonStyle::default(),
+                    Toggled(true),
                     ButtonContext,
                     button_bindings![KeyCode::F1],
                 ))

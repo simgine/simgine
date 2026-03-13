@@ -21,7 +21,7 @@ bevy_replicon = "0.39.0"
 bevy_replicon_renet = "0.15"
 simgine_core = { path = "core" }
 simgine_ui = { path = "ui" }
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 ron = "0.12"
 serde = "1.0"
 trash = { version = "5.2.5", default-features = false }

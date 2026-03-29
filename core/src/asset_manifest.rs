@@ -1,7 +1,10 @@
 use std::{any::TypeId, env, marker::PhantomData, path::Path, sync::Arc};
 
 use bevy::{
-    asset::{AssetLoader, AssetPath, AsyncReadExt, LoadContext, LoadedUntypedAsset, io::Reader},
+    asset::{
+        AssetLoader, AssetPath, AsyncReadExt, LoadContext, LoadState, LoadedUntypedAsset,
+        io::Reader,
+    },
     prelude::*,
     reflect::{TypeRegistry, TypeRegistryArc, serde::TypedReflectDeserializer},
 };
@@ -27,7 +30,7 @@ fn wait_for_loading(
 ) {
     if manifests
         .iter()
-        .all(|handle| asset_server.is_loaded(handle))
+        .all(|h| !matches!(asset_server.load_state(h), LoadState::Loading))
     {
         info!("finished loading asset manifests");
         commands.set_state(GameState::Menu);

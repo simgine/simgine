@@ -90,7 +90,7 @@ impl<M: AssetManifest> AssetLoader for ManifestLoader<M> {
         reader.read_to_string(&mut string).await?;
 
         let registry = self.registry.read();
-        let registration = registry.get(TypeId::of::<ObjectManifest>()).unwrap();
+        let registration = registry.get(TypeId::of::<M>()).unwrap();
 
         let mut deserializer = ron::Deserializer::from_str(&string)?;
         let reflect_deserializer = TypedReflectDeserializer::new(registration, &registry);

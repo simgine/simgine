@@ -11,6 +11,7 @@ mod sky;
 pub mod speed;
 pub mod state;
 pub mod time;
+pub mod undo;
 pub mod world;
 
 use bevy::prelude::*;
@@ -26,6 +27,7 @@ impl Plugin for SimgineCorePlugin {
             time::plugin,
             component_res::plugin,
             cursor_follower::plugin,
+            undo::plugin,
             game_paths::plugin,
             network::plugin,
             object::plugin,

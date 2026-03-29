@@ -22,8 +22,12 @@ bevy_replicon.workspace = true
 bevy_replicon_renet.workspace = true
 ron.workspace = true
 serde.workspace = true
+smallvec.workspace = true
 walkdir.workspace = true
 directories.workspace = true
+
+[dev-dependencies]
+test-log.workspace = true
 
 [lints]
 workspace = true

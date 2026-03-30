@@ -1,4 +1,6 @@
-use std::{any::TypeId, env, marker::PhantomData, path::Path, sync::Arc};
+mod reflected_component;
+
+use std::{any::TypeId, env, marker::PhantomData, path::Path};
 
 use bevy::{
     asset::{
@@ -11,7 +13,7 @@ use bevy::{
 use serde::{Deserialize, de::DeserializeSeed};
 use walkdir::WalkDir;
 
-use crate::state::GameState;
+use crate::{asset_manifest::reflected_component::ReflectedComponent, state::GameState};
 
 pub(super) fn plugin(app: &mut App) {
     app.init_asset::<ObjectManifest>()
@@ -126,7 +128,7 @@ pub struct ObjectManifest {
     pub info: ManifestInfo,
     pub scene: AssetPath<'static>,
     pub category: ObjectCategory,
-    pub components: Vec<Arc<dyn PartialReflect>>,
+    pub components: Vec<ReflectedComponent>,
 }
 
 impl AssetManifest for ObjectManifest {

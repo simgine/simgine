@@ -47,7 +47,7 @@ fn init(
 
     let mut entity = commands.entity(insert.entity);
     for component in &manifest.components {
-        entity.insert_reflect(component.reflect_clone().unwrap());
+        entity.insert_reflect(component.as_ref().reflect_clone().unwrap());
     }
 }
 

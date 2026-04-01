@@ -54,7 +54,7 @@ impl<'de> Visitor<'de> for ShortReflectVisitor<'_> {
     fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> Result<Self::Value, A::Error> {
         let type_path = map
             .next_key::<String>()?
-            .ok_or_else(|| de::Error::invalid_length(0, &"at least one entry"))?;
+            .ok_or_else(|| de::Error::invalid_length(0, &"missing type name"))?;
         let registration = self
             .registry
             .get_with_short_type_path(&type_path)

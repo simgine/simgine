@@ -8,6 +8,7 @@ repository.workspace = true
 publish.workspace = true
 
 [dependencies]
+avian3d.workspace = true
 bevy = { workspace = true, features = [
   "bevy_gilrs",
   "default_app",
@@ -17,6 +18,7 @@ bevy = { workspace = true, features = [
   "ui_bevy_render",
 ] }
 bevy_enhanced_input.workspace = true
+bevy_mod_outline.workspace = true
 bevy_simple_text_input.workspace = true
 bevy_replicon.workspace = true
 bevy_replicon_renet.workspace = true

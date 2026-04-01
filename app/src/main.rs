@@ -1,8 +1,10 @@
 mod cli;
 mod window_name;
 
+use avian3d::prelude::*;
 use bevy::{input_focus::InputDispatchPlugin, prelude::*, render::RenderPlugin};
 use bevy_enhanced_input::EnhancedInputPlugin;
+use bevy_mod_outline::OutlinePlugin;
 use bevy_replicon::prelude::*;
 use bevy_replicon_renet::RepliconRenetPlugins;
 use bevy_simple_text_input::TextInputPlugin;
@@ -24,6 +26,22 @@ fn main() {
                 ..Default::default()
             }),
             RepliconRenetPlugins,
+            PhysicsPlugins::default()
+                .build()
+                .disable::<ColliderTransformPlugin>()
+                .disable::<SolverBodyPlugin>()
+                .disable::<SolverSchedulePlugin>()
+                .disable::<IntegratorPlugin>()
+                .disable::<SolverPlugin>()
+                .disable::<CcdPlugin>()
+                .disable::<IslandPlugin>()
+                .disable::<IslandSleepingPlugin>()
+                .disable::<JointPlugin>()
+                .disable::<MassPropertyPlugin>()
+                .disable::<ForcePlugin>()
+                .disable::<PhysicsInterpolationPlugin>(),
+            PhysicsPickingPlugin,
+            OutlinePlugin,
             TextInputPlugin,
             SimgineCorePlugin,
             SimgineUiPlugin,

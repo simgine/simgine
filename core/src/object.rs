@@ -1,10 +1,12 @@
 pub mod placing;
 
+use avian3d::prelude::*;
 use bevy::{asset::AssetPath, ecs::reflect::ReflectCommandExt, prelude::*};
+use bevy_mod_outline::{AsyncSceneInheritOutline, OutlineVolume};
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{asset_manifest::ObjectManifest, state::GameState};
+use crate::{asset_manifest::ObjectManifest, outline::OUTLINE_VOLUME, state::GameState};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(placing::plugin)
@@ -52,7 +54,18 @@ fn init(
 }
 
 #[derive(Component, Serialize, Deserialize)]
-#[require(Replicated, SceneRoot, Name)]
+#[require(
+    Name,
+    Replicated,
+    SceneRoot,
+    AsyncSceneInheritOutline,
+    RigidBody::Kinematic,
+    OutlineVolume = OUTLINE_VOLUME,
+    ColliderConstructorHierarchy {
+        default_constructor: Some(ColliderConstructor::ConvexHullFromMesh),
+        ..Default::default()
+    }
+)]
 #[component(immutable)]
 pub struct Object {
     pub path: AssetPath<'static>,

@@ -20,7 +20,7 @@ avian3d = { version = "0.6", default-features = false, features = [
   "bevy_scene",
   "bevy_picking",
   "collider-from-mesh",
-  "serialize"
+  "serialize",
 ] }
 bevy = { version = "0.18", default-features = false }
 bevy_enhanced_input = "0.24"

@@ -13,6 +13,7 @@ mod sky;
 pub mod speed;
 pub mod state;
 pub mod time;
+pub(crate) mod tint;
 pub mod undo;
 pub mod world;
 
@@ -28,6 +29,7 @@ impl Plugin for SimgineCorePlugin {
                 asset_manifest::plugin,
                 city::plugin,
                 time::plugin,
+                tint::plugin,
                 component_res::plugin,
                 cursor_follower::plugin,
                 undo::plugin,

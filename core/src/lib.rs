@@ -4,6 +4,7 @@ pub mod component_res;
 mod cursor_follower;
 pub mod error_event;
 pub mod game_paths;
+pub(crate) mod ghost;
 pub mod network;
 pub mod object;
 mod outline;
@@ -21,22 +22,26 @@ pub struct SimgineCorePlugin;
 
 impl Plugin for SimgineCorePlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(GlobalAmbientLight::NONE).add_plugins((
-            state::plugin,
-            asset_manifest::plugin,
-            city::plugin,
-            time::plugin,
-            component_res::plugin,
-            cursor_follower::plugin,
-            undo::plugin,
-            game_paths::plugin,
-            network::plugin,
-            object::plugin,
-            outline::plugin,
-            player_camera::plugin,
-            sky::plugin,
-            speed::plugin,
-            world::plugin,
-        ));
+        app.insert_resource(GlobalAmbientLight::NONE)
+            .add_plugins((
+                state::plugin,
+                asset_manifest::plugin,
+                city::plugin,
+                time::plugin,
+                component_res::plugin,
+                cursor_follower::plugin,
+                undo::plugin,
+                game_paths::plugin,
+            ))
+            .add_plugins((
+                ghost::plugin,
+                network::plugin,
+                object::plugin,
+                outline::plugin,
+                player_camera::plugin,
+                sky::plugin,
+                speed::plugin,
+                world::plugin,
+            ));
     }
 }

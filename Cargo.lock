@@ -743,9 +743,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_enhanced_input"
-version = "0.24.1"
+version = "0.24.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f68d3e92cc29743386bba59180747035fef268d222e3d107bcb4540ebf09cac"
+checksum = "1fd528e0238ebc77e1e4737e55aa8f51188b7405eebc281f2498a627ae51a2e3"
 dependencies = [
  "bevy",
  "bevy_enhanced_input_macros",
@@ -2876,7 +2876,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.61.3",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -2990,7 +2990,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 1.0.69",
- "windows 0.58.0",
+ "windows 0.56.0",
 ]
 
 [[package]]

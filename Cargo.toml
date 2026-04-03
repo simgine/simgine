@@ -26,7 +26,7 @@ bevy = { version = "0.18", default-features = false }
 bevy_enhanced_input = "0.24"
 bevy_mod_outline = "0.12"
 bevy_simple_text_input = "0.14"
-bevy_replicon = "0.39.1"
+bevy_replicon = "0.39.2"
 bevy_replicon_renet = "0.15"
 smallvec = "1.15"
 simgine_core = { path = "core" }

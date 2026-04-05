@@ -217,7 +217,6 @@ impl HistoryCommand {
         Self::Reversible(Box::new(command))
     }
 
-    #[allow(unused, reason = "not used in the project yet")]
     pub(crate) fn confirmable<C: ConfirmableCommand>(command: C) -> Self {
         Self::Confirmable(Box::new(command))
     }

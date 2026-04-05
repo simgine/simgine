@@ -1,15 +1,30 @@
 pub mod placing;
 
 use avian3d::prelude::*;
-use bevy::{asset::AssetPath, ecs::reflect::ReflectCommandExt, prelude::*};
+use bevy::{
+    asset::AssetPath,
+    ecs::{entity::MapEntities, reflect::ReflectCommandExt},
+    prelude::*,
+};
 use bevy_mod_outline::{AsyncSceneInheritOutline, OutlineVolume};
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{asset_manifest::ObjectManifest, outline::OUTLINE_VOLUME, state::GameState};
+use crate::{
+    asset_manifest::ObjectManifest,
+    outline::OUTLINE_VOLUME,
+    state::GameState,
+    undo::{
+        CommandConfirmation, CommandId, CommandStatus, ConfirmableCommand, EntityRecorder,
+        HistoryCommand,
+        request::{ClientCommand, ClientCommandAppExt, CommandRequest},
+    },
+};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins(placing::plugin)
+    app.add_client_command::<MoveObject>()
+        .add_observer(apply_move)
+        .add_plugins(placing::plugin)
         .add_observer(init)
         .add_systems(OnEnter(GameState::World), spawn);
 }
@@ -53,6 +68,34 @@ fn init(
     }
 }
 
+fn apply_move(
+    move_command: On<ClientCommand<MoveObject>>,
+    mut commands: Commands,
+    mut objects: Query<&mut Transform, With<Object>>,
+) {
+    match objects.get_mut(move_command.object) {
+        Ok(mut transform) => {
+            info!(
+                "`{:?}` moves object `{}`",
+                move_command.client_id, move_command.object
+            );
+            transform.translation = move_command.translation;
+            transform.rotation = move_command.rotation;
+            commands.client_trigger(CommandConfirmation {
+                id: move_command.id,
+                status: CommandStatus::Confirmed,
+            });
+        }
+        Err(e) => {
+            error!("unable to move object: {e}");
+            commands.client_trigger(CommandConfirmation {
+                id: move_command.id,
+                status: CommandStatus::Denied,
+            });
+        }
+    }
+}
+
 #[derive(Component, Serialize, Deserialize)]
 #[require(
     Name,
@@ -69,4 +112,30 @@ fn init(
 #[component(immutable)]
 pub struct Object {
     pub path: AssetPath<'static>,
+}
+
+#[derive(Serialize, Deserialize, MapEntities, Clone, Copy)]
+struct MoveObject {
+    #[entities]
+    object: Entity,
+    translation: Vec3,
+    rotation: Quat,
+}
+
+impl ConfirmableCommand for MoveObject {
+    fn apply(
+        self: Box<Self>,
+        id: CommandId,
+        _recorder: &mut EntityRecorder,
+        world: &mut World,
+    ) -> Option<HistoryCommand> {
+        world.client_trigger(CommandRequest { id, command: *self });
+
+        let transform = *world.get::<Transform>(self.object)?;
+        Some(HistoryCommand::confirmable(Self {
+            object: self.object,
+            translation: transform.translation,
+            rotation: transform.rotation,
+        }))
+    }
 }

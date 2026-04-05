@@ -4,15 +4,14 @@ use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
 use super::{CommandId, ConfirmableCommand};
 
-#[allow(dead_code, reason = "not used in the codebase yet")]
-pub(crate) trait RemoteConfirmableAppExt {
-    fn add_remote_confirmable<C>(&mut self) -> &mut Self
+pub(crate) trait ClientCommandAppExt {
+    fn add_client_command<C>(&mut self) -> &mut Self
     where
         C: ConfirmableCommand + Serialize + DeserializeOwned + MapEntities + Clone;
 }
 
-impl RemoteConfirmableAppExt for App {
-    fn add_remote_confirmable<C>(&mut self) -> &mut Self
+impl ClientCommandAppExt for App {
+    fn add_client_command<C>(&mut self) -> &mut Self
     where
         C: ConfirmableCommand + Serialize + DeserializeOwned + MapEntities + Clone,
     {
@@ -20,10 +19,15 @@ impl RemoteConfirmableAppExt for App {
     }
 }
 
-/// Generic event to send a confirmable command with its ID.
-#[derive(Event, Clone, Copy, Serialize, Deserialize)]
+/// Command request from a client.
+pub(crate) type ClientCommand<C> = FromClient<CommandRequest<C>>;
+
+/// Generic event to send a confirmable command with its ID to server.
+#[derive(Event, Deref, DerefMut, Serialize, Deserialize, Clone, Copy)]
 pub(crate) struct CommandRequest<C> {
     pub(crate) id: CommandId,
+
+    #[deref]
     pub(crate) command: C,
 }
 

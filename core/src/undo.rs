@@ -1,9 +1,11 @@
 pub(crate) mod history;
+pub(crate) mod request;
 
 use bevy::{
     ecs::entity::{EntityHashMap, MapEntities},
     prelude::*,
 };
+use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 
@@ -14,7 +16,8 @@ use history::CommandHistory;
 type RecordedEntities = SmallVec<[Entity; 1]>;
 
 pub(super) fn plugin(app: &mut App) {
-    app.init_resource::<CommandHistory>()
+    app.add_client_event::<CommandConfirmation>(Channel::Ordered)
+        .init_resource::<CommandHistory>()
         .add_observer(confirmation);
 }
 
@@ -281,7 +284,7 @@ impl<T: MapEntities> DynReversible for T {
 mod tests {
     use std::mem;
 
-    use bevy::ecs::entity::MapEntities;
+    use bevy::{ecs::entity::MapEntities, state::app::StatesPlugin};
     use test_log::test;
 
     use super::*;
@@ -289,7 +292,12 @@ mod tests {
     #[test]
     fn translate() {
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, plugin));
+        app.add_plugins((
+            MinimalPlugins,
+            StatesPlugin,
+            RepliconSharedPlugin::default(),
+            plugin,
+        ));
 
         let entity = app.world_mut().spawn(Transform::default()).id();
         app.world_mut().commands().queue_reversible(Translate {
@@ -317,7 +325,12 @@ mod tests {
     #[test]
     fn spawn_despawn() {
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, plugin));
+        app.add_plugins((
+            MinimalPlugins,
+            StatesPlugin,
+            RepliconSharedPlugin::default(),
+            plugin,
+        ));
 
         app.world_mut()
             .commands()
@@ -341,7 +354,12 @@ mod tests {
     #[test]
     fn spawn_translate_despawn() {
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, plugin));
+        app.add_plugins((
+            MinimalPlugins,
+            StatesPlugin,
+            RepliconSharedPlugin::default(),
+            plugin,
+        ));
 
         app.world_mut()
             .commands()
@@ -406,8 +424,13 @@ mod tests {
     #[test]
     fn pending_spawn_despawn() {
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, plugin))
-            .init_resource::<LastUndoId>();
+        app.add_plugins((
+            MinimalPlugins,
+            StatesPlugin,
+            RepliconSharedPlugin::default(),
+            plugin,
+        ))
+        .init_resource::<LastUndoId>();
 
         app.world_mut()
             .commands()
@@ -446,8 +469,13 @@ mod tests {
     #[test]
     fn max_len() {
         let mut app = App::new();
-        app.add_plugins((MinimalPlugins, plugin))
-            .insert_resource(CommandHistory::new(1));
+        app.add_plugins((
+            MinimalPlugins,
+            StatesPlugin,
+            RepliconSharedPlugin::default(),
+            plugin,
+        ))
+        .insert_resource(CommandHistory::new(1));
 
         app.world_mut()
             .commands()

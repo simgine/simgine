@@ -10,6 +10,14 @@ pub(super) struct CommandHistory {
     redo: VecDeque<CommandRecord>,
     pending: HashMap<CommandId, ApplyHistoryCommand>,
     max_len: usize,
+
+    /// Entity map for [`EntityRecorder`](super::EntityRecorder).
+    ///
+    /// Cleared after each use. Stored to reuse allocated memory.
+    queued_mappings: EntityHashMap<Entity>,
+
+    /// Counter for [`CommandId`] values used by [`ConfirmableCommand`](super::ConfirmableCommand).
+    next_id: CommandId,
 }
 
 impl CommandHistory {
@@ -19,23 +27,40 @@ impl CommandHistory {
             redo: Default::default(),
             pending: Default::default(),
             max_len,
+            queued_mappings: Default::default(),
+            next_id: Default::default(),
         }
     }
 
-    /// Updates entity IDs inside commands stored in the undo and redo history.
+    /// Queues a mapping from an old entity to a new one.
     ///
-    /// Clears the map afterwards.
-    pub(super) fn map_entities(&mut self, map: &mut EntityHashMap<Entity>) {
-        if map.is_empty() {
+    /// Pending mappings are applied by [`Self::flush_entity_mappings`].
+    pub(super) fn queue_entity_map(&mut self, old_entity: Entity, new_entity: Entity) {
+        trace!("mapping `{old_entity}` to `{new_entity}`");
+        self.queued_mappings.insert(old_entity, new_entity);
+    }
+
+    /// Applies queued entity mappings to commands in undo and redo history.
+    pub(super) fn flush_entity_mappings(&mut self) {
+        if self.queued_mappings.is_empty() {
             return;
         }
 
         for record in self.undo.iter_mut().chain(&mut self.redo) {
-            record.command.map_entities(map);
+            record.command.map_entities(&mut self.queued_mappings);
         }
-        debug!("updated {} entities inside commands", map.len());
+        trace!(
+            "updated {} entities inside commands",
+            self.queued_mappings.len()
+        );
 
-        map.clear();
+        self.queued_mappings.clear();
+    }
+
+    pub(super) fn next_id(&mut self) -> CommandId {
+        let current = self.next_id;
+        self.next_id.0 += 1;
+        current
     }
 
     pub(super) fn push_pending(&mut self, id: CommandId, apply: ApplyHistoryCommand) {

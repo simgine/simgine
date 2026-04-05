@@ -15,7 +15,6 @@ type RecordedEntities = SmallVec<[Entity; 1]>;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<CommandHistory>()
-        .init_resource::<CommandApplyState>()
         .add_observer(confirmation);
 }
 
@@ -107,20 +106,22 @@ impl Command for ApplyHistoryCommand {
 
         let world_cell = world.as_unsafe_world_cell();
         // SAFETY: access is disjoint since the state resource is private and can't be accessed during apply.
-        let state = unsafe { &mut *world_cell.get_resource_mut::<CommandApplyState>().unwrap() };
+        let history = unsafe { &mut *world_cell.get_resource_mut::<CommandHistory>().unwrap() };
         let world = unsafe { world_cell.world_mut() };
 
-        let mut recorder = EntityRecorder::new(&mut self.entities, &mut state.map);
         let (id, inverted) = match self.command {
-            HistoryCommand::Reversible(command) => (None, command.apply(&mut recorder, world)),
+            HistoryCommand::Reversible(command) => {
+                let mut recorder = EntityRecorder::new(&mut self.entities, history);
+                (None, command.apply(&mut recorder, world))
+            }
             HistoryCommand::Confirmable(command) => {
-                let id = state.next_id.advance();
+                let id = history.next_id();
+                let mut recorder = EntityRecorder::new(&mut self.entities, history);
                 (Some(id), command.apply(id, &mut recorder, world))
             }
         };
 
-        let history = world.resource_mut::<CommandHistory>().into_inner();
-        history.map_entities(recorder.map);
+        history.flush_entity_mappings();
 
         let Some(inverted) = inverted else {
             debug!("unable to apply `{name}`");
@@ -134,18 +135,6 @@ impl Command for ApplyHistoryCommand {
             history.push(inverted, self.entities, self.source);
         }
     }
-}
-
-/// Shared state for [`ApplyHistoryCommand`].
-#[derive(Resource, Default)]
-struct CommandApplyState {
-    /// Counter for [`CommandId`] values used by [`ConfirmableCommand`]
-    next_id: CommandId,
-
-    /// Entity map for [`EntityRecorder`].
-    ///
-    /// Cleared after each use. Stored to reuse allocated memory.
-    map: EntityHashMap<Entity>,
 }
 
 #[derive(Event, Serialize, Deserialize)]
@@ -164,28 +153,20 @@ pub(crate) enum CommandStatus {
 #[derive(Component, Default, Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, Copy)]
 pub struct CommandId(u64);
 
-impl CommandId {
-    fn advance(&mut self) -> CommandId {
-        let current = *self;
-        self.0 += 1;
-        current
-    }
-}
-
 /// Records entity changes in commands.
 ///
 /// Needed to correctly handle entity references in commands that spawn/despawn entities.
 pub struct EntityRecorder<'a> {
     entities: &'a mut RecordedEntities,
-    map: &'a mut EntityHashMap<Entity>,
+    history: &'a mut CommandHistory,
     index: usize,
 }
 
 impl<'a> EntityRecorder<'a> {
-    fn new(entities: &'a mut RecordedEntities, map: &'a mut EntityHashMap<Entity>) -> Self {
+    fn new(entities: &'a mut RecordedEntities, history: &'a mut CommandHistory) -> Self {
         Self {
             entities,
-            map,
+            history,
             index: 0,
         }
     }
@@ -203,12 +184,11 @@ impl<'a> EntityRecorder<'a> {
     /// stored in the undo and redo history.
     #[allow(unused, reason = "not used in the project yet")]
     pub(crate) fn record(&mut self, entity: Entity) {
+        trace!("recording `{entity}`");
         if let Some(old_entity) = self.entities.get_mut(self.index) {
-            trace!("mapping `{old_entity}` to `{entity}`");
-            self.map.insert(*old_entity, entity);
+            self.history.queue_entity_map(*old_entity, entity);
             *old_entity = entity;
         } else {
-            trace!("recording `{entity}`");
             self.entities.push(entity);
         }
 

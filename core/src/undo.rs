@@ -447,7 +447,7 @@ mod tests {
     fn max_len() {
         let mut app = App::new();
         app.add_plugins((MinimalPlugins, plugin))
-            .insert_resource(CommandHistory::new(25));
+            .insert_resource(CommandHistory::new(1));
 
         app.world_mut()
             .commands()

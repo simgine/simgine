@@ -30,6 +30,7 @@ directories.workspace = true
 
 [dev-dependencies]
 test-log.workspace = true
+bevy = { workspace = true, features = ["debug"] }
 
 [lints]
 workspace = true

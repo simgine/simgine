@@ -302,7 +302,7 @@ mod tests {
         let entity = app.world_mut().spawn(Transform::default()).id();
         app.world_mut().commands().queue_reversible(Translate {
             entity,
-            position: Vec3::ONE,
+            translation: Vec3::ONE,
         });
         app.world_mut().flush();
 
@@ -372,7 +372,7 @@ mod tests {
 
         app.world_mut().commands().queue_reversible(Translate {
             entity,
-            position: Vec3::ONE,
+            translation: Vec3::ONE,
         });
         app.world_mut().flush();
 
@@ -503,7 +503,7 @@ mod tests {
     struct Translate {
         #[entities]
         entity: Entity,
-        position: Vec3,
+        translation: Vec3,
     }
 
     impl ReversibleCommand for Translate {
@@ -513,18 +513,18 @@ mod tests {
             world: &mut World,
         ) -> Option<HistoryCommand> {
             let mut transform = world.get_mut::<Transform>(self.entity)?;
-            let original_position = mem::replace(&mut transform.translation, self.position);
+            let original_translation = mem::replace(&mut transform.translation, self.translation);
 
             Some(HistoryCommand::reversible(Self {
                 entity: self.entity,
-                position: original_position,
+                translation: original_translation,
             }))
         }
     }
 
     #[derive(MapEntities, Default)]
     struct Spawn {
-        position: Vec3,
+        translation: Vec3,
     }
 
     impl ReversibleCommand for Spawn {
@@ -533,7 +533,9 @@ mod tests {
             ctx: &mut EntityRecorder,
             world: &mut World,
         ) -> Option<HistoryCommand> {
-            let entity = world.spawn(Transform::from_translation(self.position)).id();
+            let entity = world
+                .spawn(Transform::from_translation(self.translation))
+                .id();
             ctx.record(entity);
 
             Some(HistoryCommand::reversible(Despawn { entity }))
@@ -557,14 +559,14 @@ mod tests {
             ctx.record(self.entity);
 
             Some(HistoryCommand::reversible(Spawn {
-                position: transform.translation,
+                translation: transform.translation,
             }))
         }
     }
 
     #[derive(MapEntities, Default)]
     struct PendingSpawn {
-        position: Vec3,
+        translation: Vec3,
     }
 
     impl ConfirmableCommand for PendingSpawn {
@@ -577,7 +579,9 @@ mod tests {
             let mut last_id = world.resource_mut::<LastUndoId>();
             **last_id = id;
 
-            let entity = world.spawn(Transform::from_translation(self.position)).id();
+            let entity = world
+                .spawn(Transform::from_translation(self.translation))
+                .id();
             recorder.record(entity);
 
             Some(HistoryCommand::confirmable(PendingDespawn { entity }))
@@ -605,7 +609,7 @@ mod tests {
             recorder.record(self.entity);
 
             Some(HistoryCommand::confirmable(PendingSpawn {
-                position: transform.translation,
+                translation: transform.translation,
             }))
         }
     }

@@ -4,6 +4,7 @@ use bevy::{
     ecs::entity::{EntityHashMap, MapEntities},
     prelude::*,
 };
+use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 
 use history::CommandHistory;
@@ -14,7 +15,15 @@ type RecordedEntities = SmallVec<[Entity; 1]>;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<CommandHistory>()
-        .init_resource::<CommandApplyState>();
+        .init_resource::<CommandApplyState>()
+        .add_observer(confirmation);
+}
+
+fn confirmation(confirmation: On<CommandConfirmation>, mut history: ResMut<CommandHistory>) {
+    match confirmation.status {
+        CommandStatus::Confirmed => history.confirm(confirmation.id),
+        CommandStatus::Denied => history.deny(confirmation.id),
+    }
 }
 
 pub trait HistoryCommandsExt {
@@ -139,8 +148,20 @@ struct CommandApplyState {
     map: EntityHashMap<Entity>,
 }
 
+#[derive(Event, Serialize, Deserialize)]
+pub(crate) struct CommandConfirmation {
+    pub(crate) id: CommandId,
+    pub(crate) status: CommandStatus,
+}
+
+#[derive(Serialize, Deserialize)]
+pub(crate) enum CommandStatus {
+    Confirmed,
+    Denied,
+}
+
 /// ID for a [`ConfirmableCommand`].
-#[derive(Component, Default, Debug, Hash, PartialEq, Eq, Clone, Copy)]
+#[derive(Component, Default, Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone, Copy)]
 pub struct CommandId(u64);
 
 impl CommandId {

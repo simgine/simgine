@@ -5,7 +5,7 @@ use bevy::{ecs::entity::EntityHashMap, platform::collections::HashMap, prelude::
 use super::{ApplyHistoryCommand, CommandId, CommandSource, HistoryCommand, RecordedEntities};
 
 #[derive(Resource)]
-pub(crate) struct CommandHistory {
+pub(super) struct CommandHistory {
     undo: VecDeque<CommandRecord>,
     redo: VecDeque<CommandRecord>,
     pending: HashMap<CommandId, ApplyHistoryCommand>,
@@ -67,8 +67,7 @@ impl CommandHistory {
         }
     }
 
-    #[allow(unused, reason = "not used in the project yet")]
-    pub(crate) fn confirm(&mut self, id: CommandId) {
+    pub(super) fn confirm(&mut self, id: CommandId) {
         let Some(apply) = self.pending.remove(&id) else {
             debug!("ignoring confirmation for non-existing `{id:?}`");
             return;
@@ -78,8 +77,7 @@ impl CommandHistory {
         self.push(apply.command, apply.entities, apply.source);
     }
 
-    #[allow(unused, reason = "not used in the project yet")]
-    pub(crate) fn deny(&mut self, id: CommandId) {
+    pub(super) fn deny(&mut self, id: CommandId) {
         if let Some(apply) = self.pending.remove(&id) {
             debug!("denying `{id:?}` with `{}`", apply.command.name());
         } else {

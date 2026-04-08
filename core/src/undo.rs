@@ -115,12 +115,15 @@ impl Command for ApplyHistoryCommand {
         let (id, inverted) = match self.command {
             HistoryCommand::Reversible(command) => {
                 let mut recorder = EntityRecorder::new(&mut self.entities, history);
-                (None, command.apply(&mut recorder, world))
+                (None, command.apply(&mut recorder, world).map(Into::into))
             }
             HistoryCommand::Confirmable(command) => {
                 let id = history.next_id();
                 let mut recorder = EntityRecorder::new(&mut self.entities, history);
-                (Some(id), command.apply(id, &mut recorder, world))
+                (
+                    Some(id),
+                    command.apply(id, &mut recorder, world).map(Into::into),
+                )
             }
         };
 
@@ -206,21 +209,12 @@ enum CommandSource {
     Redo,
 }
 
-pub enum HistoryCommand {
+enum HistoryCommand {
     Reversible(Box<dyn ReversibleCommand>),
     Confirmable(Box<dyn ConfirmableCommand>),
 }
 
 impl HistoryCommand {
-    #[allow(unused, reason = "not used in the project yet")]
-    pub(crate) fn reversible<C: ReversibleCommand>(command: C) -> Self {
-        Self::Reversible(Box::new(command))
-    }
-
-    pub(crate) fn confirmable<C: ConfirmableCommand>(command: C) -> Self {
-        Self::Confirmable(Box::new(command))
-    }
-
     fn name(&self) -> ShortName<'static> {
         match self {
             HistoryCommand::Reversible(command) => command.dyn_name(),
@@ -236,6 +230,18 @@ impl HistoryCommand {
     }
 }
 
+impl From<Box<dyn ReversibleCommand>> for HistoryCommand {
+    fn from(value: Box<dyn ReversibleCommand>) -> Self {
+        Self::Reversible(value)
+    }
+}
+
+impl From<Box<dyn ConfirmableCommand>> for HistoryCommand {
+    fn from(value: Box<dyn ConfirmableCommand>) -> Self {
+        Self::Confirmable(value)
+    }
+}
+
 /// Like [`Command`], but can be undone.
 pub trait ReversibleCommand: DynReversible + Send + Sync + 'static {
     /// Applies the command and returns the inverted command to store in history.
@@ -246,7 +252,7 @@ pub trait ReversibleCommand: DynReversible + Send + Sync + 'static {
         self: Box<Self>,
         recorder: &mut EntityRecorder,
         world: &mut World,
-    ) -> Option<HistoryCommand>;
+    ) -> Option<Box<dyn ReversibleCommand>>;
 }
 
 /// Like [`ReversibleCommand`], but requires confirmation before being considered applied.
@@ -259,7 +265,7 @@ pub trait ConfirmableCommand: DynReversible + Send + Sync + 'static {
         id: CommandId,
         recorder: &mut EntityRecorder,
         world: &mut World,
-    ) -> Option<HistoryCommand>;
+    ) -> Option<Box<dyn ConfirmableCommand>>;
 }
 
 /// Helper for [`ReversibleCommand`] to auto-implement name info and entity mapping
@@ -510,11 +516,11 @@ mod tests {
             self: Box<Self>,
             _ctx: &mut EntityRecorder,
             world: &mut World,
-        ) -> Option<HistoryCommand> {
+        ) -> Option<Box<dyn ReversibleCommand>> {
             let mut transform = world.get_mut::<Transform>(self.entity)?;
             let original_translation = mem::replace(&mut transform.translation, self.translation);
 
-            Some(HistoryCommand::reversible(Self {
+            Some(Box::new(Self {
                 entity: self.entity,
                 translation: original_translation,
             }))
@@ -531,13 +537,13 @@ mod tests {
             self: Box<Self>,
             ctx: &mut EntityRecorder,
             world: &mut World,
-        ) -> Option<HistoryCommand> {
+        ) -> Option<Box<dyn ReversibleCommand>> {
             let entity = world
                 .spawn(Transform::from_translation(self.translation))
                 .id();
             ctx.record(entity);
 
-            Some(HistoryCommand::reversible(Despawn { entity }))
+            Some(Box::new(Despawn { entity }))
         }
     }
 
@@ -552,12 +558,12 @@ mod tests {
             self: Box<Self>,
             ctx: &mut EntityRecorder,
             world: &mut World,
-        ) -> Option<HistoryCommand> {
+        ) -> Option<Box<dyn ReversibleCommand>> {
             let transform = *world.get::<Transform>(self.entity)?;
             world.entity_mut(self.entity).despawn();
             ctx.record(self.entity);
 
-            Some(HistoryCommand::reversible(Spawn {
+            Some(Box::new(Spawn {
                 translation: transform.translation,
             }))
         }
@@ -574,7 +580,7 @@ mod tests {
             id: CommandId,
             recorder: &mut EntityRecorder,
             world: &mut World,
-        ) -> Option<HistoryCommand> {
+        ) -> Option<Box<dyn ConfirmableCommand>> {
             let mut last_id = world.resource_mut::<LastUndoId>();
             **last_id = id;
 
@@ -583,7 +589,7 @@ mod tests {
                 .id();
             recorder.record(entity);
 
-            Some(HistoryCommand::confirmable(PendingDespawn { entity }))
+            Some(Box::new(PendingDespawn { entity }))
         }
     }
 
@@ -599,7 +605,7 @@ mod tests {
             id: CommandId,
             recorder: &mut EntityRecorder,
             world: &mut World,
-        ) -> Option<HistoryCommand> {
+        ) -> Option<Box<dyn ConfirmableCommand>> {
             let mut last_id = world.resource_mut::<LastUndoId>();
             **last_id = id;
 
@@ -607,7 +613,7 @@ mod tests {
             world.entity_mut(self.entity).despawn();
             recorder.record(self.entity);
 
-            Some(HistoryCommand::confirmable(PendingSpawn {
+            Some(Box::new(PendingSpawn {
                 translation: transform.translation,
             }))
         }

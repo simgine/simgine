@@ -16,7 +16,6 @@ use crate::{
     state::GameState,
     undo::{
         CommandConfirmation, CommandId, CommandStatus, ConfirmableCommand, EntityRecorder,
-        HistoryCommand,
         request::{ClientCommand, ClientCommandAppExt, CommandRequest},
     },
 };
@@ -131,11 +130,11 @@ impl ConfirmableCommand for MoveObject {
         id: CommandId,
         _recorder: &mut EntityRecorder,
         world: &mut World,
-    ) -> Option<HistoryCommand> {
+    ) -> Option<Box<dyn ConfirmableCommand>> {
         world.client_trigger(CommandRequest { id, command: *self });
 
         let transform = world.get::<Transform>(self.object)?;
-        Some(HistoryCommand::confirmable(Self {
+        Some(Box::new(Self {
             object: self.object,
             translation: transform.translation,
             rotation: transform.rotation,

@@ -23,9 +23,9 @@ use crate::{
 
 pub(super) fn plugin(app: &mut App) {
     app.add_client_command::<MoveObject>()
-        .add_observer(apply_move)
         .add_plugins(placing::plugin)
         .add_observer(init)
+        .add_observer(move_command)
         .add_systems(OnEnter(GameState::World), spawn);
 }
 
@@ -68,7 +68,7 @@ fn init(
     }
 }
 
-fn apply_move(
+fn move_command(
     move_command: On<ClientCommand<MoveObject>>,
     mut commands: Commands,
     mut objects: Query<&mut Transform, With<Object>>,
@@ -76,7 +76,7 @@ fn apply_move(
     match objects.get_mut(move_command.object) {
         Ok(mut transform) => {
             info!(
-                "`{:?}` moves object `{}`",
+                "`{:?}` moves `{}`",
                 move_command.client_id, move_command.object
             );
             transform.translation = move_command.translation;
@@ -87,7 +87,10 @@ fn apply_move(
             });
         }
         Err(e) => {
-            error!("unable to move object: {e}");
+            info!(
+                "denying `{:?}` to move `{}`: {e}",
+                move_command.client_id, move_command.object
+            );
             commands.client_trigger(CommandConfirmation {
                 id: move_command.id,
                 status: CommandStatus::Denied,
@@ -131,7 +134,7 @@ impl ConfirmableCommand for MoveObject {
     ) -> Option<HistoryCommand> {
         world.client_trigger(CommandRequest { id, command: *self });
 
-        let transform = *world.get::<Transform>(self.object)?;
+        let transform = world.get::<Transform>(self.object)?;
         Some(HistoryCommand::confirmable(Self {
             object: self.object,
             translation: transform.translation,

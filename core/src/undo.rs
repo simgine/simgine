@@ -11,10 +11,6 @@ use smallvec::SmallVec;
 
 use history::CommandHistory;
 
-/// Most commands operate on a single entity, so this uses
-/// [`SmallVec`] to avoid heap allocations in the common case.
-type RecordedEntities = SmallVec<[Entity; 1]>;
-
 pub(super) fn plugin(app: &mut App) {
     app.add_client_event::<CommandConfirmation>(Channel::Ordered)
         .init_resource::<CommandHistory>()
@@ -143,6 +139,46 @@ impl Command for ApplyHistoryCommand {
     }
 }
 
+enum HistoryCommand {
+    Reversible(Box<dyn ReversibleCommand>),
+    Confirmable(Box<dyn ConfirmableCommand>),
+}
+
+impl HistoryCommand {
+    fn name(&self) -> ShortName<'static> {
+        match self {
+            HistoryCommand::Reversible(command) => command.dyn_name(),
+            HistoryCommand::Confirmable(command) => command.dyn_name(),
+        }
+    }
+
+    fn map_entities(&mut self, map: &mut EntityHashMap<Entity>) {
+        match self {
+            HistoryCommand::Reversible(command) => command.dyn_map_entities(map),
+            HistoryCommand::Confirmable(command) => command.dyn_map_entities(map),
+        }
+    }
+}
+
+impl From<Box<dyn ReversibleCommand>> for HistoryCommand {
+    fn from(value: Box<dyn ReversibleCommand>) -> Self {
+        Self::Reversible(value)
+    }
+}
+
+impl From<Box<dyn ConfirmableCommand>> for HistoryCommand {
+    fn from(value: Box<dyn ConfirmableCommand>) -> Self {
+        Self::Confirmable(value)
+    }
+}
+
+#[derive(PartialEq, Clone, Copy)]
+enum CommandSource {
+    User,
+    Undo,
+    Redo,
+}
+
 #[derive(Event, Serialize, Deserialize)]
 pub(crate) struct CommandConfirmation {
     pub(crate) id: CommandId,
@@ -202,45 +238,9 @@ impl<'a> EntityRecorder<'a> {
     }
 }
 
-#[derive(PartialEq, Clone, Copy)]
-enum CommandSource {
-    User,
-    Undo,
-    Redo,
-}
-
-enum HistoryCommand {
-    Reversible(Box<dyn ReversibleCommand>),
-    Confirmable(Box<dyn ConfirmableCommand>),
-}
-
-impl HistoryCommand {
-    fn name(&self) -> ShortName<'static> {
-        match self {
-            HistoryCommand::Reversible(command) => command.dyn_name(),
-            HistoryCommand::Confirmable(command) => command.dyn_name(),
-        }
-    }
-
-    fn map_entities(&mut self, map: &mut EntityHashMap<Entity>) {
-        match self {
-            HistoryCommand::Reversible(command) => command.dyn_map_entities(map),
-            HistoryCommand::Confirmable(command) => command.dyn_map_entities(map),
-        }
-    }
-}
-
-impl From<Box<dyn ReversibleCommand>> for HistoryCommand {
-    fn from(value: Box<dyn ReversibleCommand>) -> Self {
-        Self::Reversible(value)
-    }
-}
-
-impl From<Box<dyn ConfirmableCommand>> for HistoryCommand {
-    fn from(value: Box<dyn ConfirmableCommand>) -> Self {
-        Self::Confirmable(value)
-    }
-}
+/// Most commands operate on a single entity, so this uses
+/// [`SmallVec`] to avoid heap allocations in the common case.
+type RecordedEntities = SmallVec<[Entity; 1]>;
 
 /// Like [`Command`], but can be undone.
 pub trait ReversibleCommand: DynReversible + Send + Sync + 'static {

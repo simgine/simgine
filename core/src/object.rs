@@ -7,7 +7,8 @@ use bevy::{
     prelude::*,
 };
 use bevy_mod_outline::{AsyncSceneInheritOutline, OutlineVolume};
-use bevy_replicon::prelude::*;
+use bevy_replicon::{prelude::*, shared::backend::connected_client::NetworkId};
+use bevy_replicon_renet::netcode::NetcodeClientTransport;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -16,15 +17,20 @@ use crate::{
     state::GameState,
     undo::{
         CommandId, ConfirmableCommand, EntityRecorder,
-        request::{ClientCommand, ClientCommandAppExt, ClientCommandExt, CommandRequest},
+        request::{ClientCommand, ClientCommandAppExt, ClientCommandExt, CommandRequest, Deny},
     },
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.add_client_command::<MoveObject>()
+        .add_client_command::<BuyObject>()
+        .add_client_command::<SellObject>()
         .add_plugins(placing::plugin)
         .add_observer(init)
         .add_observer(move_command)
+        .add_observer(buy)
+        .add_observer(buy_deny)
+        .add_observer(sell)
         .add_systems(OnEnter(GameState::World), spawn);
 }
 
@@ -92,6 +98,70 @@ fn move_command(
     }
 }
 
+fn buy(
+    buy: On<ClientCommand<BuyObject>>,
+    mut commands: Commands,
+    clients: Query<&NetworkId>,
+    pending_objects: Query<(Entity, &PendingObject), Without<Object>>,
+) {
+    let bundle = (
+        Object {
+            path: buy.path.clone(),
+        },
+        Transform::from_translation(buy.translation).with_rotation(buy.rotation),
+    );
+
+    if let ClientId::Client(client) = buy.client_id {
+        let network_id = clients.get(client).unwrap();
+        commands.spawn((bundle, Signature::from((buy.id, network_id))));
+    } else {
+        // While it's O(n), it's usually a single entity.
+        let Some((object, _)) = pending_objects.iter().find(|(_, o)| o.id == buy.id) else {
+            debug!("ignoring buy for non-existing `{:?}`", buy.id);
+            commands.client_trigger(buy.deny());
+            return;
+        };
+
+        commands.entity(object).insert(bundle);
+    };
+
+    info!("`{:?}` buys '{:?}'", buy.client_id, buy.path);
+
+    commands.client_trigger(buy.confirm());
+}
+
+fn buy_deny(
+    buy: On<Deny<BuyObject>>,
+    mut commands: Commands,
+    pending_objects: Query<(Entity, &PendingObject), Without<Object>>,
+) {
+    if let Some((object, _)) = pending_objects.iter().find(|(_, o)| o.id == buy.id) {
+        debug!("despawning `{object}` from denied buy");
+        commands.entity(object).despawn();
+    }
+}
+
+fn sell(
+    sell: On<ClientCommand<SellObject>>,
+    mut commands: Commands,
+    objects: Query<(), With<Object>>,
+) {
+    match objects.get(sell.object) {
+        Ok(()) => {
+            info!("`{:?}` sells `{}`", sell.client_id, sell.object);
+            commands.entity(sell.object).despawn();
+            commands.client_trigger(sell.confirm());
+        }
+        Err(e) => {
+            info!(
+                "denying `{:?}` to sell `{}`: {e}",
+                sell.client_id, sell.object
+            );
+            commands.client_trigger(sell.deny());
+        }
+    }
+}
+
 #[derive(Component, Serialize, Deserialize)]
 #[require(
     Name,
@@ -131,6 +201,73 @@ impl ConfirmableCommand for MoveObject {
 
         Some(Box::new(Self {
             object: self.object,
+            translation: transform.translation,
+            rotation: transform.rotation,
+        }))
+    }
+}
+
+#[derive(Serialize, Deserialize, MapEntities, Clone)]
+struct BuyObject {
+    path: AssetPath<'static>,
+    translation: Vec3,
+    rotation: Quat,
+}
+
+impl ConfirmableCommand for BuyObject {
+    fn apply(
+        self: Box<Self>,
+        id: CommandId,
+        _recorder: &mut EntityRecorder,
+        world: &mut World,
+    ) -> Option<Box<dyn ConfirmableCommand>> {
+        // Spawns a placeholder entity immediately so undo has something to point at.
+        // The entity will be matched by hash if spawned by client or manually matched by ID on the server.
+        let pending_object = PendingObject { id };
+        let object = if let Some(transport) = world.get_resource::<NetcodeClientTransport>() {
+            world
+                .spawn((
+                    pending_object,
+                    Signature::from((id, NetworkId::new(transport.client_id()))),
+                ))
+                .id()
+        } else {
+            world.spawn(pending_object).id()
+        };
+
+        world.client_trigger(CommandRequest { id, command: *self });
+
+        Some(Box::new(SellObject { object }))
+    }
+}
+
+#[derive(Component)]
+struct PendingObject {
+    id: CommandId,
+}
+
+#[derive(Serialize, Deserialize, MapEntities, Clone, Copy)]
+struct SellObject {
+    object: Entity,
+}
+
+impl ConfirmableCommand for SellObject {
+    fn apply(
+        self: Box<Self>,
+        id: CommandId,
+        recorder: &mut EntityRecorder,
+        world: &mut World,
+    ) -> Option<Box<dyn ConfirmableCommand>> {
+        let entity = world.get_entity(self.object).ok()?;
+        let object = entity.get::<Object>()?;
+        let transform = *entity.get::<Transform>()?;
+        let path = object.path.clone();
+
+        world.client_trigger(CommandRequest { id, command: *self });
+        recorder.record(self.object);
+
+        Some(Box::new(BuyObject {
+            path,
             translation: transform.translation,
             rotation: transform.rotation,
         }))

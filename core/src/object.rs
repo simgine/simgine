@@ -15,8 +15,8 @@ use crate::{
     outline::OUTLINE_VOLUME,
     state::GameState,
     undo::{
-        CommandConfirmation, CommandId, CommandStatus, ConfirmableCommand, EntityRecorder,
-        request::{ClientCommand, ClientCommandAppExt, CommandRequest},
+        CommandId, ConfirmableCommand, EntityRecorder,
+        request::{ClientCommand, ClientCommandAppExt, ClientCommandExt, CommandRequest},
     },
 };
 
@@ -80,20 +80,14 @@ fn move_command(
             );
             transform.translation = move_command.translation;
             transform.rotation = move_command.rotation;
-            commands.client_trigger(CommandConfirmation {
-                id: move_command.id,
-                status: CommandStatus::Confirmed,
-            });
+            commands.server_trigger(move_command.confirm());
         }
         Err(e) => {
             info!(
                 "denying `{:?}` to move `{}`: {e}",
                 move_command.client_id, move_command.object
             );
-            commands.client_trigger(CommandConfirmation {
-                id: move_command.id,
-                status: CommandStatus::Denied,
-            });
+            commands.client_trigger(move_command.deny());
         }
     }
 }
@@ -131,9 +125,10 @@ impl ConfirmableCommand for MoveObject {
         _recorder: &mut EntityRecorder,
         world: &mut World,
     ) -> Option<Box<dyn ConfirmableCommand>> {
+        let transform = *world.get::<Transform>(self.object)?;
+
         world.client_trigger(CommandRequest { id, command: *self });
 
-        let transform = world.get::<Transform>(self.object)?;
         Some(Box::new(Self {
             object: self.object,
             translation: transform.translation,

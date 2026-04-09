@@ -5,23 +5,13 @@ use bevy::{
     ecs::entity::{EntityHashMap, MapEntities},
     prelude::*,
 };
-use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 use smallvec::SmallVec;
 
 use history::CommandHistory;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_client_event::<CommandConfirmation>(Channel::Ordered)
-        .init_resource::<CommandHistory>()
-        .add_observer(confirmation);
-}
-
-fn confirmation(confirmation: On<CommandConfirmation>, mut history: ResMut<CommandHistory>) {
-    match confirmation.status {
-        CommandStatus::Confirmed => history.confirm(confirmation.id),
-        CommandStatus::Denied => history.deny(confirmation.id),
-    }
+    app.init_resource::<CommandHistory>();
 }
 
 pub trait HistoryCommandsExt {
@@ -36,6 +26,17 @@ pub trait HistoryCommandsExt {
 
     /// Reapplies the most recently undone command, if any.
     fn redo(&mut self);
+
+    /// Confirms a pending [`ConfirmableCommand`].
+    ///
+    /// Moves the command from the pending state into the undo/redo history.
+    fn confirm(&mut self, id: CommandId);
+
+    /// Denies a pending [`ConfirmableCommand`].
+    ///
+    /// Cancels the command and removes it from the pending state without
+    /// adding it to the undo/redo history.
+    fn deny(&mut self, id: CommandId);
 }
 
 impl HistoryCommandsExt for Commands<'_, '_> {
@@ -82,6 +83,20 @@ impl HistoryCommandsExt for Commands<'_, '_> {
                 };
                 command.apply(world);
             }
+        });
+    }
+
+    fn confirm(&mut self, id: CommandId) {
+        self.queue(move |world: &mut World| {
+            let mut history = world.resource_mut::<CommandHistory>();
+            history.confirm(id);
+        });
+    }
+
+    fn deny(&mut self, id: CommandId) {
+        self.queue(move |world: &mut World| {
+            let mut history = world.resource_mut::<CommandHistory>();
+            history.deny(id);
         });
     }
 }
@@ -177,18 +192,6 @@ enum CommandSource {
     User,
     Undo,
     Redo,
-}
-
-#[derive(Event, Serialize, Deserialize)]
-pub(crate) struct CommandConfirmation {
-    pub(crate) id: CommandId,
-    pub(crate) status: CommandStatus,
-}
-
-#[derive(Serialize, Deserialize)]
-pub(crate) enum CommandStatus {
-    Confirmed,
-    Denied,
 }
 
 /// ID for a [`ConfirmableCommand`].
@@ -289,7 +292,7 @@ impl<T: MapEntities> DynReversible for T {
 mod tests {
     use std::mem;
 
-    use bevy::{ecs::entity::MapEntities, state::app::StatesPlugin};
+    use bevy::ecs::entity::MapEntities;
     use test_log::test;
 
     use super::*;
@@ -297,12 +300,7 @@ mod tests {
     #[test]
     fn translate() {
         let mut app = App::new();
-        app.add_plugins((
-            MinimalPlugins,
-            StatesPlugin,
-            RepliconSharedPlugin::default(),
-            plugin,
-        ));
+        app.add_plugins((MinimalPlugins, plugin));
 
         let entity = app.world_mut().spawn(Transform::default()).id();
         app.world_mut().commands().queue_reversible(Translate {
@@ -330,12 +328,7 @@ mod tests {
     #[test]
     fn spawn_despawn() {
         let mut app = App::new();
-        app.add_plugins((
-            MinimalPlugins,
-            StatesPlugin,
-            RepliconSharedPlugin::default(),
-            plugin,
-        ));
+        app.add_plugins((MinimalPlugins, plugin));
 
         app.world_mut()
             .commands()
@@ -359,12 +352,7 @@ mod tests {
     #[test]
     fn spawn_translate_despawn() {
         let mut app = App::new();
-        app.add_plugins((
-            MinimalPlugins,
-            StatesPlugin,
-            RepliconSharedPlugin::default(),
-            plugin,
-        ));
+        app.add_plugins((MinimalPlugins, plugin));
 
         app.world_mut()
             .commands()
@@ -429,13 +417,8 @@ mod tests {
     #[test]
     fn pending_spawn_despawn() {
         let mut app = App::new();
-        app.add_plugins((
-            MinimalPlugins,
-            StatesPlugin,
-            RepliconSharedPlugin::default(),
-            plugin,
-        ))
-        .init_resource::<LastUndoId>();
+        app.add_plugins((MinimalPlugins, plugin))
+            .init_resource::<LastUndoId>();
 
         app.world_mut()
             .commands()
@@ -474,13 +457,8 @@ mod tests {
     #[test]
     fn max_len() {
         let mut app = App::new();
-        app.add_plugins((
-            MinimalPlugins,
-            StatesPlugin,
-            RepliconSharedPlugin::default(),
-            plugin,
-        ))
-        .insert_resource(CommandHistory::new(1));
+        app.add_plugins((MinimalPlugins, plugin))
+            .insert_resource(CommandHistory::new(1));
 
         app.world_mut()
             .commands()

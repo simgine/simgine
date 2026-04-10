@@ -37,7 +37,7 @@ pub(super) fn plugin(app: &mut App) {
 /// Spawns object for testing.
 fn spawn(mut commands: Commands) {
     commands.spawn(Object {
-        path: "base/objects/test/test.object.ron".into(),
+        manifest: "base/objects/test/test.object.ron".into(),
     });
 }
 
@@ -50,19 +50,19 @@ fn init(
 ) {
     let (object, mut name, mut scene_root) = objects.get_mut(insert.entity).unwrap();
 
-    let Some(manifest_handle) = asset_server.get_handle(&object.path) else {
-        error!("'{}' is missing, ignoring", &object.path);
+    let Some(manifest_handle) = asset_server.get_handle(&object.manifest) else {
+        error!("'{}' is missing, ignoring", &object.manifest);
         return;
     };
 
     debug!(
         "initializing object '{}' for `{}`",
-        &object.path, insert.entity
+        &object.manifest, insert.entity
     );
 
     let manifest = manifests
         .get(&manifest_handle)
-        .unwrap_or_else(|| panic!("'{:?}' should be loaded", &object.path));
+        .unwrap_or_else(|| panic!("'{:?}' should be loaded", &object.manifest));
 
     *name = manifest.info.name.clone();
     scene_root.0 = asset_server.load(manifest.scene.clone());
@@ -106,7 +106,7 @@ fn buy(
 ) {
     let bundle = (
         Object {
-            path: buy.path.clone(),
+            manifest: buy.manifest.clone(),
         },
         Transform::from_translation(buy.translation).with_rotation(buy.rotation),
     );
@@ -125,7 +125,7 @@ fn buy(
         commands.entity(object).insert(bundle);
     };
 
-    info!("`{:?}` buys '{:?}'", buy.client_id, buy.path);
+    info!("`{:?}` buys '{:?}'", buy.client_id, buy.manifest);
 
     commands.client_trigger(buy.confirm());
 }
@@ -177,7 +177,7 @@ fn sell(
 )]
 #[component(immutable)]
 pub struct Object {
-    pub path: AssetPath<'static>,
+    pub manifest: AssetPath<'static>,
 }
 
 #[derive(Serialize, Deserialize, MapEntities, Clone, Copy)]
@@ -209,7 +209,7 @@ impl ConfirmableCommand for MoveObject {
 
 #[derive(Serialize, Deserialize, MapEntities, Clone)]
 struct BuyObject {
-    path: AssetPath<'static>,
+    manifest: AssetPath<'static>,
     translation: Vec3,
     rotation: Quat,
 }
@@ -261,13 +261,13 @@ impl ConfirmableCommand for SellObject {
         let entity = world.get_entity(self.object).ok()?;
         let object = entity.get::<Object>()?;
         let transform = *entity.get::<Transform>()?;
-        let path = object.path.clone();
+        let manifest = object.manifest.clone();
 
         world.client_trigger(CommandRequest { id, command: *self });
         recorder.record(self.object);
 
         Some(Box::new(BuyObject {
-            path,
+            manifest,
             translation: transform.translation,
             rotation: transform.rotation,
         }))

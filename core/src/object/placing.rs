@@ -31,10 +31,10 @@ fn place(
     placing_object: Single<&PlacingObject>,
 ) {
     commands.entity(cancel.context).despawn();
-    let manifest_path = asset_server
+    let manifest = asset_server
         .get_path(placing_object.id)
         .expect("manifest should always come from file");
-    info!("placing '{manifest_path}'");
+    info!("placing '{manifest}'");
 }
 
 fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {

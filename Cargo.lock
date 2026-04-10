@@ -1356,12 +1356,13 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon"
-version = "0.39.2"
+version = "0.39.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f225170050ff5e716c3fd6f0fdf6a9f6ced3701320baaee8579218b0f00bed03"
+checksum = "04cb3e08874b843e4f599f9535f8ac5e8be2a8b7fb6e441a426e624ca8c26a71"
 dependencies = [
  "bevy",
  "bitflags 2.10.0",
+ "bumpalo",
  "bytes",
  "deterministic-hash",
  "log",
@@ -1833,9 +1834,9 @@ dependencies = [
 
 [[package]]
 name = "bumpalo"
-version = "3.19.1"
+version = "3.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5dd9dc738b7a8311c7ade152424974d8115f2cdad61e8dab8dac9f2362298510"
+checksum = "5d20789868f4b01b2f2caec9f5c4e0213b41e3e5702a50157d699ae31ced2fcb"
 
 [[package]]
 name = "bytemuck"
@@ -2876,7 +2877,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.56.0",
+ "windows 0.61.3",
 ]
 
 [[package]]
@@ -2990,7 +2991,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 1.0.69",
- "windows 0.56.0",
+ "windows 0.58.0",
 ]
 
 [[package]]

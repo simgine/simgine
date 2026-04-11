@@ -11,11 +11,6 @@ pub(super) struct CommandHistory {
     pending: HashMap<CommandId, ApplyHistoryCommand>,
     max_len: usize,
 
-    /// Entity map for [`EntityRecorder`](super::EntityRecorder).
-    ///
-    /// Cleared after each use. Stored to reuse allocated memory.
-    queued_mappings: EntityHashMap<Entity>,
-
     /// Counter for [`CommandId`] values used by [`ConfirmableCommand`](super::ConfirmableCommand).
     next_id: CommandId,
 }
@@ -27,34 +22,20 @@ impl CommandHistory {
             redo: Default::default(),
             pending: Default::default(),
             max_len,
-            queued_mappings: Default::default(),
             next_id: Default::default(),
         }
     }
 
-    /// Queues a mapping from an old entity to a new one.
-    ///
-    /// Pending mappings are applied by [`Self::flush_entity_mappings`].
-    pub(super) fn queue_entity_map(&mut self, old_entity: Entity, new_entity: Entity) {
-        trace!("mapping `{old_entity}` to `{new_entity}`");
-        self.queued_mappings.insert(old_entity, new_entity);
-    }
-
     /// Applies queued entity mappings to commands in undo and redo history.
-    pub(super) fn flush_entity_mappings(&mut self) {
-        if self.queued_mappings.is_empty() {
+    pub(super) fn flush_entity_mappings(&mut self, queued_mappings: &mut EntityHashMap<Entity>) {
+        if queued_mappings.is_empty() {
             return;
         }
 
         for record in self.undo.iter_mut().chain(&mut self.redo) {
-            record.command.map_entities(&mut self.queued_mappings);
+            record.command.map_entities(queued_mappings);
         }
-        trace!(
-            "updated {} entities inside commands",
-            self.queued_mappings.len()
-        );
-
-        self.queued_mappings.clear();
+        trace!("updated {} entities inside commands", queued_mappings.len());
     }
 
     pub(super) fn next_id(&mut self) -> CommandId {

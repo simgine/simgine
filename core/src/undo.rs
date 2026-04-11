@@ -122,15 +122,14 @@ impl Command for ApplyHistoryCommand {
         // SAFETY: access is disjoint since the state resource is private and can't be accessed during apply.
         let history = unsafe { &mut *world_cell.get_resource_mut::<CommandHistory>().unwrap() };
         let world = unsafe { world_cell.world_mut() };
+        let mut recorder = EntityRecorder::new(&mut self.entities);
 
         let (id, inverted) = match self.command {
             HistoryCommand::Reversible(command) => {
-                let mut recorder = EntityRecorder::new(&mut self.entities, history);
                 (None, command.apply(&mut recorder, world).map(Into::into))
             }
             HistoryCommand::Confirmable(command) => {
                 let id = history.next_id();
-                let mut recorder = EntityRecorder::new(&mut self.entities, history);
                 (
                     Some(id),
                     command.apply(id, &mut recorder, world).map(Into::into),
@@ -138,7 +137,7 @@ impl Command for ApplyHistoryCommand {
             }
         };
 
-        history.flush_entity_mappings();
+        history.flush_entity_mappings(&mut recorder.queued_mappings);
 
         let Some(inverted) = inverted else {
             debug!("unable to apply `{name}`");
@@ -203,15 +202,15 @@ pub struct CommandId(u64);
 /// Needed to correctly handle entity references in commands that spawn/despawn entities.
 pub struct EntityRecorder<'a> {
     entities: &'a mut RecordedEntities,
-    history: &'a mut CommandHistory,
+    queued_mappings: EntityHashMap<Entity>,
     index: usize,
 }
 
 impl<'a> EntityRecorder<'a> {
-    fn new(entities: &'a mut RecordedEntities, history: &'a mut CommandHistory) -> Self {
+    fn new(entities: &'a mut RecordedEntities) -> Self {
         Self {
             entities,
-            history,
+            queued_mappings: Default::default(),
             index: 0,
         }
     }
@@ -231,7 +230,8 @@ impl<'a> EntityRecorder<'a> {
     pub(crate) fn record(&mut self, entity: Entity) {
         trace!("recording `{entity}`");
         if let Some(old_entity) = self.entities.get_mut(self.index) {
-            self.history.queue_entity_map(*old_entity, entity);
+            trace!("mapping `{old_entity}` to `{entity}`");
+            self.queued_mappings.insert(*old_entity, entity);
             *old_entity = entity;
         } else {
             self.entities.push(entity);

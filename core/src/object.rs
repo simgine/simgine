@@ -51,7 +51,7 @@ fn init(
     let (object, mut name, mut scene_root) = objects.get_mut(insert.entity).unwrap();
 
     let Some(manifest_handle) = asset_server.get_handle(&object.manifest) else {
-        error!("'{}' is missing, ignoring", &object.manifest);
+        error!("'{}' is missing, ignoring", object.manifest);
         return;
     };
 
@@ -62,7 +62,7 @@ fn init(
 
     let manifest = manifests
         .get(&manifest_handle)
-        .unwrap_or_else(|| panic!("'{:?}' should be loaded", &object.manifest));
+        .unwrap_or_else(|| panic!("'{:?}' should be loaded", object.manifest));
 
     *name = manifest.info.name.clone();
     scene_root.0 = asset_server.load(manifest.scene.clone());

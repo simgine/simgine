@@ -18,12 +18,12 @@ pub(super) fn plugin(app: &mut App) {
 fn init(
     insert: On<Insert, PlacingObject>,
     asset_server: Res<AssetServer>,
-    objects_manifests: Res<Assets<ObjectManifest>>,
-    mut objects: Query<(&PlacingObject, &mut SceneRoot)>,
+    manifests: Res<Assets<ObjectManifest>>,
+    mut placing_objects: Query<(&PlacingObject, &mut SceneRoot)>,
 ) {
-    let (placing_object, mut scene_root) = objects.get_mut(insert.entity).unwrap();
-    let manifest = objects_manifests
-        .get(placing_object.id)
+    let (placing, mut scene_root) = placing_objects.get_mut(insert.entity).unwrap();
+    let manifest = manifests
+        .get(placing.id)
         .expect("manifests should be preloaded");
 
     debug!("loading scene `{}`", manifest.scene);
@@ -37,8 +37,8 @@ fn place(
     asset_server: Res<AssetServer>,
     placing_object: Single<(&PlacingObject, &Transform)>,
 ) {
-    let (object, transform) = *placing_object;
-    let manifest = asset_server.get_path(object.id).unwrap();
+    let (placing, transform) = *placing_object;
+    let manifest = asset_server.get_path(placing.id).unwrap();
 
     info!("placing '{manifest}'");
 
@@ -51,8 +51,8 @@ fn place(
     commands
         .entity(place.context)
         .remove_with_requires::<(CursorFollower, PlacingObject)>()
-        .insert(DespawnOnResponse::<BuyObject>::new(id))
-        .despawn_related::<Actions<PlacingObject>>();
+        .despawn_related::<Actions<PlacingObject>>()
+        .insert(DespawnOnResponse::<BuyObject>::new(id));
 }
 
 fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {

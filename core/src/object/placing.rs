@@ -96,7 +96,7 @@ pub fn placing_object(id: AssetId<ObjectManifest>) -> impl Bundle {
 
 #[derive(Component)]
 #[component(immutable)]
-struct PlacingObject {
+pub(super) struct PlacingObject {
     id: AssetId<ObjectManifest>,
 }
 

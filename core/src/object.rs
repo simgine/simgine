@@ -1,3 +1,4 @@
+mod moving;
 pub mod placing;
 
 use avian3d::prelude::*;
@@ -27,7 +28,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_client_command::<MoveObject>()
         .add_client_command::<BuyObject>()
         .add_client_command::<SellObject>()
-        .add_plugins(placing::plugin)
+        .add_plugins((placing::plugin, moving::plugin))
         .add_observer(init)
         .add_observer(move_command)
         .add_observer(buy)

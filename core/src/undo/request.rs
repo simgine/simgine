@@ -4,8 +4,7 @@ use bevy::{ecs::entity::MapEntities, prelude::*};
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
-use super::{CommandId, ConfirmableCommand};
-use crate::undo::HistoryCommandsExt;
+use super::{CommandId, ConfirmableCommand, history::CommandHistory};
 
 pub(crate) trait ClientCommandAppExt {
     fn add_client_command<C>(&mut self) -> &mut Self
@@ -24,12 +23,12 @@ impl ClientCommandAppExt for App {
     }
 }
 
-fn confirm<C: ConfirmableCommand>(confirm: On<Confirm<C>>, mut commands: Commands) {
-    commands.confirm(confirm.id);
+fn confirm<C: ConfirmableCommand>(confirm: On<Confirm<C>>, mut history: ResMut<CommandHistory>) {
+    history.confirm(confirm.id);
 }
 
-fn deny<C: ConfirmableCommand>(deny: On<Deny<C>>, mut commands: Commands) {
-    commands.deny(deny.id);
+fn deny<C: ConfirmableCommand>(deny: On<Deny<C>>, mut history: ResMut<CommandHistory>) {
+    history.deny(deny.id);
 }
 
 /// Command request from a client.

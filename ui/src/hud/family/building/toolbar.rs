@@ -1,6 +1,6 @@
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use bevy_enhanced_input::prelude::*;
-use simgine_core::{state::FamilyMode, undo::HistoryCommandsExt};
+use simgine_core::{state::FamilyMode, undo::HistoryCommands};
 
 use crate::{
     button_bindings,
@@ -36,7 +36,7 @@ pub(super) fn toolbar_node() -> impl Bundle {
                     ButtonContext,
                     button_bindings![KeyCode::KeyZ.with_mod_keys(ModKeys::CONTROL)],
                 ))
-                .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                .observe(|_on: On<Fire<Activate>>, mut commands: HistoryCommands| {
                     commands.undo();
                 });
             parent
@@ -49,7 +49,7 @@ pub(super) fn toolbar_node() -> impl Bundle {
                         KeyCode::KeyZ.with_mod_keys(ModKeys::CONTROL | ModKeys::SHIFT)
                     ],
                 ))
-                .observe(|_on: On<Fire<Activate>>, mut commands: Commands| {
+                .observe(|_on: On<Fire<Activate>>, mut commands: HistoryCommands| {
                     commands.redo();
                 });
         })),

@@ -2,17 +2,14 @@ use std::collections::VecDeque;
 
 use bevy::{ecs::entity::EntityHashMap, platform::collections::HashMap, prelude::*};
 
-use super::{ApplyHistoryCommand, CommandId, CommandSource, HistoryCommand, RecordedEntities};
+use super::{CommandId, CommandSource, ConfirmableCommand, RecordedEntities, ReversibleCommand};
 
 #[derive(Resource)]
-pub(super) struct CommandHistory {
+pub(crate) struct CommandHistory {
     undo: VecDeque<CommandRecord>,
     redo: VecDeque<CommandRecord>,
-    pending: HashMap<CommandId, ApplyHistoryCommand>,
+    pending: HashMap<CommandId, PendingCommandRecord>,
     max_len: usize,
-
-    /// Counter for [`CommandId`] values used by [`ConfirmableCommand`](super::ConfirmableCommand).
-    next_id: CommandId,
 }
 
 impl CommandHistory {
@@ -22,40 +19,93 @@ impl CommandHistory {
             redo: Default::default(),
             pending: Default::default(),
             max_len,
-            next_id: Default::default(),
         }
     }
 
     /// Applies queued entity mappings to commands in undo and redo history.
-    pub(super) fn flush_entity_mappings(&mut self, queued_mappings: &mut EntityHashMap<Entity>) {
-        if queued_mappings.is_empty() {
+    pub(super) fn flush_entity_mappings(&mut self, queued: &mut EntityHashMap<Entity>) {
+        if queued.is_empty() {
             return;
         }
 
         for record in self.undo.iter_mut().chain(&mut self.redo) {
-            record.command.map_entities(queued_mappings);
+            match &mut record.command {
+                HistoryCommand::Reversible(command) => command.dyn_map_entities(queued),
+                HistoryCommand::Confirmable(command) => command.dyn_map_entities(queued),
+            }
         }
-        trace!("updated {} entities inside commands", queued_mappings.len());
+        trace!("updated {} entities inside commands", queued.len());
     }
 
-    pub(super) fn next_id(&mut self) -> CommandId {
-        let current = self.next_id;
-        self.next_id.0 += 1;
-        current
-    }
-
-    pub(super) fn push_pending(&mut self, id: CommandId, apply: ApplyHistoryCommand) {
-        self.pending.insert(id, apply);
-    }
-
-    pub(super) fn push(
+    pub(super) fn push_confirmable(
         &mut self,
-        command: HistoryCommand,
+        id: CommandId,
+        command: Box<dyn ConfirmableCommand>,
         entities: RecordedEntities,
         source: CommandSource,
     ) {
-        let name = command.name();
-        let record = CommandRecord { command, entities };
+        self.pending.insert(
+            id,
+            PendingCommandRecord {
+                command,
+                entities,
+                source,
+            },
+        );
+    }
+
+    pub(super) fn push_reversible(
+        &mut self,
+        command: Box<dyn ReversibleCommand>,
+        entities: RecordedEntities,
+        source: CommandSource,
+    ) {
+        self.push(
+            CommandRecord {
+                command: HistoryCommand::Reversible(command),
+                entities,
+            },
+            source,
+        );
+    }
+
+    /// Confirms a pending [`ConfirmableCommand`].
+    ///
+    /// Moves the command from the pending state into the undo/redo history.
+    pub(crate) fn confirm(&mut self, id: CommandId) {
+        let Some(record) = self.pending.remove(&id) else {
+            debug!("ignoring confirmation for non-existing `{id:?}`");
+            return;
+        };
+
+        debug!("confirming `{id:?}` with `{}`", record.command.dyn_name());
+        self.push(
+            CommandRecord {
+                command: HistoryCommand::Confirmable(record.command),
+                entities: record.entities,
+            },
+            record.source,
+        );
+    }
+
+    /// Denies a pending [`ConfirmableCommand`].
+    ///
+    /// Cancels the command and removes it from the pending state without
+    /// adding it to the undo/redo history.
+    pub(crate) fn deny(&mut self, id: CommandId) {
+        if let Some(record) = self.pending.remove(&id) {
+            debug!("denying `{id:?}` with `{}`", record.command.dyn_name());
+        } else {
+            debug!("ignoring deny for non-existing `{id:?}`");
+        }
+    }
+
+    fn push(&mut self, record: CommandRecord, source: CommandSource) {
+        let name = match &record.command {
+            HistoryCommand::Reversible(command) => command.dyn_name(),
+            HistoryCommand::Confirmable(command) => command.dyn_name(),
+        };
+
         match source {
             CommandSource::User => {
                 debug!("adding `{name}` to undo and clearing redo");
@@ -70,24 +120,6 @@ impl CommandHistory {
                 debug!("adding `{name}` to undo");
                 push_to_stack(&mut self.undo, record, self.max_len);
             }
-        }
-    }
-
-    pub(super) fn confirm(&mut self, id: CommandId) {
-        let Some(apply) = self.pending.remove(&id) else {
-            debug!("ignoring confirmation for non-existing `{id:?}`");
-            return;
-        };
-
-        debug!("confirming `{id:?}` with `{}`", apply.command.name());
-        self.push(apply.command, apply.entities, apply.source);
-    }
-
-    pub(super) fn deny(&mut self, id: CommandId) {
-        if let Some(apply) = self.pending.remove(&id) {
-            debug!("denying `{id:?}` with `{}`", apply.command.name());
-        } else {
-            debug!("ignoring deny for non-existing `{id:?}`");
         }
     }
 
@@ -113,6 +145,12 @@ fn push_to_stack(stack: &mut VecDeque<CommandRecord>, record: CommandRecord, max
     }
 }
 
+struct PendingCommandRecord {
+    command: Box<dyn ConfirmableCommand>,
+    entities: RecordedEntities,
+    source: CommandSource,
+}
+
 /// A command stored in the undo or redo history.
 pub(super) struct CommandRecord {
     pub(super) command: HistoryCommand,
@@ -122,4 +160,9 @@ pub(super) struct CommandRecord {
     /// Used to update entity references in other commands once [`Self::command`]
     /// executes and produces new entities.
     pub(super) entities: RecordedEntities,
+}
+
+pub(super) enum HistoryCommand {
+    Reversible(Box<dyn ReversibleCommand>),
+    Confirmable(Box<dyn ConfirmableCommand>),
 }

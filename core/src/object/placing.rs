@@ -5,6 +5,7 @@ use crate::{
     asset_manifest::ObjectManifest,
     cursor_follower::CursorFollower,
     object::BuyObject,
+    outline::OutlineDisabler,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
 };
 
@@ -66,6 +67,7 @@ pub fn placing_object(id: AssetId<ObjectManifest>) -> impl Bundle {
         CursorFollower::default(),
         SceneRoot::default(),
         PlacingObject { id },
+        OutlineDisabler,
         ContextPriority::<PlacingObject>::new(100),
         actions!(PlacingObject[
             (

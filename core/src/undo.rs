@@ -161,7 +161,7 @@ struct ApplyConfirmableCommand {
 impl Command for ApplyConfirmableCommand {
     fn apply(mut self, world: &mut World) {
         let name = self.command.dyn_name();
-        debug!("applying `{name}`");
+        debug!("applying `{name}` with `{:?}`", self.id);
 
         let mut recorder = EntityRecorder::new(&mut self.entities);
         let Some(inverted) = self.command.apply(self.id, &mut recorder, world) else {

@@ -78,7 +78,7 @@ impl CommandHistory {
             return;
         };
 
-        debug!("confirming `{id:?}` with `{}`", record.command.dyn_name());
+        debug!("confirming `{id:?}`");
         self.push(
             CommandRecord {
                 command: HistoryCommand::Confirmable(record.command),
@@ -93,8 +93,8 @@ impl CommandHistory {
     /// Cancels the command and removes it from the pending state without
     /// adding it to the undo/redo history.
     pub(crate) fn deny(&mut self, id: CommandId) {
-        if let Some(record) = self.pending.remove(&id) {
-            debug!("denying `{id:?}` with `{}`", record.command.dyn_name());
+        if self.pending.remove(&id).is_some() {
+            debug!("denying `{id:?}`");
         } else {
             debug!("ignoring deny for non-existing `{id:?}`");
         }

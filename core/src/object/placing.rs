@@ -52,7 +52,7 @@ fn place(
         .entity(place.context)
         .remove_with_requires::<(CursorFollower, PlacingObject)>()
         .despawn_related::<Actions<PlacingObject>>()
-        .insert(DespawnOnResponse::<BuyObject>::new(id));
+        .insert(DespawnOnResponse { id });
 }
 
 fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {

@@ -29,7 +29,7 @@ fn confirm<C: ConfirmableCommand>(
     confirm: On<Confirm<C>>,
     mut commands: Commands,
     mut history: ResMut<CommandHistory>,
-    despawn_entities: Query<(Entity, &DespawnOnResponse<C>)>,
+    despawn_entities: Query<(Entity, &DespawnOnResponse)>,
 ) {
     history.confirm(confirm.id);
 
@@ -45,7 +45,7 @@ fn deny<C: ConfirmableCommand>(
     deny: On<Deny<C>>,
     mut commands: Commands,
     mut history: ResMut<CommandHistory>,
-    despawn_entities: Query<(Entity, &DespawnOnResponse<C>)>,
+    despawn_entities: Query<(Entity, &DespawnOnResponse)>,
 ) {
     history.deny(deny.id);
 
@@ -115,16 +115,6 @@ pub(crate) struct Deny<C> {
 }
 
 #[derive(Component)]
-pub(crate) struct DespawnOnResponse<C: ConfirmableCommand> {
-    id: CommandId,
-    marker: PhantomData<C>,
-}
-
-impl<C: ConfirmableCommand> DespawnOnResponse<C> {
-    pub(crate) fn new(id: CommandId) -> Self {
-        Self {
-            id,
-            marker: PhantomData,
-        }
-    }
+pub(crate) struct DespawnOnResponse {
+    pub(crate) id: CommandId,
 }

@@ -25,12 +25,36 @@ impl ClientCommandAppExt for App {
     }
 }
 
-fn confirm<C: ConfirmableCommand>(confirm: On<Confirm<C>>, mut history: ResMut<CommandHistory>) {
+fn confirm<C: ConfirmableCommand>(
+    confirm: On<Confirm<C>>,
+    mut commands: Commands,
+    mut history: ResMut<CommandHistory>,
+    despawn_entities: Query<(Entity, &DespawnOnResponse<C>)>,
+) {
     history.confirm(confirm.id);
+
+    for (entity, despawn) in despawn_entities {
+        if despawn.id == confirm.id {
+            debug!("despawning `{entity}` on response for `{:?}`", despawn.id);
+            commands.entity(entity).despawn();
+        }
+    }
 }
 
-fn deny<C: ConfirmableCommand>(deny: On<Deny<C>>, mut history: ResMut<CommandHistory>) {
+fn deny<C: ConfirmableCommand>(
+    deny: On<Deny<C>>,
+    mut commands: Commands,
+    mut history: ResMut<CommandHistory>,
+    despawn_entities: Query<(Entity, &DespawnOnResponse<C>)>,
+) {
     history.deny(deny.id);
+
+    for (entity, despawn) in despawn_entities {
+        if despawn.id == deny.id {
+            debug!("despawning `{entity}` on response for `{:?}`", despawn.id);
+            commands.entity(entity).despawn();
+        }
+    }
 }
 
 /// Command request from a client.
@@ -88,4 +112,19 @@ pub(crate) struct Confirm<C> {
 pub(crate) struct Deny<C> {
     pub(crate) id: CommandId,
     marker: PhantomData<C>,
+}
+
+#[derive(Component)]
+pub(crate) struct DespawnOnResponse<C: ConfirmableCommand> {
+    id: CommandId,
+    marker: PhantomData<C>,
+}
+
+impl<C: ConfirmableCommand> DespawnOnResponse<C> {
+    pub(crate) fn new(id: CommandId) -> Self {
+        Self {
+            id,
+            marker: PhantomData,
+        }
+    }
 }

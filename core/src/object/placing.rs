@@ -1,7 +1,12 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
 
-use crate::{asset_manifest::ObjectManifest, cursor_follower::CursorFollower};
+use crate::{
+    asset_manifest::ObjectManifest,
+    cursor_follower::CursorFollower,
+    object::BuyObject,
+    undo::{HistoryCommands, request::DespawnOnResponse},
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<PlacingObject>()
@@ -27,16 +32,27 @@ fn init(
 }
 
 fn place(
-    cancel: On<Fire<Place>>,
-    mut commands: Commands,
+    place: On<Fire<Place>>,
+    mut commands: HistoryCommands,
     asset_server: Res<AssetServer>,
-    placing_object: Single<&PlacingObject>,
+    placing_object: Single<(&PlacingObject, &Transform)>,
 ) {
-    commands.entity(cancel.context).despawn();
-    let manifest = asset_server
-        .get_path(placing_object.id)
-        .expect("manifest should always come from file");
+    let (object, transform) = *placing_object;
+    let manifest = asset_server.get_path(object.id).unwrap();
+
     info!("placing '{manifest}'");
+
+    let id = commands.queue_confirmable(BuyObject {
+        manifest: manifest.clone_owned(),
+        translation: transform.translation,
+        rotation: transform.rotation,
+    });
+
+    commands
+        .entity(place.context)
+        .remove_with_requires::<(CursorFollower, PlacingObject)>()
+        .insert(DespawnOnResponse::<BuyObject>::new(id))
+        .despawn_related::<Actions<PlacingObject>>();
 }
 
 fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {

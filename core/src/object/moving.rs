@@ -73,6 +73,11 @@ fn select(
             (
                 Action::<Cancel>::new(),
                 Press::default(),
+                ActionSettings {
+                    consume_input: true,
+                    require_reset: true,
+                    ..Default::default()
+                },
                 bindings![KeyCode::Escape, GamepadButton::East]
             )
         ]),

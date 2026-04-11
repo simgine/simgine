@@ -1,10 +1,10 @@
 pub mod asset_manifest;
 mod city;
 pub mod component_res;
-mod cursor_follower;
+mod cursor;
 pub mod error_event;
 pub mod game_paths;
-pub(crate) mod ghost;
+mod ghost;
 pub mod network;
 pub mod object;
 mod outline;
@@ -13,7 +13,7 @@ mod sky;
 pub mod speed;
 pub mod state;
 pub mod time;
-pub(crate) mod tint;
+mod tint;
 pub mod undo;
 pub mod world;
 
@@ -31,7 +31,7 @@ impl Plugin for SimgineCorePlugin {
                 time::plugin,
                 tint::plugin,
                 component_res::plugin,
-                cursor_follower::plugin,
+                cursor::plugin,
                 undo::plugin,
                 game_paths::plugin,
             ))

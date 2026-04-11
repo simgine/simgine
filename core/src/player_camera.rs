@@ -59,11 +59,14 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
                 SmoothNudge::default(),
                 DeltaScale::default(),
                 Scale::splat(100.0),
-                Chord::single(enable_pan),
                 Bindings::spawn((
                     Cardinal::wasd_keys(),
                     Axial::left_stick(),
-                    Spawn((Binding::mouse_motion(), Negate::y())),
+                    Spawn((
+                        Binding::mouse_motion(),
+                        Chord::single(enable_pan),
+                        Negate::y(),
+                    )),
                 )),
             ));
 

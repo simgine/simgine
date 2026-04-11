@@ -5,7 +5,7 @@ use crate::{
     asset_manifest::ObjectManifest,
     cursor_follower::CursorFollower,
     object::BuyObject,
-    undo::{HistoryCommands, request::DespawnOnResponse},
+    undo::{HistoryCommands, client_command::DespawnOnResponse},
 };
 
 pub(super) fn plugin(app: &mut App) {

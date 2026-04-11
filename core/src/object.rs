@@ -17,7 +17,9 @@ use crate::{
     state::GameState,
     undo::{
         CommandId, ConfirmableCommand, EntityRecorder,
-        request::{ClientCommand, ClientCommandAppExt, ClientCommandExt, CommandRequest, Deny},
+        client_command::{
+            ClientCommand, ClientCommandAppExt, ClientCommandExt, CommandRequest, Deny,
+        },
     },
 };
 

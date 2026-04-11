@@ -1,5 +1,5 @@
+pub(crate) mod client_command;
 pub(crate) mod history;
-pub(crate) mod request;
 
 use bevy::{
     ecs::{

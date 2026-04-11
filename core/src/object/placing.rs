@@ -21,6 +21,8 @@ fn init(
         .get(placing_object.id)
         .expect("manifests should be preloaded");
 
+    debug!("loading scene `{}`", manifest.scene);
+
     **scene_root = asset_server.load(manifest.scene.clone());
 }
 

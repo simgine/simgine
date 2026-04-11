@@ -93,7 +93,7 @@ fn move_command(
                 "denying `{:?}` to move `{}`: {e}",
                 move_command.client_id, move_command.object
             );
-            commands.client_trigger(move_command.deny());
+            commands.server_trigger(move_command.deny());
         }
     }
 }
@@ -118,7 +118,7 @@ fn buy(
         // While it's O(n), it's usually a single entity.
         let Some((object, _)) = pending_objects.iter().find(|(_, o)| o.id == buy.id) else {
             debug!("ignoring buy for non-existing `{:?}`", buy.id);
-            commands.client_trigger(buy.deny());
+            commands.server_trigger(buy.deny());
             return;
         };
 
@@ -127,7 +127,7 @@ fn buy(
 
     info!("`{:?}` buys '{:?}'", buy.client_id, buy.manifest);
 
-    commands.client_trigger(buy.confirm());
+    commands.server_trigger(buy.confirm());
 }
 
 fn buy_deny(
@@ -150,14 +150,14 @@ fn sell(
         Ok(()) => {
             info!("`{:?}` sells `{}`", sell.client_id, sell.object);
             commands.entity(sell.object).despawn();
-            commands.client_trigger(sell.confirm());
+            commands.server_trigger(sell.confirm());
         }
         Err(e) => {
             info!(
                 "denying `{:?}` to sell `{}`: {e}",
                 sell.client_id, sell.object
             );
-            commands.client_trigger(sell.deny());
+            commands.server_trigger(sell.deny());
         }
     }
 }

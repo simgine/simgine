@@ -18,6 +18,8 @@ impl ClientCommandAppExt for App {
         C: ConfirmableCommand + Serialize + DeserializeOwned + MapEntities + Clone,
     {
         self.add_mapped_client_event::<CommandRequest<C>>(Channel::Ordered)
+            .add_server_event::<Confirm<C>>(Channel::Ordered)
+            .add_server_event::<Deny<C>>(Channel::Ordered)
             .add_observer(confirm::<C>)
             .add_observer(deny::<C>)
     }

@@ -10,7 +10,7 @@ use bevy::{
 };
 use bevy_enhanced_input::prelude::*;
 
-use crate::state::GameState;
+use crate::{cursor::caster::CursorCaster, state::GameState};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<PlayerCamera>()
@@ -26,7 +26,7 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
 
     commands.spawn((
         Name::new("Player camera"),
-        PlayerCamera,
+        (PlayerCamera, CursorCaster),
         OrbitOrigin::default(),
         OrbitRotation::default(),
         SpringArm::default(),

@@ -15,7 +15,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     asset_manifest::ObjectManifest,
     combined_collider::CombinedCollider,
-    outline::OUTLINE_VOLUME,
+    cursor::outline::OUTLINE_VOLUME,
+    layer::GameLayer,
     state::GameState,
     undo::{
         CommandId, ConfirmableCommand, EntityRecorder,
@@ -175,6 +176,7 @@ fn sell(
     RigidBody::Kinematic,
     OutlineVolume = OUTLINE_VOLUME,
     CombinedCollider::Aabb,
+    CollisionLayers::new(GameLayer::Object, LayerMask::ALL),
 )]
 #[component(immutable)]
 pub struct Object {

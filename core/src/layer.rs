@@ -5,4 +5,5 @@ pub(crate) enum GameLayer {
     #[default]
     Default,
     Ground,
+    Object,
 }

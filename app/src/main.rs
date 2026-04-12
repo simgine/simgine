@@ -29,8 +29,6 @@ fn main() {
             PhysicsPlugins::default()
                 .build()
                 .disable::<ColliderTransformPlugin>()
-                .disable::<SolverBodyPlugin>()
-                .disable::<SolverSchedulePlugin>()
                 .disable::<IntegratorPlugin>()
                 .disable::<SolverPlugin>()
                 .disable::<CcdPlugin>()
@@ -40,7 +38,6 @@ fn main() {
                 .disable::<MassPropertyPlugin>()
                 .disable::<ForcePlugin>()
                 .disable::<PhysicsInterpolationPlugin>(),
-            PhysicsPickingPlugin,
             OutlinePlugin,
             TextInputPlugin,
             SimgineCorePlugin,

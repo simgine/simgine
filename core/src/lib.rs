@@ -9,7 +9,6 @@ mod ghost;
 mod layer;
 pub mod network;
 pub mod object;
-mod outline;
 mod player_camera;
 mod sky;
 pub mod speed;
@@ -42,7 +41,6 @@ impl Plugin for SimgineCorePlugin {
                 ghost::plugin,
                 network::plugin,
                 object::plugin,
-                outline::plugin,
                 player_camera::plugin,
                 sky::plugin,
                 speed::plugin,

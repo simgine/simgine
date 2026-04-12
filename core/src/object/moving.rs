@@ -1,64 +1,78 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
 
-use super::{Object, placing::PlacingObject};
+use super::Object;
 use crate::{
-    cursor::{caster::CursorCaster, follower::CursorFollower},
+    cursor::{
+        caster::{CursorQuery, CursorTarget},
+        follower::CursorFollower,
+    },
     ghost::Ghost,
     layer::GameLayer,
     object::{MoveObject, SellObject},
-    outline::OutlineDisabler,
     state::BuildingMode,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<MovePreview>()
+        .add_input_context::<ObjectSelector>()
         .add_observer(select)
         .add_observer(move_action)
         .add_observer(sell)
-        .add_observer(cancel);
+        .add_observer(cancel)
+        .add_systems(OnEnter(BuildingMode::Objects), spawn);
+}
+
+fn spawn(mut commands: Commands) {
+    commands.spawn((
+        ObjectSelector,
+        DespawnOnExit(BuildingMode::Objects),
+        actions!(ObjectSelector[
+            (
+                Action::<Select>::new(),
+                Press::default(),
+                ActionSettings {
+                    consume_input: true,
+                    require_reset: true,
+                    ..Default::default()
+                },
+                bindings![MouseButton::Left, GamepadButton::South]
+            ),
+        ]),
+    ));
 }
 
 fn select(
-    mut click: On<Pointer<Click>>,
-    caster: CursorCaster,
+    _on: On<Fire<Select>>,
+    caster: CursorQuery,
+    cursor_target: Single<&CursorTarget>,
     mut commands: Commands,
-    building_mode: Option<Res<State<BuildingMode>>>,
     objects: Query<(&SceneRoot, &Transform), With<Object>>,
-    placing_or_moving: Query<(), Or<(With<PlacingObject>, With<MovePreview>)>>,
 ) {
-    if click.button != PointerButton::Primary {
-        return;
-    }
-    if building_mode.is_none_or(|mode| **mode != BuildingMode::Objects) {
-        return;
-    }
-    if !placing_or_moving.is_empty() {
-        return;
-    }
-    let Ok((scene_root, transform)) = objects.get(click.entity) else {
+    let Some(cursor_target) = ***cursor_target else {
         return;
     };
-    let Some(ground_point) = caster.cast_ray(GameLayer::Ground) else {
+    let Ok((scene_root, transform)) = objects.get(cursor_target) else {
+        return;
+    };
+    let Some((_, ground_hit)) = caster.cast_ray(GameLayer::Ground) else {
         return;
     };
 
-    click.propagate(false);
-
-    info!("selecting `{}`", click.entity);
+    info!("selecting `{cursor_target}`");
     commands.spawn((
         Name::new("Selected object"),
         scene_root.clone(),
         CursorFollower {
-            offset: transform.translation - ground_point,
+            offset: transform.translation - ground_hit,
         },
+        DespawnOnExit(BuildingMode::Objects),
         MovePreview {
-            object: click.entity,
+            object: cursor_target,
         },
-        OutlineDisabler,
         Ghost {
-            original_entity: click.entity,
+            original_entity: cursor_target,
         },
         ContextPriority::<MovePreview>::new(100),
         actions!(MovePreview[
@@ -130,6 +144,13 @@ fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
     info!("cancelling");
     commands.entity(cancel.context).despawn();
 }
+
+#[derive(Component)]
+struct ObjectSelector;
+
+#[derive(InputAction)]
+#[action_output(bool)]
+struct Select;
 
 #[derive(Component)]
 #[component(immutable)]

@@ -1,5 +1,6 @@
 pub mod asset_manifest;
 mod city;
+mod combined_collider;
 pub mod component_res;
 mod cursor;
 pub mod error_event;
@@ -29,6 +30,7 @@ impl Plugin for SimgineCorePlugin {
                 state::plugin,
                 asset_manifest::plugin,
                 city::plugin,
+                combined_collider::plugin,
                 time::plugin,
                 tint::plugin,
                 component_res::plugin,

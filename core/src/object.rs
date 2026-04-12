@@ -14,6 +14,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     asset_manifest::ObjectManifest,
+    combined_collider::CombinedCollider,
     outline::OUTLINE_VOLUME,
     state::GameState,
     undo::{
@@ -173,10 +174,7 @@ fn sell(
     AsyncSceneInheritOutline,
     RigidBody::Kinematic,
     OutlineVolume = OUTLINE_VOLUME,
-    ColliderConstructorHierarchy {
-        default_constructor: Some(ColliderConstructor::ConvexHullFromMesh),
-        ..Default::default()
-    }
+    CombinedCollider::Aabb,
 )]
 #[component(immutable)]
 pub struct Object {

@@ -5,6 +5,7 @@ mod cursor;
 pub mod error_event;
 pub mod game_paths;
 mod ghost;
+mod layer;
 pub mod network;
 pub mod object;
 mod outline;

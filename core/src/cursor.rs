@@ -1,3 +1,4 @@
+pub(crate) mod caster;
 pub(crate) mod follower;
 
 use bevy::prelude::*;

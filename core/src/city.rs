@@ -1,6 +1,7 @@
+use avian3d::prelude::*;
 use bevy::{color::palettes::tailwind::NEUTRAL_500, prelude::*};
 
-use crate::state::GameState;
+use crate::{layer::GameLayer, state::GameState};
 
 const HALF_CITY_SIZE: f32 = 250.0;
 
@@ -16,5 +17,7 @@ fn spawn(
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(HALF_CITY_SIZE)))),
         MeshMaterial3d(materials.add(Color::from(NEUTRAL_500))),
+        Collider::cuboid(HALF_CITY_SIZE * 2.0, 0.0, HALF_CITY_SIZE * 2.0),
+        CollisionLayers::new(GameLayer::Ground, LayerMask::ALL),
     ));
 }

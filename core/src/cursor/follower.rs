@@ -20,5 +20,5 @@ fn update_position(caster: CursorCaster, follower: Single<(&mut Transform, &Curs
 
 #[derive(Component, Default)]
 pub(crate) struct CursorFollower {
-    offset: Vec3,
+    pub(crate) offset: Vec3,
 }

@@ -3,8 +3,9 @@ use bevy_enhanced_input::prelude::{Press, *};
 
 use super::{Object, placing::PlacingObject};
 use crate::{
-    cursor::follower::CursorFollower,
+    cursor::{caster::CursorCaster, follower::CursorFollower},
     ghost::Ghost,
+    layer::GameLayer,
     object::{MoveObject, SellObject},
     outline::OutlineDisabler,
     state::BuildingMode,
@@ -21,9 +22,10 @@ pub(super) fn plugin(app: &mut App) {
 
 fn select(
     mut click: On<Pointer<Click>>,
+    caster: CursorCaster,
     mut commands: Commands,
     building_mode: Option<Res<State<BuildingMode>>>,
-    objects: Query<&SceneRoot, With<Object>>,
+    objects: Query<(&SceneRoot, &Transform), With<Object>>,
     placing_or_moving: Query<(), Or<(With<PlacingObject>, With<MovePreview>)>>,
 ) {
     if click.button != PointerButton::Primary {
@@ -35,7 +37,10 @@ fn select(
     if !placing_or_moving.is_empty() {
         return;
     }
-    let Ok(scene_root) = objects.get(click.entity) else {
+    let Ok((scene_root, transform)) = objects.get(click.entity) else {
+        return;
+    };
+    let Some(ground_point) = caster.cast_ray(GameLayer::Ground) else {
         return;
     };
 
@@ -45,7 +50,9 @@ fn select(
     commands.spawn((
         Name::new("Selected object"),
         scene_root.clone(),
-        CursorFollower::default(),
+        CursorFollower {
+            offset: transform.translation - ground_point,
+        },
         MovePreview {
             object: click.entity,
         },

@@ -37,6 +37,7 @@ fn main() {
                 .disable::<JointPlugin>()
                 .disable::<MassPropertyPlugin>()
                 .disable::<ForcePlugin>()
+                .disable::<SpatialQueryPlugin>()
                 .disable::<PhysicsInterpolationPlugin>(),
             OutlinePlugin,
             TextInputPlugin,

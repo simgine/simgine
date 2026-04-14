@@ -160,6 +160,7 @@ impl AssetManifest for ObjectManifest {
 #[derive(Deserialize, Reflect, PartialEq, Clone, Copy)]
 pub enum ObjectCategory {
     Furniture,
+    Foliage,
 }
 
 #[derive(Deserialize, Reflect)]

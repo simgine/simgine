@@ -1,12 +1,35 @@
 use avian3d::prelude::*;
-use bevy::{ecs::system::SystemParam, input::InputSystems, prelude::*};
+use bevy::{input::InputSystems, prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(PreUpdate, cast_ray.pipe(update).after(InputSystems));
+    app.add_systems(
+        PreUpdate,
+        cast_ray
+            .pipe(update)
+            .after(InputSystems)
+            .in_set(CursorCastSystems),
+    );
 }
 
-fn cast_ray(query: CursorQuery, cast_mask: Single<&CursorCastMask>) -> Option<(Entity, Vec3)> {
-    query.cast_ray(***cast_mask)
+fn cast_ray(
+    query: SpatialQuery,
+    window: Single<&Window>,
+    caster_camera: Single<(&Camera, &GlobalTransform, &CursorCaster)>,
+    mask_override: Option<Single<&CursorMaskOverride>>,
+) -> Option<(Entity, Vec3)> {
+    let cursor_pos = window.cursor_position()?;
+    let (camera, transform, caster) = *caster_camera;
+    let ray = camera.viewport_to_world(transform, cursor_pos).ok()?;
+    let mask = mask_override.map(|m| m.0).unwrap_or(caster.mask);
+    let hit = query.cast_ray(
+        ray.origin,
+        ray.direction,
+        f32::MAX,
+        true,
+        &SpatialQueryFilter::from_mask(mask),
+    )?;
+
+    Some((hit.entity, ray.get_point(hit.distance)))
 }
 
 fn update(
@@ -25,40 +48,20 @@ fn update(
     hit.0 = new_hit;
 }
 
-#[derive(SystemParam)]
-pub(crate) struct CursorQuery<'w, 's> {
-    spatial_query: SpatialQuery<'w, 's>,
-    window: Single<'w, 's, &'static Window>,
-    caster_camera: Single<'w, 's, (&'static Camera, &'static GlobalTransform), With<CursorCaster>>,
-}
-
-impl CursorQuery<'_, '_> {
-    pub(crate) fn cast_ray(&self, mask: impl Into<LayerMask>) -> Option<(Entity, Vec3)> {
-        let cursor_pos = self.window.cursor_position()?;
-        let (camera, transform) = *self.caster_camera;
-        let ray = camera.viewport_to_world(transform, cursor_pos).ok()?;
-        let hit = self.spatial_query.cast_ray(
-            ray.origin,
-            ray.direction,
-            f32::MAX,
-            true,
-            &SpatialQueryFilter::from_mask(mask),
-        )?;
-
-        Some((hit.entity, ray.get_point(hit.distance)))
-    }
-}
+#[derive(SystemSet, Debug, PartialEq, Eq, Hash, Clone)]
+pub(super) struct CursorCastSystems;
 
 #[derive(Component)]
-#[require(CursorTarget, CursorHit, CursorCastMask)]
-pub(crate) struct CursorCaster;
+#[require(CursorTarget, CursorHit)]
+pub(crate) struct CursorCaster {
+    mask: LayerMask,
+}
 
-#[derive(Component, Deref, DerefMut)]
-pub(crate) struct CursorCastMask(LayerMask);
-
-impl Default for CursorCastMask {
+impl Default for CursorCaster {
     fn default() -> Self {
-        Self(LayerMask::ALL)
+        Self {
+            mask: LayerMask::ALL,
+        }
     }
 }
 
@@ -68,3 +71,12 @@ pub(crate) struct CursorTarget(Option<Entity>);
 
 #[derive(Component, Deref, Default)]
 pub(crate) struct CursorHit(Option<Vec3>);
+
+#[derive(Component)]
+pub(crate) struct CursorMaskOverride(LayerMask);
+
+impl CursorMaskOverride {
+    pub(crate) fn new(mask: impl Into<LayerMask>) -> Self {
+        Self(mask.into())
+    }
+}

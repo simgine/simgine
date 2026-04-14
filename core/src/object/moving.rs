@@ -4,8 +4,8 @@ use bevy_enhanced_input::prelude::{Press, *};
 use super::Object;
 use crate::{
     cursor::{
-        caster::{CursorQuery, CursorTarget},
-        follower::CursorFollower,
+        caster::{CursorMaskOverride, CursorTarget},
+        follower::{CursorFollower, CursorOffset},
     },
     ghost::Ghost,
     layer::GameLayer,
@@ -45,7 +45,6 @@ fn spawn(mut commands: Commands) {
 
 fn select(
     _on: On<Fire<Select>>,
-    caster: CursorQuery,
     cursor_target: Single<&CursorTarget>,
     mut commands: Commands,
     objects: Query<(&SceneRoot, &Transform), With<Object>>,
@@ -56,17 +55,15 @@ fn select(
     let Ok((scene_root, transform)) = objects.get(cursor_target) else {
         return;
     };
-    let Some((_, ground_hit)) = caster.cast_ray(GameLayer::Ground) else {
-        return;
-    };
 
     info!("selecting `{cursor_target}`");
     commands.spawn((
         Name::new("Selected object"),
         scene_root.clone(),
-        CursorFollower {
-            offset: transform.translation - ground_hit,
-        },
+        *transform,
+        CursorFollower,
+        CursorOffset::default(),
+        CursorMaskOverride::new(GameLayer::Ground),
         DespawnOnExit(BuildingMode::Objects),
         MovePreview {
             object: cursor_target,

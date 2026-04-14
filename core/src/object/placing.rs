@@ -63,7 +63,7 @@ fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
 pub fn placing_object(id: AssetId<ObjectManifest>) -> impl Bundle {
     (
         Name::new("Placing object"),
-        CursorFollower::default(),
+        CursorFollower,
         SceneRoot::default(),
         PlacingObject { id },
         ContextPriority::<PlacingObject>::new(100),

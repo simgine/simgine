@@ -26,7 +26,7 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
 
     commands.spawn((
         Name::new("Player camera"),
-        (PlayerCamera, CursorCaster),
+        (PlayerCamera, CursorCaster::default()),
         OrbitOrigin::default(),
         OrbitRotation::default(),
         SpringArm::default(),

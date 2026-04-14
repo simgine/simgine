@@ -100,6 +100,8 @@ impl<M: AssetManifest> AssetLoader for ManifestLoader<M> {
         let mut manifest = M::take_from_reflect(reflect).unwrap();
         manifest.resolve_paths(&registry, load_context.path());
 
+        debug!("loaded {:?}", load_context.path());
+
         Ok(manifest)
     }
 

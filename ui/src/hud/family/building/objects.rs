@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use simgine_core::{asset_manifest::ObjectManifest, object::placing, state::BuildingMode};
+use simgine_core::{asset_manifest::object::ObjectManifest, object::placing, state::BuildingMode};
 
 use crate::{
     preview::Preview,

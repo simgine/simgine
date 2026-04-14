@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
 
 use crate::{
-    asset_manifest::ObjectManifest,
+    asset_manifest::object::ObjectManifest,
     cursor::follower::CursorFollower,
     object::BuyObject,
     undo::{HistoryCommands, client_command::DespawnOnResponse},

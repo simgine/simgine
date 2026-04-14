@@ -13,7 +13,7 @@ use bevy_replicon_renet::netcode::NetcodeClientTransport;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    asset_manifest::ObjectManifest,
+    asset_manifest::object::ObjectManifest,
     combined_collider::CombinedCollider,
     cursor::outline::OUTLINE_VOLUME,
     layer::GameLayer,

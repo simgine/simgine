@@ -12,7 +12,7 @@ use bevy::{
     render::render_resource::TextureFormat,
     scene,
 };
-use simgine_core::asset_manifest::ObjectManifest;
+use simgine_core::asset_manifest::object::ObjectManifest;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<PreviewState>()

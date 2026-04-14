@@ -4,7 +4,7 @@ use bevy_enhanced_input::prelude::{Press, *};
 use super::Object;
 use crate::{
     cursor::{
-        caster::{CursorMaskOverride, CursorTarget},
+        caster::{CursorMask, CursorTarget},
         follower::{CursorFollower, CursorOffset},
     },
     ghost::Ghost,
@@ -27,6 +27,7 @@ pub(super) fn plugin(app: &mut App) {
 fn spawn(mut commands: Commands) {
     commands.spawn((
         ObjectSelector,
+        CursorMask::new(GameLayer::Object),
         DespawnOnExit(BuildingMode::Objects),
         actions!(ObjectSelector[
             (
@@ -63,7 +64,7 @@ fn select(
         *transform,
         CursorFollower,
         CursorOffset::default(),
-        CursorMaskOverride::new(GameLayer::Ground),
+        CursorMask::new(GameLayer::Ground),
         DespawnOnExit(BuildingMode::Objects),
         MovePreview {
             object: cursor_target,

@@ -66,4 +66,4 @@ fn unregister<C: Component>(_on: On<Remove, C>, mut resource_entities: ResMut<Re
 
 /// Maps types with entities marked as resources to entities on which they are stored.
 #[derive(Resource, Default, Deref, DerefMut)]
-struct ResEntities(TypeIdMap<Entity>);
+pub(crate) struct ResEntities(TypeIdMap<Entity>);

@@ -7,9 +7,9 @@ use crate::{
         caster::{CursorMask, CursorTarget},
         follower::{CursorFollower, CursorOffset},
     },
-    ghost::Ghost,
     layer::GameLayer,
     object::{MoveObject, Object, SellObject, placing::placing_object},
+    preview::PreviewOf,
     state::BuildingMode,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
 };
@@ -49,22 +49,20 @@ fn pick(
     mut commands: Commands,
     objects: Query<(&SceneRoot, &Transform), With<Object>>,
 ) {
-    let Some(cursor_target) = ***cursor_target else {
+    let Some(target) = ***cursor_target else {
         return;
     };
-    let Ok((scene_root, transform)) = objects.get(cursor_target) else {
+    let Ok((scene_root, transform)) = objects.get(target) else {
         return;
     };
 
-    info!("picking `{cursor_target}`");
+    info!("picking `{target}`");
     commands.spawn((
         Name::new("Moving object"),
         placing_object(),
         MovingObject,
         ContextPriority::<MovingObject>::new(100),
-        Ghost {
-            original_entity: cursor_target,
-        },
+        PreviewOf { target },
         scene_root.clone(),
         *transform,
         CursorOffset::default(),
@@ -92,13 +90,13 @@ fn pick(
 fn place(
     place: On<Fire<Place>>,
     mut commands: HistoryCommands,
-    moving_object: Single<(&Ghost, &Transform), With<MovingObject>>,
+    moving_object: Single<(&PreviewOf, &Transform), With<MovingObject>>,
 ) {
-    let (ghost, transform) = *moving_object;
-    info!("moving `{}`", ghost.original_entity);
+    let (preview, transform) = *moving_object;
+    info!("moving `{}`", preview.target);
 
     let id = commands.queue_confirmable(MoveObject {
-        object: ghost.original_entity,
+        object: preview.target,
         translation: transform.translation,
         rotation: transform.rotation,
     });
@@ -114,12 +112,12 @@ fn place(
 fn sell(
     sell: On<Fire<Sell>>,
     mut commands: HistoryCommands,
-    ghost: Single<&Ghost, With<MovingObject>>,
+    preview: Single<&PreviewOf, With<MovingObject>>,
 ) {
-    info!("selling `{}`", ghost.original_entity);
+    info!("selling `{}`", preview.target);
 
     let id = commands.queue_confirmable(SellObject {
-        object: ghost.original_entity,
+        object: preview.target,
     });
 
     commands

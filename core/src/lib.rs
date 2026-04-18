@@ -5,11 +5,11 @@ pub mod component_res;
 mod cursor;
 pub mod error_event;
 pub mod game_paths;
-mod ghost;
 mod layer;
 pub mod network;
 pub mod object;
 mod player_camera;
+mod preview;
 mod sky;
 pub mod speed;
 pub mod state;
@@ -38,7 +38,7 @@ impl Plugin for SimgineCorePlugin {
                 game_paths::plugin,
             ))
             .add_plugins((
-                ghost::plugin,
+                preview::plugin,
                 network::plugin,
                 object::plugin,
                 player_camera::plugin,

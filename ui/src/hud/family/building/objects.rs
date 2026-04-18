@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use simgine_core::{asset_manifest::object::ObjectManifest, object::placing, state::BuildingMode};
+use simgine_core::{asset_manifest::object::ObjectManifest, object::spawning, state::BuildingMode};
 
 use crate::{
     preview::Preview,
@@ -51,7 +51,7 @@ fn spawn_grid_buttons(
                     )],
                 ))
                 .observe(move |_on: On<Pointer<Click>>, mut commands: Commands| {
-                    commands.spawn(placing::placing_object(id));
+                    commands.spawn(spawning::spawning_object(id));
                 });
         }
     });

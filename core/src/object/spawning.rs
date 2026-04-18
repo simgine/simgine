@@ -9,21 +9,21 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_input_context::<PlacingObject>()
+    app.add_input_context::<SpawningObject>()
         .add_observer(init)
         .add_observer(place)
         .add_observer(cancel);
 }
 
 fn init(
-    insert: On<Insert, PlacingObject>,
+    insert: On<Insert, SpawningObject>,
     asset_server: Res<AssetServer>,
     manifests: Res<Assets<ObjectManifest>>,
-    mut placing_objects: Query<(&PlacingObject, &mut SceneRoot)>,
+    mut spawning_objects: Query<(&SpawningObject, &mut SceneRoot)>,
 ) {
-    let (placing, mut scene_root) = placing_objects.get_mut(insert.entity).unwrap();
+    let (spawning, mut scene_root) = spawning_objects.get_mut(insert.entity).unwrap();
     let manifest = manifests
-        .get(placing.id)
+        .get(spawning.id)
         .expect("manifests should be preloaded");
 
     debug!("loading scene `{}`", manifest.scene);
@@ -35,12 +35,12 @@ fn place(
     place: On<Fire<Place>>,
     mut commands: HistoryCommands,
     asset_server: Res<AssetServer>,
-    placing_object: Single<(&PlacingObject, &Transform)>,
+    spawning_object: Single<(&SpawningObject, &Transform)>,
 ) {
-    let (placing, transform) = *placing_object;
-    let manifest = asset_server.get_path(placing.id).unwrap();
+    let (spawning, transform) = *spawning_object;
+    let manifest = asset_server.get_path(spawning.id).unwrap();
 
-    info!("placing '{manifest}'");
+    info!("spawning '{manifest}'");
 
     let id = commands.queue_confirmable(BuyObject {
         manifest: manifest.clone_owned(),
@@ -50,8 +50,8 @@ fn place(
 
     commands
         .entity(place.context)
-        .remove_with_requires::<(CursorFollower, PlacingObject)>()
-        .despawn_related::<Actions<PlacingObject>>()
+        .remove_with_requires::<(CursorFollower, SpawningObject)>()
+        .despawn_related::<Actions<SpawningObject>>()
         .insert(DespawnOnResponse { id });
 }
 
@@ -60,14 +60,14 @@ fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
     commands.entity(cancel.context).despawn();
 }
 
-pub fn placing_object(id: AssetId<ObjectManifest>) -> impl Bundle {
+pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
     (
-        Name::new("Placing object"),
+        Name::new("spawning object"),
         CursorFollower,
         SceneRoot::default(),
-        PlacingObject { id },
-        ContextPriority::<PlacingObject>::new(100),
-        actions!(PlacingObject[
+        SpawningObject { id },
+        ContextPriority::<SpawningObject>::new(100),
+        actions!(SpawningObject[
             (
                 Action::<Place>::new(),
                 Press::default(),
@@ -94,7 +94,7 @@ pub fn placing_object(id: AssetId<ObjectManifest>) -> impl Bundle {
 
 #[derive(Component)]
 #[component(immutable)]
-pub(super) struct PlacingObject {
+pub(super) struct SpawningObject {
     id: AssetId<ObjectManifest>,
 }
 

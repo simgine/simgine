@@ -2,7 +2,7 @@ mod connection_dialog;
 mod error_dialog;
 mod hud;
 mod menu;
-mod preview;
+mod thumbnail;
 mod widget;
 
 use bevy::prelude::*;
@@ -16,7 +16,7 @@ impl Plugin for SimgineUiPlugin {
             error_dialog::plugin,
             hud::plugin,
             menu::plugin,
-            preview::plugin,
+            thumbnail::plugin,
             widget::plugin,
         ));
     }

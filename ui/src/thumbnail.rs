@@ -15,22 +15,22 @@ use bevy::{
 use simgine_core::asset_manifest::object::ObjectManifest;
 
 pub(super) fn plugin(app: &mut App) {
-    app.init_state::<PreviewState>()
+    app.init_state::<ThumbnailState>()
         .add_systems(Startup, setup)
-        .add_systems(OnEnter(PreviewState::Inactive), despawn_scene)
-        .add_systems(OnEnter(PreviewState::Warmup), warmup)
-        .add_systems(OnEnter(PreviewState::Rendering), render)
+        .add_systems(OnEnter(ThumbnailState::Inactive), despawn_scene)
+        .add_systems(OnEnter(ThumbnailState::Warmup), warmup)
+        .add_systems(OnEnter(ThumbnailState::Rendering), render)
         .add_systems(
             SpawnScene,
             wait_for_request
                 .before(scene::scene_spawner_system)
-                .run_if(in_state(PreviewState::Inactive)),
+                .run_if(in_state(ThumbnailState::Inactive)),
         )
         .add_systems(
             PostUpdate,
             wait_for_loading
                 .after(TransformSystems::Propagate) // To properly calculate AABB.
-                .run_if(in_state(PreviewState::LoadingAsset)),
+                .run_if(in_state(ThumbnailState::LoadingAsset)),
         );
 }
 
@@ -39,9 +39,9 @@ fn setup(mut commands: Commands) {
     const PITCH: f32 = 50.0_f32.to_radians();
 
     commands.spawn((
-        Name::new("Preview camera"),
-        PreviewCamera,
-        PREVIEW_RENDER_LAYER,
+        Name::new("Thumbnail camera"),
+        ThumbnailCamera,
+        THUMBNAIL_RENDER_LAYER,
         Camera3d::default(),
         RenderTarget::from(Handle::<Image>::default()),
         Msaa::Sample8,
@@ -53,8 +53,8 @@ fn setup(mut commands: Commands) {
         },
     ));
     commands.spawn((
-        Name::new("Preview light"),
-        PREVIEW_RENDER_LAYER,
+        Name::new("Thumbnail light"),
+        THUMBNAIL_RENDER_LAYER,
         DirectionalLight {
             illuminance: lux::FULL_DAYLIGHT,
             shadows_enabled: true,
@@ -68,46 +68,46 @@ fn wait_for_request(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     manifests: Res<Assets<ObjectManifest>>,
-    previews: Query<(Entity, &Preview, Has<CalculatedClip>), Without<PreviewProcessed>>,
+    thumbnails: Query<(Entity, &Thumbnail, Has<CalculatedClip>), Without<ThumbnailProcessed>>,
 ) {
-    // Check for `CalculatedClip` to make sure that the preview node is visible.
-    let Some((target, &preview, ..)) = previews.iter().find(|&(.., c)| !c) else {
+    // Check for `CalculatedClip` to make sure that the thumbnail node is visible.
+    let Some((target, &thumbnail, ..)) = thumbnails.iter().find(|&(.., c)| !c) else {
         return;
     };
 
     let manifest = manifests
-        .get(*preview)
+        .get(*thumbnail)
         .expect("manifests should be preloaded");
     debug!("spawning scene '{:?}'", manifest.scene);
     let scene = asset_server.load(manifest.scene.clone());
 
-    commands.entity(target).insert(PreviewProcessed);
+    commands.entity(target).insert(ThumbnailProcessed);
     commands.spawn((
-        Name::new("Preview target"),
-        PREVIEW_RENDER_LAYER,
-        PreviewTarget(target),
+        Name::new("Thumbnail target"),
+        THUMBNAIL_RENDER_LAYER,
+        ThumbnailOf(target),
         SceneRoot(scene),
     ));
 
-    commands.set_state(PreviewState::LoadingAsset);
+    commands.set_state(ThumbnailState::LoadingAsset);
 }
 
 fn wait_for_loading(
     mut commands: Commands,
     mut images: ResMut<Assets<Image>>,
     asset_server: Res<AssetServer>,
-    scene: Single<(Entity, &PreviewTarget, &SceneRoot)>,
-    camera: Single<(&mut RenderTarget, &mut Transform, &Projection), With<PreviewCamera>>,
+    scene: Single<(Entity, &ThumbnailOf, &SceneRoot)>,
+    camera: Single<(&mut RenderTarget, &mut Transform, &Projection), With<ThumbnailCamera>>,
     nodes: Query<&Node>,
     children: Query<&Children>,
     meshes: Query<(Entity, &Aabb, &GlobalTransform)>,
 ) {
-    let (scene_entity, &preview_target, scene) = *scene;
+    let (scene_entity, &thumbnail_of, scene) = *scene;
     match asset_server.recursive_dependency_load_state(&**scene) {
         RecursiveDependencyLoadState::Loaded => {
-            let Ok(node) = nodes.get(*preview_target) else {
-                debug!("preview target is no longer valid");
-                commands.set_state(PreviewState::Inactive);
+            let Ok(node) = nodes.get(*thumbnail_of) else {
+                debug!("thumbnail target is no longer valid");
+                commands.set_state(ThumbnailState::Inactive);
                 return;
             };
 
@@ -115,7 +115,7 @@ fn wait_for_loading(
                 panic!("width and height should be set in pixels");
             };
 
-            debug!("creating preview {width}x{height} for loaded scene");
+            debug!("creating thumbnail {width}x{height} for loaded scene");
             let image = images.add(Image::new_target_texture(
                 width as u32,
                 height as u32,
@@ -132,7 +132,7 @@ fn wait_for_loading(
                 meshes.iter_many(children.iter_descendants(scene_entity))
             {
                 commands.entity(child_entity).insert((
-                    PREVIEW_RENDER_LAYER,
+                    THUMBNAIL_RENDER_LAYER,
                     NoFrustumCulling,
                     NoWireframe,
                 ));
@@ -152,7 +152,7 @@ fn wait_for_loading(
             let radius = aabb.half_extents.length();
             let fov = match projection {
                 Projection::Perspective(p) => p.fov,
-                _ => unreachable!("preview camera should be perspective"),
+                _ => unreachable!("thumbnail camera should be perspective"),
             };
 
             const PADDING: f32 = 1.2;
@@ -162,11 +162,11 @@ fn wait_for_loading(
             camera_transform.translation = center + view_dir * distance;
             camera_transform.look_at(center, Vec3::Y);
 
-            commands.set_state(PreviewState::Warmup);
+            commands.set_state(ThumbnailState::Warmup);
         }
         RecursiveDependencyLoadState::Failed(e) => {
             error!("unable to load asset: {e:#}");
-            commands.set_state(PreviewState::Inactive);
+            commands.set_state(ThumbnailState::Inactive);
         }
         RecursiveDependencyLoadState::NotLoaded | RecursiveDependencyLoadState::Loading => (),
     }
@@ -175,42 +175,42 @@ fn wait_for_loading(
 /// Waits one frame for camera transform and components like [`NoWireframe`] to take effect.
 fn warmup(mut commands: Commands) {
     debug!("warming up");
-    commands.set_state(PreviewState::Rendering);
+    commands.set_state(ThumbnailState::Rendering);
 }
 
-fn render(mut commands: Commands, mut camera: Single<&mut Camera, With<PreviewCamera>>) {
+fn render(mut commands: Commands, mut camera: Single<&mut Camera, With<ThumbnailCamera>>) {
     debug!("starting rendering");
     camera.is_active = true;
-    commands.set_state(PreviewState::Inactive);
+    commands.set_state(ThumbnailState::Inactive);
 }
 
 fn despawn_scene(
     mut commands: Commands,
-    camera: Single<(&mut Camera, &RenderTarget), With<PreviewCamera>>,
-    scene: Single<(Entity, &PreviewTarget)>,
+    camera: Single<(&mut Camera, &RenderTarget), With<ThumbnailCamera>>,
+    scene: Single<(Entity, &ThumbnailOf)>,
     mut nodes: Query<&mut ImageNode>,
 ) {
     let (mut camera, render_target) = camera.into_inner();
     camera.is_active = false;
 
-    let (entity, &preview_target) = *scene;
-    if let Ok(mut node) = nodes.get_mut(*preview_target) {
+    let (entity, &thumbnail_of) = *scene;
+    if let Ok(mut node) = nodes.get_mut(*thumbnail_of) {
         debug!("assigning image to node");
         let image = render_target
             .as_image()
-            .expect("preview camera should render only to images");
+            .expect("thumbnail camera should render only to images");
         node.image = image.clone();
     } else {
-        debug!("preview target is no longer valid");
+        debug!("thumbnail target is no longer valid");
     }
 
     commands.entity(entity).despawn();
 }
 
-const PREVIEW_RENDER_LAYER: RenderLayers = RenderLayers::layer(1);
+const THUMBNAIL_RENDER_LAYER: RenderLayers = RenderLayers::layer(1);
 
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq, States)]
-enum PreviewState {
+enum ThumbnailState {
     #[default]
     Inactive,
     LoadingAsset,
@@ -218,23 +218,23 @@ enum PreviewState {
     Rendering,
 }
 
-/// Specifies preview that should be generated for specific actor in the world or for an object by its manifest.
+/// Specifies thumbnail that should be generated for specific actor in the world or for an object by its manifest.
 ///
 /// Generated image handle will be written to the image handle on this entity.
-/// Preview generation happens only if UI element entity is visible.
-/// Processed entities will be marked with [`PreviewProcessed`].
+/// Thumbnail generation happens only if UI element entity is visible.
+/// Processed entities will be marked with [`ThumbnailProcessed`].
 #[derive(Component, Deref, Clone, Copy)]
 #[require(ImageNode)]
-pub(crate) struct Preview(pub(crate) AssetId<ObjectManifest>);
+pub(crate) struct Thumbnail(pub(crate) AssetId<ObjectManifest>);
 
-/// Marks entity with [`Preview`] as processed end excludes it from preview generation.
+/// Marks entity with [`Thumbnail`] as processed end excludes it from thumbnail generation.
 #[derive(Component)]
-struct PreviewProcessed;
+struct ThumbnailProcessed;
 
-/// Marker for preview camera.
+/// Marker for thumbnail camera.
 #[derive(Component)]
-struct PreviewCamera;
+struct ThumbnailCamera;
 
-/// Points to the entity for which the preview will be generated.
+/// Points to the entity for which the thumbnail will be generated.
 #[derive(Component, Deref, Clone, Copy)]
-struct PreviewTarget(Entity);
+struct ThumbnailOf(Entity);

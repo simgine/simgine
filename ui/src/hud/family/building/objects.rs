@@ -4,7 +4,7 @@ use simgine_core::{
 };
 
 use crate::{
-    preview::Preview,
+    thumbnail::Thumbnail,
     widget::{
         button::{
             exclusive_group::ExclusiveGroup, icon::ButtonIcon, style::ButtonStyle, toggled::Toggled,
@@ -43,7 +43,7 @@ fn spawn_grid_buttons(
                     ButtonStyle::default(),
                     Toggled(false),
                     children![(
-                        Preview(id),
+                        Thumbnail(id),
                         Node {
                             height: PREVIEW_HEIGHT,
                             width: PREVIEW_WIDTH,

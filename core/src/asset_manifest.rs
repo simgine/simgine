@@ -42,7 +42,7 @@ fn wait_for_loading(
 }
 
 /// Resource that keeps manifests loaded.
-#[derive(Resource, Deref)]
+#[derive(Resource, Deref, DerefMut)]
 struct AssetManifests(Vec<Handle<LoadedUntypedAsset>>);
 
 impl FromWorld for AssetManifests {
@@ -66,7 +66,7 @@ impl FromWorld for AssetManifests {
             debug!("loading manifest {relative_path:?}");
 
             let handle = asset_server.load_untyped(AssetPath::from_path(relative_path));
-            manifests.0.push(handle);
+            manifests.push(handle);
         }
 
         manifests

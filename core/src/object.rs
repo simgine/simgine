@@ -69,7 +69,7 @@ fn init(
         .unwrap_or_else(|| panic!("'{:?}' should be loaded", object.manifest));
 
     *name = manifest.info.name.clone();
-    scene_root.0 = asset_server.load(manifest.scene.clone());
+    **scene_root = asset_server.load(manifest.scene.clone());
 
     let mut entity = commands.entity(insert.entity);
     for component in &manifest.components {

@@ -19,7 +19,7 @@ fn update_position(
     };
 
     let offset = match offset {
-        Some(mut offset) => *offset.0.get_or_insert_with(|| transform.translation - hit),
+        Some(mut offset) => *offset.get_or_insert_with(|| transform.translation - hit),
         None => Vec3::ZERO,
     };
 
@@ -30,5 +30,5 @@ fn update_position(
 #[require(OutlineDisabler)]
 pub(crate) struct CursorFollower;
 
-#[derive(Component, Default)]
+#[derive(Component, Deref, DerefMut, Default)]
 pub(crate) struct CursorOffset(Option<Vec3>);

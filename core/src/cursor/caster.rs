@@ -28,14 +28,14 @@ fn cast_ray(
     let (camera, transform, caster) = *caster_camera;
     let cursor_pos = window.cursor_position()?;
     let mask_entity = *caster.masks.last()?;
-    let mask = masks.get(mask_entity).ok()?;
+    let mask = **masks.get(mask_entity).ok()?;
     let ray = camera.viewport_to_world(transform, cursor_pos).ok()?;
     let hit = query.cast_ray(
         ray.origin,
         ray.direction,
         f32::MAX,
         true,
-        &SpatialQueryFilter::from_mask(mask.0),
+        &SpatialQueryFilter::from_mask(mask),
     )?;
 
     Some((hit.entity, ray.get_point(hit.distance)))
@@ -76,7 +76,7 @@ pub(crate) struct CursorHit(Option<Vec3>);
 /// Configures [`CursorCaster`].
 ///
 /// Can be inserted on any entity. Last inserted mask takes priority.
-#[derive(Component)]
+#[derive(Component, Deref)]
 #[component(on_add = on_mask_add, on_remove = on_mask_remove)]
 pub(crate) struct CursorMask(LayerMask);
 

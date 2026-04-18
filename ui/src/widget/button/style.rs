@@ -61,7 +61,7 @@ impl ButtonStyle {
 
 impl ButtonStyle {
     fn get_color(&self, interaction: &Interaction, toggled: Option<&Toggled>) -> Color {
-        let toggled = toggled.map(|toggled| toggled.0).unwrap_or_default();
+        let toggled = toggled.map(|&t| *t).unwrap_or_default();
         match (interaction, toggled) {
             (Interaction::Pressed, _) | (Interaction::None, true) => self.pressed,
             (Interaction::Hovered, true) => self.hovered_pressed,

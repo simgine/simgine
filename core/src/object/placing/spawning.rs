@@ -1,18 +1,17 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
 
+use super::PlacingObject;
 use crate::{
     asset_manifest::object::ObjectManifest,
-    cursor::follower::CursorFollower,
-    object::BuyObject,
+    object::{BuyObject, placing::placing_object},
     undo::{HistoryCommands, client_command::DespawnOnResponse},
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<SpawningObject>()
         .add_observer(init)
-        .add_observer(place)
-        .add_observer(cancel);
+        .add_observer(place);
 }
 
 fn init(
@@ -50,23 +49,19 @@ fn place(
 
     commands
         .entity(place.context)
-        .remove_with_requires::<(CursorFollower, SpawningObject)>()
+        .remove_with_requires::<(PlacingObject, SpawningObject)>()
+        .despawn_related::<Actions<PlacingObject>>()
         .despawn_related::<Actions<SpawningObject>>()
         .insert(DespawnOnResponse { id });
 }
 
-fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
-    info!("cancelling");
-    commands.entity(cancel.context).despawn();
-}
-
 pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
     (
-        Name::new("spawning object"),
-        CursorFollower,
-        SceneRoot::default(),
+        Name::new("Spawning object"),
+        placing_object(),
         SpawningObject { id },
         ContextPriority::<SpawningObject>::new(100),
+        SceneRoot::default(),
         actions!(SpawningObject[
             (
                 Action::<Place>::new(),
@@ -78,16 +73,6 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
                 },
                 bindings![MouseButton::Left, GamepadButton::South]
             ),
-            (
-                Action::<Cancel>::new(),
-                Press::default(),
-                ActionSettings {
-                    consume_input: true,
-                    require_reset: true,
-                    ..Default::default()
-                },
-                bindings![KeyCode::Escape, KeyCode::Delete, GamepadButton::East]
-            )
         ]),
     )
 }
@@ -101,7 +86,3 @@ pub(super) struct SpawningObject {
 #[derive(InputAction)]
 #[action_output(bool)]
 struct Place;
-
-#[derive(InputAction)]
-#[action_output(bool)]
-struct Cancel;

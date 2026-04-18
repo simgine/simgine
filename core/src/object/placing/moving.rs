@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
 
+use super::PlacingObject;
 use crate::{
     cursor::{
         caster::{CursorMask, CursorTarget},
@@ -8,18 +9,17 @@ use crate::{
     },
     ghost::Ghost,
     layer::GameLayer,
-    object::{MoveObject, Object, SellObject},
+    object::{MoveObject, Object, SellObject, placing::placing_object},
     state::BuildingMode,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_input_context::<MovePreview>()
+    app.add_input_context::<MovingObject>()
         .add_input_context::<ObjectSelector>()
-        .add_observer(select)
+        .add_observer(pick)
         .add_observer(move_action)
         .add_observer(sell)
-        .add_observer(cancel)
         .add_systems(OnEnter(BuildingMode::Objects), spawn);
 }
 
@@ -30,7 +30,7 @@ fn spawn(mut commands: Commands) {
         DespawnOnExit(BuildingMode::Objects),
         actions!(ObjectSelector[
             (
-                Action::<Select>::new(),
+                Action::<Pick>::new(),
                 Press::default(),
                 ActionSettings {
                     consume_input: true,
@@ -43,8 +43,8 @@ fn spawn(mut commands: Commands) {
     ));
 }
 
-fn select(
-    _on: On<Fire<Select>>,
+fn pick(
+    _on: On<Fire<Pick>>,
     cursor_target: Single<&CursorTarget>,
     mut commands: Commands,
     objects: Query<(&SceneRoot, &Transform), With<Object>>,
@@ -58,21 +58,20 @@ fn select(
 
     info!("selecting `{cursor_target}`");
     commands.spawn((
-        Name::new("Selected object"),
-        scene_root.clone(),
-        *transform,
-        CursorFollower,
-        CursorOffset::default(),
-        CursorMask::new(GameLayer::Ground),
-        DespawnOnExit(BuildingMode::Objects),
-        MovePreview {
+        Name::new("Moving object"),
+        placing_object(),
+        MovingObject {
             object: cursor_target,
         },
+        ContextPriority::<MovingObject>::new(100),
+        scene_root.clone(),
+        *transform,
+        CursorOffset::default(),
+        DespawnOnExit(BuildingMode::Objects),
         Ghost {
             original_entity: cursor_target,
         },
-        ContextPriority::<MovePreview>::new(100),
-        actions!(MovePreview[
+        actions!(MovingObject[
             (
                 Action::<Move>::new(),
                 Press::default(),
@@ -88,16 +87,6 @@ fn select(
                 Press::default(),
                 bindings![KeyCode::Delete, GamepadButton::North]
             ),
-            (
-                Action::<Cancel>::new(),
-                Press::default(),
-                ActionSettings {
-                    consume_input: true,
-                    require_reset: true,
-                    ..Default::default()
-                },
-                bindings![KeyCode::Escape, GamepadButton::East]
-            )
         ]),
     ));
 }
@@ -105,7 +94,7 @@ fn select(
 fn move_action(
     move_action: On<Fire<Move>>,
     mut commands: HistoryCommands,
-    move_preview: Single<(&MovePreview, &Transform)>,
+    move_preview: Single<(&MovingObject, &Transform)>,
 ) {
     let (preview, transform) = *move_preview;
     info!("moving `{}`", preview.object);
@@ -118,12 +107,13 @@ fn move_action(
 
     commands
         .entity(move_action.context)
-        .remove_with_requires::<(CursorFollower, MovePreview)>()
-        .despawn_related::<Actions<MovePreview>>()
+        .remove_with_requires::<(PlacingObject, MovingObject)>()
+        .despawn_related::<Actions<PlacingObject>>()
+        .despawn_related::<Actions<MovingObject>>()
         .insert(DespawnOnResponse { id });
 }
 
-fn sell(sell: On<Fire<Sell>>, mut commands: HistoryCommands, preview: Single<&MovePreview>) {
+fn sell(sell: On<Fire<Sell>>, mut commands: HistoryCommands, preview: Single<&MovingObject>) {
     info!("selling `{}`", preview.object);
 
     let id = commands.queue_confirmable(SellObject {
@@ -132,14 +122,9 @@ fn sell(sell: On<Fire<Sell>>, mut commands: HistoryCommands, preview: Single<&Mo
 
     commands
         .entity(sell.context)
-        .remove_with_requires::<(CursorFollower, MovePreview)>()
-        .despawn_related::<Actions<MovePreview>>()
+        .remove_with_requires::<(CursorFollower, MovingObject)>()
+        .despawn_related::<Actions<MovingObject>>()
         .insert(DespawnOnResponse { id });
-}
-
-fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
-    info!("cancelling");
-    commands.entity(cancel.context).despawn();
 }
 
 #[derive(Component)]
@@ -147,11 +132,11 @@ struct ObjectSelector;
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct Select;
+struct Pick;
 
 #[derive(Component)]
 #[component(immutable)]
-struct MovePreview {
+struct MovingObject {
     object: Entity,
 }
 
@@ -162,7 +147,3 @@ struct Move;
 #[derive(InputAction)]
 #[action_output(bool)]
 struct Sell;
-
-#[derive(InputAction)]
-#[action_output(bool)]
-struct Cancel;

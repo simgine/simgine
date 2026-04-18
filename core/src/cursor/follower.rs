@@ -26,7 +26,7 @@ fn update_position(
     transform.translation = hit + offset;
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 #[require(OutlineDisabler)]
 pub(crate) struct CursorFollower;
 

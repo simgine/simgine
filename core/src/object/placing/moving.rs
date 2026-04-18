@@ -1,7 +1,6 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::{Press, *};
 
-use super::Object;
 use crate::{
     cursor::{
         caster::{CursorMask, CursorTarget},
@@ -9,7 +8,7 @@ use crate::{
     },
     ghost::Ghost,
     layer::GameLayer,
-    object::{MoveObject, SellObject},
+    object::{MoveObject, Object, SellObject},
     state::BuildingMode,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
 };

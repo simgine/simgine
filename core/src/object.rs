@@ -1,5 +1,4 @@
-mod moving;
-pub mod spawning;
+pub mod placing;
 
 use avian3d::prelude::*;
 use bevy::{
@@ -30,7 +29,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_client_command::<MoveObject>()
         .add_client_command::<BuyObject>()
         .add_client_command::<SellObject>()
-        .add_plugins((spawning::plugin, moving::plugin))
+        .add_plugins(placing::plugin)
         .add_observer(init)
         .add_observer(move_command)
         .add_observer(buy)

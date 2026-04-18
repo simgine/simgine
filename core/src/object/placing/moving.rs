@@ -60,17 +60,15 @@ fn pick(
     commands.spawn((
         Name::new("Moving object"),
         placing_object(),
-        MovingObject {
-            object: cursor_target,
-        },
+        MovingObject,
         ContextPriority::<MovingObject>::new(100),
+        Ghost {
+            original_entity: cursor_target,
+        },
         scene_root.clone(),
         *transform,
         CursorOffset::default(),
         DespawnOnExit(BuildingMode::Objects),
-        Ghost {
-            original_entity: cursor_target,
-        },
         actions!(MovingObject[
             (
                 Action::<Place>::new(),
@@ -94,13 +92,13 @@ fn pick(
 fn place(
     place: On<Fire<Place>>,
     mut commands: HistoryCommands,
-    move_preview: Single<(&MovingObject, &Transform)>,
+    moving_object: Single<(&Ghost, &Transform), With<MovingObject>>,
 ) {
-    let (preview, transform) = *move_preview;
-    info!("moving `{}`", preview.object);
+    let (ghost, transform) = *moving_object;
+    info!("moving `{}`", ghost.original_entity);
 
     let id = commands.queue_confirmable(MoveObject {
-        object: preview.object,
+        object: ghost.original_entity,
         translation: transform.translation,
         rotation: transform.rotation,
     });
@@ -113,11 +111,15 @@ fn place(
         .insert(DespawnOnResponse { id });
 }
 
-fn sell(sell: On<Fire<Sell>>, mut commands: HistoryCommands, preview: Single<&MovingObject>) {
-    info!("selling `{}`", preview.object);
+fn sell(
+    sell: On<Fire<Sell>>,
+    mut commands: HistoryCommands,
+    ghost: Single<&Ghost, With<MovingObject>>,
+) {
+    info!("selling `{}`", ghost.original_entity);
 
     let id = commands.queue_confirmable(SellObject {
-        object: preview.object,
+        object: ghost.original_entity,
     });
 
     commands
@@ -135,10 +137,7 @@ struct ObjectSelector;
 struct Pick;
 
 #[derive(Component)]
-#[component(immutable)]
-struct MovingObject {
-    object: Entity,
-}
+struct MovingObject;
 
 #[derive(InputAction)]
 #[action_output(bool)]

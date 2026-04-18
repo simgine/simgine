@@ -18,7 +18,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<MovingObject>()
         .add_input_context::<ObjectSelector>()
         .add_observer(pick)
-        .add_observer(move_action)
+        .add_observer(place)
         .add_observer(sell)
         .add_systems(OnEnter(BuildingMode::Objects), spawn);
 }
@@ -56,7 +56,7 @@ fn pick(
         return;
     };
 
-    info!("selecting `{cursor_target}`");
+    info!("picking `{cursor_target}`");
     commands.spawn((
         Name::new("Moving object"),
         placing_object(),
@@ -73,7 +73,7 @@ fn pick(
         },
         actions!(MovingObject[
             (
-                Action::<Move>::new(),
+                Action::<Place>::new(),
                 Press::default(),
                 ActionSettings {
                     consume_input: true,
@@ -91,8 +91,8 @@ fn pick(
     ));
 }
 
-fn move_action(
-    move_action: On<Fire<Move>>,
+fn place(
+    place: On<Fire<Place>>,
     mut commands: HistoryCommands,
     move_preview: Single<(&MovingObject, &Transform)>,
 ) {
@@ -106,7 +106,7 @@ fn move_action(
     });
 
     commands
-        .entity(move_action.context)
+        .entity(place.context)
         .remove_with_requires::<(PlacingObject, MovingObject)>()
         .despawn_related::<Actions<PlacingObject>>()
         .despawn_related::<Actions<MovingObject>>()
@@ -142,7 +142,7 @@ struct MovingObject {
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct Move;
+struct Place;
 
 #[derive(InputAction)]
 #[action_output(bool)]

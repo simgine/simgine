@@ -11,7 +11,7 @@ use crate::{
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<SpawningObject>()
         .add_observer(init)
-        .add_observer(place);
+        .add_observer(buy);
 }
 
 fn init(
@@ -30,8 +30,8 @@ fn init(
     **scene_root = asset_server.load(manifest.scene.clone());
 }
 
-fn place(
-    place: On<Fire<Place>>,
+fn buy(
+    buy: On<Fire<Buy>>,
     mut commands: HistoryCommands,
     asset_server: Res<AssetServer>,
     spawning_object: Single<(&SpawningObject, &Transform)>,
@@ -48,7 +48,7 @@ fn place(
     });
 
     commands
-        .entity(place.context)
+        .entity(buy.context)
         .remove_with_requires::<(PlacingObject, SpawningObject)>()
         .despawn_related::<Actions<PlacingObject>>()
         .despawn_related::<Actions<SpawningObject>>()
@@ -64,7 +64,7 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
         SceneRoot::default(),
         actions!(SpawningObject[
             (
-                Action::<Place>::new(),
+                Action::<Buy>::new(),
                 Press::default(),
                 ActionSettings {
                     consume_input: true,
@@ -85,4 +85,4 @@ pub(super) struct SpawningObject {
 
 #[derive(InputAction)]
 #[action_output(bool)]
-struct Place;
+struct Buy;

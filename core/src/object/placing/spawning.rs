@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_enhanced_input::prelude::{Press, *};
+use bevy_enhanced_input::prelude::*;
 
 use super::PlacingObject;
 use crate::{
@@ -31,7 +31,7 @@ fn init(
 }
 
 fn buy(
-    buy: On<Fire<Buy>>,
+    buy: On<Start<Buy>>,
     mut commands: HistoryCommands,
     asset_server: Res<AssetServer>,
     spawning_object: Single<(&SpawningObject, &Transform)>,
@@ -65,7 +65,6 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
         actions!(SpawningObject[
             (
                 Action::<Buy>::new(),
-                Press::default(),
                 ActionSettings {
                     consume_input: true,
                     require_reset: true,

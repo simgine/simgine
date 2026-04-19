@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_enhanced_input::prelude::{Press, *};
+use bevy_enhanced_input::prelude::*;
 
 use super::PlacingObject;
 use crate::{
@@ -31,7 +31,6 @@ fn spawn(mut commands: Commands) {
         actions!(ObjectSelector[
             (
                 Action::<Pick>::new(),
-                Press::default(),
                 ActionSettings {
                     consume_input: true,
                     require_reset: true,
@@ -44,7 +43,7 @@ fn spawn(mut commands: Commands) {
 }
 
 fn pick(
-    _on: On<Fire<Pick>>,
+    _on: On<Start<Pick>>,
     cursor_target: Single<&CursorTarget>,
     mut commands: Commands,
     objects: Query<(&SceneRoot, &Transform), With<Object>>,
@@ -70,7 +69,6 @@ fn pick(
         actions!(MovingObject[
             (
                 Action::<Place>::new(),
-                Press::default(),
                 ActionSettings {
                     consume_input: true,
                     require_reset: true,
@@ -80,7 +78,6 @@ fn pick(
             ),
             (
                 Action::<Sell>::new(),
-                Press::default(),
                 bindings![KeyCode::Delete, GamepadButton::North]
             ),
         ]),
@@ -88,7 +85,7 @@ fn pick(
 }
 
 fn place(
-    place: On<Fire<Place>>,
+    place: On<Start<Place>>,
     mut commands: HistoryCommands,
     moving_object: Single<(&PreviewOf, &Transform), With<MovingObject>>,
 ) {
@@ -110,7 +107,7 @@ fn place(
 }
 
 fn sell(
-    sell: On<Fire<Sell>>,
+    sell: On<Start<Sell>>,
     mut commands: HistoryCommands,
     preview: Single<&PreviewOf, With<MovingObject>>,
 ) {

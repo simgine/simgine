@@ -4,7 +4,7 @@ pub mod spawning;
 use std::f32::consts::FRAC_PI_4;
 
 use bevy::prelude::*;
-use bevy_enhanced_input::prelude::{Press, *};
+use bevy_enhanced_input::prelude::*;
 
 use crate::{
     cursor::{caster::CursorMask, follower::CursorFollower},
@@ -26,7 +26,7 @@ fn rotate(start: On<Start<Rotate>>, mut transform: Single<&mut Transform, With<P
     info!("rotating to '{}'", yaw.to_degrees());
 }
 
-fn cancel(cancel: On<Fire<Cancel>>, mut commands: Commands) {
+fn cancel(cancel: On<Start<Cancel>>, mut commands: Commands) {
     info!("cancelling");
     commands.entity(cancel.context).despawn();
 }
@@ -52,7 +52,6 @@ pub fn placing_object() -> impl Bundle {
                 ),
                 (
                     Action::<Cancel>::new(),
-                    Press::default(),
                     ActionSettings {
                         consume_input: true,
                         require_reset: true,

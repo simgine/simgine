@@ -1,7 +1,7 @@
 use avian3d::prelude::*;
 use bevy::{color::palettes::tailwind::NEUTRAL_500, prelude::*};
 
-use crate::{layer::GameLayer, state::GameState};
+use crate::{state::GameState, world::layer::GameLayer};
 
 const HALF_CITY_SIZE: f32 = 250.0;
 

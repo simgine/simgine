@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::cursor::caster::CursorCastSystems;
+use crate::world::cursor::caster::CursorCastSystems;
 
 use super::{caster::CursorHit, outline::OutlineDisabler};
 

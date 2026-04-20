@@ -13,15 +13,15 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     asset_manifest::object::ObjectManifest,
-    combined_collider::CombinedCollider,
-    cursor::outline::OUTLINE_VOLUME,
-    layer::GameLayer,
     state::GameState,
     undo::{
         CommandId, ConfirmableCommand, EntityRecorder,
         client_command::{
             ClientCommand, ClientCommandAppExt, ClientCommandExt, CommandRequest, Deny,
         },
+    },
+    world::{
+        combined_collider::CombinedCollider, cursor::outline::OUTLINE_VOLUME, layer::GameLayer,
     },
 };
 

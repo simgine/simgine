@@ -3,15 +3,17 @@ use bevy_enhanced_input::prelude::*;
 
 use super::PlacingObject;
 use crate::{
-    cursor::{
-        caster::{CursorMask, CursorTarget},
-        follower::{CursorFollower, CursorOffset},
-    },
-    layer::GameLayer,
-    object::{MoveObject, Object, SellObject, placing::placing_object},
-    preview::PreviewOf,
     state::BuildingMode,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
+    world::{
+        cursor::{
+            caster::{CursorMask, CursorTarget},
+            follower::{CursorFollower, CursorOffset},
+        },
+        layer::GameLayer,
+        object::{MoveObject, Object, SellObject, placing::placing_object},
+        preview::PreviewOf,
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {

@@ -4,9 +4,11 @@ use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
 use bevy_enhanced_input::prelude::{Release, *};
 use bevy_replicon::prelude::*;
 use simgine_core::{
-    speed::{Paused, SetPaused},
     state::GameState,
-    world::SaveWorld,
+    world::{
+        SaveWorld,
+        speed::{Paused, SetPaused},
+    },
 };
 
 use crate::{

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use simgine_core::{
-    asset_manifest::object::ObjectManifest, object::placing::spawning, state::BuildingMode,
+    asset_manifest::object::ObjectManifest, state::BuildingMode, world::object::placing::spawning,
 };
 
 use crate::{

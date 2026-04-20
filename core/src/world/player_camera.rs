@@ -10,7 +10,7 @@ use bevy::{
 };
 use bevy_enhanced_input::prelude::*;
 
-use crate::{cursor::caster::CursorCaster, state::GameState};
+use crate::{state::GameState, world::cursor::caster::CursorCaster};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_input_context::<PlayerCamera>()

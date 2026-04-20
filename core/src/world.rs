@@ -1,3 +1,15 @@
+mod city;
+mod combined_collider;
+mod cursor;
+mod layer;
+pub mod object;
+mod player_camera;
+mod preview;
+mod sky;
+pub mod speed;
+pub mod time;
+mod tint;
+
 use std::{fs, mem};
 
 use bevy::{prelude::*, scene::serde::SceneDeserializer};
@@ -12,12 +24,24 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_resource_component::<WorldName>()
-        .replicate::<WorldName>()
-        .add_observer(create)
-        .add_observer(save.pipe(trigger_error))
-        .add_observer(load.pipe(trigger_error))
-        .add_observer(update_state);
+    app.add_plugins((
+        city::plugin,
+        combined_collider::plugin,
+        cursor::plugin,
+        object::plugin,
+        player_camera::plugin,
+        preview::plugin,
+        sky::plugin,
+        speed::plugin,
+        time::plugin,
+        tint::plugin,
+    ))
+    .register_resource_component::<WorldName>()
+    .replicate::<WorldName>()
+    .add_observer(create)
+    .add_observer(save.pipe(trigger_error))
+    .add_observer(load.pipe(trigger_error))
+    .add_observer(update_state);
 }
 
 fn create(mut create: On<CreateWorld>, mut commands: Commands) {

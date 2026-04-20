@@ -4,8 +4,8 @@ use bevy_enhanced_input::prelude::*;
 use super::PlacingObject;
 use crate::{
     asset_manifest::object::ObjectManifest,
-    object::{BuyObject, placing::placing_object},
     undo::{HistoryCommands, client_command::DespawnOnResponse},
+    world::object::{BuyObject, placing::placing_object},
 };
 
 pub(super) fn plugin(app: &mut App) {

@@ -8,9 +8,11 @@ use bevy::{
 use bevy_enhanced_input::prelude::*;
 use bevy_replicon::prelude::ClientTriggerExt;
 use simgine_core::{
-    speed::{GameSpeed, Paused, SetPaused, SetSpeed},
     state::FamilyMode,
-    time::{Clock, Weekday},
+    world::{
+        speed::{GameSpeed, Paused, SetPaused, SetSpeed},
+        time::{Clock, Weekday},
+    },
 };
 
 use crate::{

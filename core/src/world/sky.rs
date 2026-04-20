@@ -4,7 +4,7 @@ use bevy::{light::light_consts::lux, prelude::*};
 
 use crate::{
     state::GameState,
-    time::{Clock, MinuteCarry, SECS_PER_DAY},
+    world::time::{Clock, MinuteCarry, SECS_PER_DAY},
 };
 
 pub(super) fn plugin(app: &mut App) {

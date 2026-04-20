@@ -104,9 +104,9 @@ struct CommandIdAllocator {
 
 impl CommandIdAllocator {
     fn alloc(&mut self) -> CommandId {
-        let current = self.next_id;
+        let id = self.next_id;
         self.next_id.0 += 1;
-        current
+        id
     }
 }
 

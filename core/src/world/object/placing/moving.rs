@@ -12,6 +12,7 @@ use crate::{
         },
         layer::GameLayer,
         object::{MoveObject, Object, SellObject, placing::placing_object},
+        placing::PlacingBlockers,
         preview::PreviewOf,
     },
 };
@@ -89,11 +90,14 @@ fn pick(
 fn place(
     place: On<Start<Place>>,
     mut commands: HistoryCommands,
-    moving_object: Single<(&PreviewOf, &Transform), With<MovingObject>>,
+    moving_object: Single<(&PreviewOf, &Transform, &PlacingBlockers), With<MovingObject>>,
 ) {
-    let (preview, transform) = *moving_object;
-    info!("moving `{}`", preview.target);
+    let (preview, transform, blockers) = *moving_object;
+    if !blockers.is_empty() {
+        return;
+    }
 
+    info!("moving `{}`", preview.target);
     let id = commands.queue_confirmable(MoveObject {
         object: preview.target,
         translation: transform.translation,

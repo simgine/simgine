@@ -7,7 +7,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn init(
-    add: On<Add, Tint>,
+    add: On<Insert, Tint>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     tints: Query<&Tint>,
     children: Query<&Children>,

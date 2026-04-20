@@ -3,12 +3,15 @@ pub mod spawning;
 
 use std::f32::consts::FRAC_PI_4;
 
+use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
 use crate::world::{
+    combined_collider::CombinedCollider,
     cursor::{caster::CursorMask, follower::CursorFollower},
     layer::GameLayer,
+    placing::intersection::BlockOnIntersection,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -38,7 +41,11 @@ struct PlacingObject;
 pub fn placing_object() -> impl Bundle {
     (
         PlacingObject,
-        ContextPriority::<PlacingObject>::new(100),
+        BlockOnIntersection,
+        RigidBody::Static,
+        Sensor,
+        CombinedCollider::Aabb,
+        CollisionLayers::new(GameLayer::Object, GameLayer::Object),
         CursorMask::new(GameLayer::Ground),
         actions!(
             PlacingObject[

@@ -3,12 +3,12 @@ mod combined_collider;
 mod cursor;
 mod layer;
 pub mod object;
+mod placing;
 mod player_camera;
 mod preview;
 mod sky;
 pub mod speed;
 pub mod time;
-mod tint;
 
 use std::{fs, mem};
 
@@ -29,12 +29,12 @@ pub(super) fn plugin(app: &mut App) {
         combined_collider::plugin,
         cursor::plugin,
         object::plugin,
+        placing::plugin,
         player_camera::plugin,
         preview::plugin,
         sky::plugin,
         speed::plugin,
         time::plugin,
-        tint::plugin,
     ))
     .register_resource_component::<WorldName>()
     .replicate::<WorldName>()

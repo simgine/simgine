@@ -5,7 +5,10 @@ use super::PlacingObject;
 use crate::{
     asset_manifest::object::ObjectManifest,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
-    world::object::{BuyObject, placing::placing_object},
+    world::{
+        object::{BuyObject, placing::placing_object},
+        placing::PlacingBlockers,
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -34,9 +37,13 @@ fn buy(
     buy: On<Start<Buy>>,
     mut commands: HistoryCommands,
     asset_server: Res<AssetServer>,
-    spawning_object: Single<(&SpawningObject, &Transform)>,
+    spawning_object: Single<(&SpawningObject, &Transform, &PlacingBlockers)>,
 ) {
-    let (spawning, transform) = *spawning_object;
+    let (spawning, transform, blockers) = *spawning_object;
+    if !blockers.is_empty() {
+        return;
+    }
+
     let manifest = asset_server.get_path(spawning.id).unwrap();
 
     info!("spawning '{manifest}'");

@@ -45,7 +45,7 @@ pub fn placing_object() -> impl Bundle {
         RigidBody::Static,
         Sensor,
         CombinedCollider::Aabb,
-        CollisionLayers::new(GameLayer::Object, GameLayer::Object),
+        CollisionLayers::new(GameLayer::Preview, GameLayer::Object),
         CursorMask::new(GameLayer::Ground),
         actions!(
             PlacingObject[

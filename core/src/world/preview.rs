@@ -1,39 +1,52 @@
+use avian3d::prelude::*;
 use bevy::prelude::*;
+
+use crate::world::layer::GameLayer;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(init).add_observer(cleanup);
 }
 
-fn init(add: On<Add, PreviewOf>, previews: Query<&PreviewOf>, mut targets: Query<&mut Visibility>) {
+fn init(
+    add: On<Add, PreviewOf>,
+    mut commands: Commands,
+    previews: Query<&PreviewOf>,
+    mut targets: Query<(&mut Visibility, &CollisionLayers)>,
+) {
     let preview = previews.get(add.entity).unwrap();
-    let mut visibility = targets.get_mut(preview.target).unwrap();
+
+    debug!("creating preview for `{}`", preview.target);
+
+    let (mut visibility, &layers) = targets.get_mut(preview.target).unwrap();
 
     *visibility = Visibility::Hidden;
-    debug!(
-        "changing visibility to `{:?}` for `{}`",
-        *visibility, preview.target
-    );
+
+    let mut new_layers = layers;
+    new_layers.filters.remove(GameLayer::Preview);
+    commands.entity(preview.target).insert(new_layers);
 }
 
 fn cleanup(
     remove: On<Remove, PreviewOf>,
+    mut commands: Commands,
     previews: Query<&PreviewOf>,
-    mut targets: Query<&mut Visibility>,
+    mut targets: Query<(&mut Visibility, &CollisionLayers)>,
 ) {
     let preview = previews.get(remove.entity).unwrap();
-    let Ok(mut visibility) = targets.get_mut(preview.target) else {
-        // If entity missing visibility, consider it despawned.
+    let Ok((mut visibility, &layers)) = targets.get_mut(preview.target) else {
+        // If entity missing visibility or layers, consider it despawned.
         return;
     };
+    debug!("removing preview for `{}`", preview.target);
 
     *visibility = Visibility::Inherited;
-    debug!(
-        "changing visibility to `{:?}` for `{}`",
-        *visibility, preview.target
-    );
+
+    let mut new_layers = layers;
+    new_layers.filters.add(GameLayer::Preview);
+    commands.entity(preview.target).insert(new_layers);
 }
 
-/// Hides the target entity while this component exists.
+/// Hides the target entity and removes collision with the preview while this component exists.
 #[derive(Component, Clone, Copy)]
 #[component(immutable)]
 pub(crate) struct PreviewOf {

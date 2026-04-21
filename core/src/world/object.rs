@@ -28,6 +28,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_client_command::<MoveObject>()
         .add_client_command::<BuyObject>()
         .add_client_command::<SellObject>()
+        .replicate::<Object>()
         .add_plugins(placing::plugin)
         .add_observer(init)
         .add_observer(move_command)

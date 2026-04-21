@@ -15,16 +15,17 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(PostUpdate, update_tint);
 }
 
-fn update_tint(mut commands: Commands, placing: Single<(Entity, &PlacingBlockers, &Tint)>) {
-    let (placing_entity, blockers, tint) = placing.into_inner();
-    let color = if blockers.is_empty() {
-        ALLOWED.into()
-    } else {
-        BLOCKED.into()
-    };
+fn update_tint(mut commands: Commands, mut placing: Query<(Entity, &PlacingBlockers, &Tint)>) {
+    for (placing_entity, blockers, tint) in &mut placing {
+        let color = if blockers.is_empty() {
+            ALLOWED.into()
+        } else {
+            BLOCKED.into()
+        };
 
-    if tint.color != color {
-        commands.entity(placing_entity).insert(Tint { color });
+        if tint.color != color {
+            commands.entity(placing_entity).insert(Tint { color });
+        }
     }
 }
 

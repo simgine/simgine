@@ -9,15 +9,16 @@ pub(super) fn plugin(app: &mut App) {
 
 fn update_blocks(
     id: Local<IntersectionId>,
-    placing: Single<(&CollidingEntities, &mut PlacingBlockers), With<BlockOnIntersection>>,
+    mut placing: Query<(&CollidingEntities, &mut PlacingBlockers), With<BlockOnIntersection>>,
 ) {
-    let (collisions, mut blockers) = placing.into_inner();
-    if collisions.is_empty() {
-        if blockers.remove(&**id) {
-            debug!("intersection no longer blocking placement");
+    for (collisions, mut blockers) in &mut placing {
+        if collisions.is_empty() {
+            if blockers.remove(&**id) {
+                debug!("intersection no longer blocking placement");
+            }
+        } else if blockers.insert(**id) {
+            debug!("blocking placement due to intersection");
         }
-    } else if blockers.insert(**id) {
-        debug!("blocking placement due to intersection");
     }
 }
 

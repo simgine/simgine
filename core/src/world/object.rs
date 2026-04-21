@@ -13,7 +13,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     asset_manifest::object::ObjectManifest,
-    state::GameState,
     undo::{
         CommandId, ConfirmableCommand, EntityRecorder,
         client_command::{
@@ -34,15 +33,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_observer(move_command)
         .add_observer(buy)
         .add_observer(buy_deny)
-        .add_observer(sell)
-        .add_systems(OnEnter(GameState::World), spawn);
-}
-
-/// Spawns object for testing.
-fn spawn(mut commands: Commands) {
-    commands.spawn(Object {
-        manifest: "base/objects/test/test.object.ron".into(),
-    });
+        .add_observer(sell);
 }
 
 fn init(

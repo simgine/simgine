@@ -58,7 +58,7 @@ fn disable(
 
     if let Ok(mut outline) = volumes.get_mut(entity) {
         debug!("disabling outline for `{entity}`");
-        outline.visible = true;
+        outline.visible = false;
     }
 }
 

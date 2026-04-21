@@ -24,7 +24,12 @@ fn cast_ray(
     window: Single<&Window>,
     caster_camera: Single<(&Camera, &GlobalTransform, &CursorCaster)>,
     masks: Query<&CursorMask>,
+    disablers: Query<&CursorCastDisabler>,
 ) -> Option<(Entity, Vec3)> {
+    if !disablers.is_empty() {
+        return None;
+    }
+
     let (camera, transform, caster) = *caster_camera;
     let cursor_pos = window.cursor_position()?;
     let mask_entity = *caster.masks.last()?;
@@ -104,3 +109,6 @@ fn on_mask_remove(mut world: DeferredWorld, context: HookContext) {
         .unwrap();
     caster.masks.remove(index);
 }
+
+#[derive(Component)]
+pub struct CursorCastDisabler;

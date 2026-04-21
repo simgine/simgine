@@ -7,6 +7,7 @@ use simgine_core::{
     state::GameState,
     world::{
         SaveWorld,
+        cursor::caster::CursorCastDisabler,
         speed::{Paused, SetPaused},
     },
 };
@@ -43,6 +44,7 @@ fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
     commands.spawn((
         Name::new("Pause menu"),
         PauseMenu::default(),
+        CursorCastDisabler,
         dialog(),
         DespawnOnExit(GameState::World),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {

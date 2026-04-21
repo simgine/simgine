@@ -1,4 +1,4 @@
-pub(crate) mod caster;
+pub mod caster;
 pub(crate) mod follower;
 pub(crate) mod outline;
 

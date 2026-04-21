@@ -1,6 +1,6 @@
 mod city;
 mod combined_collider;
-mod cursor;
+pub mod cursor;
 mod layer;
 pub mod object;
 mod placing;

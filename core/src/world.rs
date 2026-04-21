@@ -38,6 +38,7 @@ pub(super) fn plugin(app: &mut App) {
     ))
     .register_resource_component::<WorldName>()
     .replicate::<WorldName>()
+    .replicate::<Transform>()
     .add_observer(create)
     .add_observer(save.pipe(trigger_error))
     .add_observer(load.pipe(trigger_error))

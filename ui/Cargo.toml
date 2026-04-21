@@ -10,6 +10,7 @@ publish.workspace = true
 [dependencies]
 bevy = { workspace = true, features = [
   "bevy_ui",
+  "serialize",
   "ui_picking",
   "default_font",
 ] }

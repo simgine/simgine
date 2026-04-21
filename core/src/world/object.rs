@@ -158,7 +158,7 @@ fn sell(
     }
 }
 
-#[derive(Component, Serialize, Deserialize)]
+#[derive(Component, Reflect, Serialize, Deserialize)]
 #[require(
     Name,
     Replicated,
@@ -170,6 +170,7 @@ fn sell(
     CollisionLayers::new(GameLayer::Object, LayerMask::ALL),
 )]
 #[component(immutable)]
+#[reflect(Component)]
 pub struct Object {
     pub manifest: AssetPath<'static>,
 }

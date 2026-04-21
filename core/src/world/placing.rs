@@ -2,7 +2,7 @@ pub(super) mod intersection;
 mod tint;
 
 use bevy::{
-    color::palettes::tailwind::{BLUE_600, RED_600},
+    color::palettes::{css::WHITE, tailwind::RED_500},
     platform::collections::{HashMap, HashSet},
     prelude::*,
 };
@@ -29,8 +29,8 @@ fn update_tint(mut commands: Commands, mut placing: Query<(Entity, &PlacingBlock
     }
 }
 
-const ALLOWED: Srgba = BLUE_600;
-const BLOCKED: Srgba = RED_600;
+const ALLOWED: Srgba = WHITE;
+const BLOCKED: Srgba = RED_500;
 
 #[derive(Component, Deref, DerefMut, Default)]
 #[require(Tint { color: ALLOWED.into() })]

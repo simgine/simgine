@@ -1105,8 +1105,7 @@ checksum = "7ef8e4b7e61dfe7719bb03c884dc270cd46a82efb40f93e9933b990c5c190c59"
 [[package]]
 name = "bevy_mod_outline"
 version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3a28cb34fab493932ec6fa98306f8cc049b2475cdc8a01459e8533448c98626"
+source = "git+https://github.com/simgine/bevy_mod_outline?branch=fix-scene-spawner#132fb4dd6566a736c7a07b8487e7d1390e36d53c"
 dependencies = [
  "bevy",
  "bitfield",

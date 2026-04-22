@@ -21,7 +21,7 @@ avian3d = { version = "0.6", default-features = false, features = [
 ] }
 bevy = { version = "0.18", default-features = false }
 bevy_enhanced_input = "0.24"
-bevy_mod_outline = "0.12"
+bevy_mod_outline = { git = "https://github.com/simgine/bevy_mod_outline", branch = "fix-scene-spawner" }
 bevy_simple_text_input = "0.14"
 bevy_replicon = "0.39.4"
 bevy_replicon_renet = "0.15"

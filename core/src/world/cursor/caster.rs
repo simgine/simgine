@@ -2,6 +2,7 @@ use avian3d::prelude::*;
 use bevy::{
     ecs::{lifecycle::HookContext, world::DeferredWorld},
     input::InputSystems,
+    picking::PickingSystems,
     prelude::*,
     utils::TypeIdMapExt,
 };
@@ -15,6 +16,7 @@ pub(super) fn plugin(app: &mut App) {
             cast_ray
                 .pipe(update)
                 .after(InputSystems)
+                .after(PickingSystems::Last)
                 .in_set(CursorCastSystems),
         );
 }

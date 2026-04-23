@@ -1,3 +1,5 @@
+pub mod speed;
+
 use std::{
     fmt::{self, Display, Formatter},
     time::Duration,
@@ -14,7 +16,8 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_resource_component::<Weekday>()
+    app.add_plugins(speed::plugin)
+        .register_resource_component::<Weekday>()
         .register_resource_component::<Clock>()
         .replicate::<Clock>()
         .replicate::<Weekday>()

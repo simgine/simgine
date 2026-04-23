@@ -7,7 +7,6 @@ mod placing;
 mod player_camera;
 mod preview;
 mod sky;
-pub mod speed;
 pub mod time;
 
 use std::{fs, mem};
@@ -33,7 +32,6 @@ pub(super) fn plugin(app: &mut App) {
         player_camera::plugin,
         preview::plugin,
         sky::plugin,
-        speed::plugin,
         time::plugin,
     ))
     .register_resource_component::<WorldName>()

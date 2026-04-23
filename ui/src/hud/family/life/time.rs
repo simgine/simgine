@@ -9,9 +9,9 @@ use bevy_enhanced_input::prelude::*;
 use bevy_replicon::prelude::ClientTriggerExt;
 use simgine_core::{
     state::FamilyMode,
-    world::{
+    world::time::{
+        Clock, Weekday,
         speed::{GameSpeed, Paused, SetPaused, SetSpeed},
-        time::{Clock, Weekday},
     },
 };
 

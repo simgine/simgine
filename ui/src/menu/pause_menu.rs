@@ -8,7 +8,7 @@ use simgine_core::{
     world::{
         SaveWorld,
         cursor::caster::CursorCastDisabler,
-        speed::{Paused, SetPaused},
+        time::speed::{Paused, SetPaused},
     },
 };
 

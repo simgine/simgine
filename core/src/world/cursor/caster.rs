@@ -6,6 +6,7 @@ use bevy::{
     prelude::*,
     utils::TypeIdMapExt,
 };
+use bevy_enhanced_input::prelude::*;
 
 use crate::component_res::{ComponentResExt, ResEntities};
 
@@ -17,6 +18,7 @@ pub(super) fn plugin(app: &mut App) {
                 .pipe(update)
                 .after(InputSystems)
                 .after(PickingSystems::Last)
+                .after(EnhancedInputSystems::Apply)
                 .in_set(CursorCastSystems),
         );
 }

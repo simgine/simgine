@@ -8,7 +8,7 @@ use crate::{
     world::{
         cursor::{
             caster::{CursorMask, CursorTarget},
-            follower::{CursorFollower, CursorOffset},
+            follower::CursorOffset,
         },
         layer::GameLayer,
         object::{MoveObject, Object, SellObject, placing::placing_object},
@@ -106,7 +106,7 @@ fn place(
 
     commands
         .entity(place.context)
-        .remove_with_requires::<(PlacingObject, MovingObject)>()
+        .remove_with_requires::<MovingObject>()
         .despawn_related::<Actions<PlacingObject>>()
         .despawn_related::<Actions<MovingObject>>()
         .insert(DespawnOnResponse { id });
@@ -125,7 +125,7 @@ fn sell(
 
     commands
         .entity(sell.context)
-        .remove_with_requires::<(CursorFollower, MovingObject)>()
+        .remove_with_requires::<MovingObject>()
         .despawn_related::<Actions<MovingObject>>()
         .insert(DespawnOnResponse { id });
 }
@@ -138,6 +138,7 @@ struct ObjectSelector;
 struct Pick;
 
 #[derive(Component)]
+#[require(PlacingObject)]
 struct MovingObject;
 
 #[derive(InputAction)]

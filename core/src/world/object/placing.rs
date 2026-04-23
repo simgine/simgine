@@ -34,7 +34,7 @@ fn cancel(cancel: On<Start<Cancel>>, mut commands: Commands) {
     commands.entity(cancel.context).despawn();
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 #[require(CursorFollower)]
 struct PlacingObject;
 

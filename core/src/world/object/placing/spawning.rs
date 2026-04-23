@@ -56,7 +56,7 @@ fn buy(
 
     commands
         .entity(buy.context)
-        .remove_with_requires::<(PlacingObject, SpawningObject)>()
+        .remove_with_requires::<SpawningObject>()
         .despawn_related::<Actions<PlacingObject>>()
         .despawn_related::<Actions<SpawningObject>>()
         .insert(DespawnOnResponse { id });
@@ -85,6 +85,7 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
 
 #[derive(Component)]
 #[component(immutable)]
+#[require(PlacingObject)]
 pub(super) struct SpawningObject {
     id: AssetId<ObjectManifest>,
 }

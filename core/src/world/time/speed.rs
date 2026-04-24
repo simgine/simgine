@@ -15,16 +15,23 @@ pub(super) fn plugin(app: &mut App) {
         .add_client_event::<SetSpeed>(Channel::Ordered)
         .replicate::<GameSpeed>()
         .replicate::<Paused>()
-        .add_observer(spawn)
+        .add_observer(create_world)
         .add_observer(set_paused)
         .add_observer(set_speed)
         .add_observer(apply_speed)
-        .add_observer(apply_paused);
+        .add_observer(apply_paused)
+        .add_systems(
+            OnEnter(GameState::World),
+            spawn.run_if(not(any_with_component::<Paused>)),
+        );
 }
 
-fn spawn(_on: On<CreateWorld>, mut commands: Commands) {
-    commands.spawn(GameSpeed::default());
+fn spawn(mut commands: Commands) {
     commands.spawn(Paused::default());
+}
+
+fn create_world(_on: On<CreateWorld>, mut commands: Commands) {
+    commands.spawn(GameSpeed::default());
 }
 
 fn set_paused(paused: On<FromClient<SetPaused>>, mut commands: Commands) {
@@ -68,14 +75,14 @@ fn apply_speed(
 #[derive(Event, Deref, Serialize, Deserialize)]
 pub struct SetPaused(pub bool);
 
-#[derive(Component, Deref, DerefMut, Reflect, Serialize, Deserialize)]
+// Replicated, but not serialized since the value is not reflected.
+#[derive(Component, Deref, DerefMut, Serialize, Deserialize)]
 #[require(
     Name::new("Paused"),
     Replicated,
     DespawnOnExit::<_>(GameState::World)
 )]
 #[component(immutable)]
-#[reflect(Component)]
 pub struct Paused(bool);
 
 impl Default for Paused {

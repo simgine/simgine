@@ -21,7 +21,7 @@ pub(super) fn plugin(app: &mut App) {
         .register_resource_component::<Clock>()
         .replicate::<Clock>()
         .replicate::<Weekday>()
-        .add_observer(spawn)
+        .add_observer(create_world)
         .add_systems(
             PreUpdate,
             tick.run_if(in_state(GameState::World))
@@ -29,7 +29,7 @@ pub(super) fn plugin(app: &mut App) {
         );
 }
 
-fn spawn(_on: On<CreateWorld>, mut commands: Commands) {
+fn create_world(_on: On<CreateWorld>, mut commands: Commands) {
     commands.spawn(Clock::default());
     commands.spawn(Weekday::default());
 }

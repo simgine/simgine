@@ -85,9 +85,13 @@ pub struct SetPaused(pub bool);
 #[component(immutable)]
 pub struct Paused(bool);
 
+#[allow(
+    clippy::derivable_impls,
+    reason = "temporarily disable pausing by default due to collisions issue with Avian"
+)]
 impl Default for Paused {
     fn default() -> Self {
-        Self(true)
+        Self(false)
     }
 }
 

@@ -38,7 +38,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
-    trace!("spawning time node");
+    debug!("spawning time node");
 
     commands.spawn((
         Node {

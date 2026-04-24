@@ -27,7 +27,7 @@ fn spawn_grid_buttons(
     mut commands: Commands,
     objects: Res<Assets<ObjectManifest>>,
 ) {
-    trace!("spawning grid buttons");
+    debug!("spawning grid buttons");
 
     commands.entity(add.entity).with_children(|parent| {
         for (id, _) in objects.iter() {

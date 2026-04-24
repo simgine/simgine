@@ -26,7 +26,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
-    trace!("spawning family mode node");
+    debug!("spawning family mode node");
 
     commands.spawn((
         Node {

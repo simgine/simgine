@@ -17,7 +17,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn spawn(mut commands: Commands) {
-    trace!("spawning building mode node");
+    debug!("spawning building mode node");
 
     commands.spawn((
         Node {

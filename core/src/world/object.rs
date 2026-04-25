@@ -158,23 +158,6 @@ fn sell(
     }
 }
 
-#[derive(Component, Reflect, Serialize, Deserialize)]
-#[require(
-    Name,
-    Replicated,
-    SceneRoot,
-    AsyncSceneInheritOutline,
-    RigidBody::Kinematic,
-    OutlineVolume = OUTLINE_VOLUME,
-    CombinedCollider::Aabb,
-    CollisionLayers::new(GameLayer::Object, LayerMask::ALL),
-)]
-#[component(immutable)]
-#[reflect(Component)]
-pub struct Object {
-    pub manifest: AssetPath<'static>,
-}
-
 #[derive(Serialize, Deserialize, MapEntities, Clone, Copy)]
 struct MoveObject {
     #[entities]
@@ -267,4 +250,21 @@ impl ConfirmableCommand for SellObject {
             rotation: transform.rotation,
         }))
     }
+}
+
+#[derive(Component, Reflect, Serialize, Deserialize)]
+#[require(
+    Name,
+    Replicated,
+    SceneRoot,
+    AsyncSceneInheritOutline,
+    RigidBody::Kinematic,
+    OutlineVolume = OUTLINE_VOLUME,
+    CombinedCollider::Aabb,
+    CollisionLayers::new(GameLayer::Object, LayerMask::ALL),
+)]
+#[component(immutable)]
+#[reflect(Component)]
+pub struct Object {
+    pub manifest: AssetPath<'static>,
 }

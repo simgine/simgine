@@ -17,6 +17,7 @@ bevy = { workspace = true, features = [
   "bevy_post_process",
   "bevy_state",
   "bevy_log",
+  "picking",
 ] }
 bevy_enhanced_input.workspace = true
 bevy_mod_outline.workspace = true

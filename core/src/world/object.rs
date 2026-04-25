@@ -196,7 +196,7 @@ impl ConfirmableCommand for BuyObject {
     fn apply(
         self: Box<Self>,
         id: CommandId,
-        _recorder: &mut EntityRecorder,
+        recorder: &mut EntityRecorder,
         world: &mut World,
     ) -> Option<Box<dyn ConfirmableCommand>> {
         // Spawns a placeholder entity immediately so undo has something to point at.
@@ -212,6 +212,7 @@ impl ConfirmableCommand for BuyObject {
         } else {
             world.spawn(pending_object).id()
         };
+        recorder.record(object);
 
         world.client_trigger(CommandRequest { id, command: *self });
 
@@ -226,6 +227,7 @@ struct PendingObject {
 
 #[derive(Serialize, Deserialize, MapEntities, Clone, Copy)]
 struct SellObject {
+    #[entities]
     object: Entity,
 }
 

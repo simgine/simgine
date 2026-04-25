@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-use super::PlacingObject;
+use super::{Place, PlacingObject};
 use crate::{
     state::BuildingMode,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
@@ -71,15 +71,6 @@ fn pick(
         DespawnOnExit(BuildingMode::Objects),
         actions!(MovingObject[
             (
-                Action::<Place>::new(),
-                ActionSettings {
-                    consume_input: true,
-                    require_reset: true,
-                    ..Default::default()
-                },
-                bindings![MouseButton::Left, GamepadButton::South]
-            ),
-            (
                 Action::<Sell>::new(),
                 bindings![KeyCode::Delete, GamepadButton::North]
             ),
@@ -140,10 +131,6 @@ struct Pick;
 #[derive(Component)]
 #[require(PlacingObject)]
 struct MovingObject;
-
-#[derive(InputAction)]
-#[action_output(bool)]
-struct Place;
 
 #[derive(InputAction)]
 #[action_output(bool)]

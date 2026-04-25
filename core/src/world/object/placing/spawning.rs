@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
 
-use super::PlacingObject;
+use super::{Place, PlacingObject};
 use crate::{
     asset_manifest::object::ObjectManifest,
     undo::{HistoryCommands, client_command::DespawnOnResponse},
@@ -12,9 +12,7 @@ use crate::{
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_input_context::<SpawningObject>()
-        .add_observer(init)
-        .add_observer(buy);
+    app.add_observer(init).add_observer(buy);
 }
 
 fn init(
@@ -34,7 +32,7 @@ fn init(
 }
 
 fn buy(
-    buy: On<Start<Buy>>,
+    buy: On<Start<Place>>,
     mut commands: HistoryCommands,
     asset_server: Res<AssetServer>,
     spawning_object: Single<(&SpawningObject, &Transform, &PlacingBlockers)>,
@@ -58,7 +56,6 @@ fn buy(
         .entity(buy.context)
         .remove_with_requires::<SpawningObject>()
         .despawn_related::<Actions<PlacingObject>>()
-        .despawn_related::<Actions<SpawningObject>>()
         .insert(DespawnOnResponse { id });
 }
 
@@ -67,19 +64,7 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
         Name::new("Spawning object"),
         placing_object(),
         SpawningObject { id },
-        ContextPriority::<SpawningObject>::new(100),
         SceneRoot::default(),
-        actions!(SpawningObject[
-            (
-                Action::<Buy>::new(),
-                ActionSettings {
-                    consume_input: true,
-                    require_reset: true,
-                    ..Default::default()
-                },
-                bindings![MouseButton::Left, GamepadButton::South]
-            ),
-        ]),
     )
 }
 
@@ -89,7 +74,3 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
 pub(super) struct SpawningObject {
     id: AssetId<ObjectManifest>,
 }
-
-#[derive(InputAction)]
-#[action_output(bool)]
-struct Buy;

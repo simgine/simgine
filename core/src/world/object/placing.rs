@@ -59,6 +59,15 @@ pub fn placing_object() -> impl Bundle {
                     )),
                 ),
                 (
+                    Action::<Place>::new(),
+                    ActionSettings {
+                        consume_input: true,
+                        require_reset: true,
+                        ..Default::default()
+                    },
+                    bindings![MouseButton::Left, GamepadButton::South]
+                ),
+                (
                     Action::<Cancel>::new(),
                     ActionSettings {
                         consume_input: true,
@@ -75,6 +84,10 @@ pub fn placing_object() -> impl Bundle {
 #[derive(InputAction)]
 #[action_output(f32)]
 struct Rotate;
+
+#[derive(InputAction)]
+#[action_output(bool)]
+struct Place;
 
 #[derive(InputAction)]
 #[action_output(bool)]

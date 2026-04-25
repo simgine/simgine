@@ -12,6 +12,7 @@ use crate::world::{
     cursor::{caster::CursorMask, follower::CursorFollower},
     layer::GameLayer,
     placing::intersection::BlockOnIntersection,
+    player_camera::HOLD_TO_PAN,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -21,9 +22,8 @@ pub(super) fn plugin(app: &mut App) {
         .add_observer(cancel);
 }
 
-fn rotate(start: On<Start<Rotate>>, mut transform: Single<&mut Transform, With<PlacingObject>>) {
-    let angle = FRAC_PI_4 * start.value;
-    transform.rotation *= Quat::from_axis_angle(Vec3::Y, angle);
+fn rotate(_on: On<Fire<Rotate>>, mut transform: Single<&mut Transform, With<PlacingObject>>) {
+    transform.rotation *= Quat::from_axis_angle(Vec3::Y, FRAC_PI_4);
 
     let (yaw, _, _) = transform.rotation.to_euler(EulerRot::YXZ);
     info!("rotating to '{}'", yaw.to_degrees());
@@ -51,6 +51,7 @@ pub fn placing_object() -> impl Bundle {
             PlacingObject[
                 (
                     Action::<Rotate>::new(),
+                    Tap::new(HOLD_TO_PAN), // Rotate if released quicker than pan.
                     Bindings::spawn((
                         Bidirectional::new(KeyCode::Comma, KeyCode::Period),
                         Spawn(Binding::from(MouseButton::Right)),

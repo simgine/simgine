@@ -21,6 +21,8 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(Update, apply_transform.run_if(in_state(GameState::World)));
 }
 
+pub(crate) const HOLD_TO_PAN: f32 = 0.2;
+
 fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
     debug!("spawning camera");
 
@@ -49,6 +51,7 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
             let enable_pan = context
                 .spawn((
                     Action::<EnablePan>::new(),
+                    Hold::new(HOLD_TO_PAN),
                     bindings![MouseButton::Right, GamepadButton::East],
                 ))
                 .id();
@@ -64,7 +67,7 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
                     Axial::left_stick(),
                     Spawn((
                         Binding::mouse_motion(),
-                        Chord::single(enable_pan),
+                        Chord::single(enable_pan).with_ongoing(false),
                         Negate::y(),
                     )),
                 )),

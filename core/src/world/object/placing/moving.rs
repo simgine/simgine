@@ -72,6 +72,11 @@ fn pick(
         actions!(MovingObject[
             (
                 Action::<Sell>::new(),
+                ActionSettings {
+                    consume_input: true,
+                    require_reset: true,
+                    ..Default::default()
+                },
                 bindings![KeyCode::Delete, GamepadButton::North]
             ),
         ]),
@@ -98,8 +103,8 @@ fn place(
     commands
         .entity(place.context)
         .remove_with_requires::<MovingObject>()
-        .despawn_related::<Actions<PlacingObject>>()
         .despawn_related::<Actions<MovingObject>>()
+        .despawn_related::<Actions<PlacingObject>>()
         .insert(DespawnOnResponse { id });
 }
 
@@ -118,6 +123,7 @@ fn sell(
         .entity(sell.context)
         .remove_with_requires::<MovingObject>()
         .despawn_related::<Actions<MovingObject>>()
+        .despawn_related::<Actions<PlacingObject>>()
         .insert(DespawnOnResponse { id });
 }
 

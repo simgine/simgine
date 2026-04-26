@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     asset_manifest::object::ObjectManifest,
+    state::GameState,
     undo::{
         CommandId, ConfirmableCommand, EntityRecorder,
         client_command::{
@@ -264,6 +265,7 @@ impl ConfirmableCommand for SellObject {
     OutlineVolume = OUTLINE_VOLUME,
     CombinedCollider::Aabb,
     CollisionLayers::new(GameLayer::Object, LayerMask::ALL),
+    DespawnOnExit::<_>(GameState::World),
 )]
 #[component(immutable)]
 #[reflect(Component)]

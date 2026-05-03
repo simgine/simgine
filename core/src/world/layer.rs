@@ -7,4 +7,5 @@ pub(crate) enum GameLayer {
     Ground,
     Object,
     Preview,
+    Character,
 }

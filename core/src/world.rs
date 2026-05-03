@@ -1,6 +1,8 @@
+pub mod character;
 mod city;
 mod combined_collider;
 pub mod cursor;
+pub mod family;
 mod layer;
 pub mod object;
 mod placing;
@@ -24,9 +26,11 @@ use crate::{
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
+        character::plugin,
         city::plugin,
         combined_collider::plugin,
         cursor::plugin,
+        family::plugin,
         object::plugin,
         placing::plugin,
         player_camera::plugin,

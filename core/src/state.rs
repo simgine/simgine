@@ -2,7 +2,6 @@ use bevy::prelude::*;
 
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<GameState>()
-        .add_sub_state::<MenuState>()
         .add_sub_state::<FamilyMode>()
         .add_sub_state::<BuildingMode>();
 }
@@ -32,13 +31,4 @@ pub enum BuildingMode {
     #[default]
     Objects,
     Walls,
-}
-
-#[derive(SubStates, Clone, PartialEq, Eq, Hash, Debug, Default)]
-#[source(GameState = GameState::Menu)]
-#[states(state_scoped = true)]
-pub enum MenuState {
-    #[default]
-    MainMenu,
-    WorldBrowser,
 }

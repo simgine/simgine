@@ -1,11 +1,13 @@
 mod world_browser;
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use simgine_core::state::MenuState;
 
-use crate::widget::{
-    button::style::ButtonStyle,
-    theme::{GAP, HUGE_TEXT, SCREEN_OFFSET},
+use crate::{
+    menu::MenuState,
+    widget::{
+        button::style::ButtonStyle,
+        theme::{GAP, HUGE_TEXT, SCREEN_OFFSET},
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {

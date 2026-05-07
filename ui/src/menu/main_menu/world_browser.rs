@@ -7,12 +7,11 @@ use bevy_simple_text_input::TextInputValue;
 use simgine_core::{
     error_event::trigger_error,
     network::{Connect, DEFAULT_PORT},
-    state::MenuState,
     world::CreateWorld,
 };
 
 use crate::{
-    menu::main_menu::world_browser::world_nodes::world_nodes,
+    menu::{MenuState, main_menu::world_browser::world_nodes::world_nodes},
     widget::{
         button::style::ButtonStyle,
         dialog::{dialog, dialog_button, dialog_close_button, dialog_title},

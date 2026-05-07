@@ -12,6 +12,7 @@ pub enum GameState {
     #[default]
     ManifestsLoading,
     Menu,
+    FamilyEditor,
     World,
 }
 

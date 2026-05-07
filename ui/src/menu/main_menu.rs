@@ -1,6 +1,7 @@
 mod world_browser;
 
 use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
+use simgine_core::state::GameState;
 
 use crate::{
     menu::MenuState,
@@ -31,6 +32,11 @@ fn spawn(mut commands: Commands) {
             parent.spawn(button("Play")).observe(
                 |_on: On<Pointer<Click>>, mut commands: Commands| {
                     commands.set_state(MenuState::WorldBrowser)
+                },
+            );
+            parent.spawn(button("Family editor")).observe(
+                |_on: On<Pointer<Click>>, mut commands: Commands| {
+                    commands.set_state(GameState::FamilyEditor)
                 },
             );
             parent.spawn(button("Exit")).observe(

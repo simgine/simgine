@@ -17,30 +17,89 @@ pub(super) fn plugin(app: &mut App) {
         .add_observer(pan)
         .add_observer(zoom)
         .add_observer(rotate)
-        .add_systems(OnEnter(GameState::World), spawn)
-        .add_systems(Update, apply_transform.run_if(in_state(GameState::World)));
+        .add_systems(OnEnter(GameState::World), world_spawn)
+        .add_systems(OnEnter(GameState::FamilyEditor), editor_spawn)
+        .add_systems(
+            Update,
+            apply_transform
+                .run_if(in_state(GameState::World).or(in_state(GameState::FamilyEditor))),
+        );
 }
 
 pub(crate) const HOLD_TO_PAN: f32 = 0.2;
 
-fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
-    debug!("spawning camera");
+fn editor_spawn(mut commands: Commands) {
+    debug!("spawning family editor camera");
+    commands.spawn(camera());
+}
 
+fn world_spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
+    debug!("spawning world camera");
     commands.spawn((
-        Name::new("Player camera"),
-        (PlayerCamera, CursorCaster::default()),
         OrbitOrigin::default(),
+        camera(),
+        Atmosphere::earthlike(scattering_mediums.add(ScatteringMedium::default())),
+        AtmosphereEnvironmentMapLight::default(),
+        Exposure { ev100: 13.0 }, // Compensate for atmosphere.
+    ));
+}
+
+fn pan(pan: On<Fire<Pan>>, camera: Single<(&mut OrbitOrigin, &Transform, &SpringArm)>) {
+    // Calculate direction without camera's tilt.
+    let (mut origin, transform, spring_arm) = camera.into_inner();
+    let forward = transform.forward();
+    let camera_dir = Vec3::new(forward.x, 0.0, forward.z).normalize();
+    let rotation = Quat::from_rotation_arc(Vec3::NEG_Z, camera_dir);
+
+    // Movement consists of X and -Z components, so swap Y and Z with negation.
+    let mut movement = pan.value.extend(0.0).xzy();
+    movement.z = -movement.z;
+
+    // Make speed dependent on camera distance.
+    let arm_multiplier = **spring_arm * 0.02;
+
+    **origin += rotation * movement * arm_multiplier;
+}
+
+fn zoom(zoom: On<Fire<Zoom>>, mut spring_arm: Single<&mut SpringArm>) {
+    // Limit to prevent clipping into the ground.
+    ***spring_arm = (***spring_arm - zoom.value).max(0.2);
+}
+
+fn rotate(rotate: On<Fire<Rotate>>, mut rotation: Single<&mut OrbitRotation>) {
+    ***rotation += rotate.value;
+    let min_y = 0.001; // To avoid flipping when the camera is vertical.
+    let max_y = FRAC_PI_2 - 0.01; // To avoid ground intersection.
+    rotation.y = rotation.y.clamp(min_y, max_y);
+}
+
+fn apply_transform(
+    camera: Single<(
+        &mut Transform,
+        Option<&OrbitOrigin>,
+        &OrbitRotation,
+        &SpringArm,
+    )>,
+) {
+    let (mut transform, origin, rotation, spring_arm) = camera.into_inner();
+    let origin = origin.map(|o| **o).unwrap_or_default();
+    transform.translation = rotation.sphere_pos() * **spring_arm + origin;
+    transform.look_at(origin, Vec3::Y);
+}
+
+fn camera() -> impl Bundle {
+    (
+        Name::new("Player camera"),
+        PlayerCamera,
+        CursorCaster::default(),
         OrbitRotation::default(),
         SpringArm::default(),
         Camera3d::default(),
         Msaa::Off, // Required for TAA.
         TemporalAntiAliasing::default(),
         Bloom::NATURAL,
-        Exposure { ev100: 13.0 }, // Compensate for atmosphere.
-        AtmosphereEnvironmentMapLight::default(),
         ScreenSpaceAmbientOcclusion::default(),
         DespawnOnExit(GameState::World),
-        Atmosphere::earthlike(scattering_mediums.add(ScatteringMedium::default())),
         Actions::<PlayerCamera>::spawn(SpawnWith(|context: &mut ActionSpawner<_>| {
             let enable_rotation = context
                 .spawn((
@@ -101,42 +160,7 @@ fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<Scatterin
                 )),
             ));
         })),
-    ));
-}
-
-fn pan(pan: On<Fire<Pan>>, camera: Single<(&mut OrbitOrigin, &Transform, &SpringArm)>) {
-    // Calculate direction without camera's tilt.
-    let (mut orbit_origin, transform, spring_arm) = camera.into_inner();
-    let forward = transform.forward();
-    let camera_dir = Vec3::new(forward.x, 0.0, forward.z).normalize();
-    let rotation = Quat::from_rotation_arc(Vec3::NEG_Z, camera_dir);
-
-    // Movement consists of X and -Z components, so swap Y and Z with negation.
-    let mut movement = pan.value.extend(0.0).xzy();
-    movement.z = -movement.z;
-
-    // Make speed dependent on camera distance.
-    let arm_multiplier = **spring_arm * 0.02;
-
-    **orbit_origin += rotation * movement * arm_multiplier;
-}
-
-fn zoom(zoom: On<Fire<Zoom>>, mut spring_arm: Single<&mut SpringArm>) {
-    // Limit to prevent clipping into the ground.
-    ***spring_arm = (***spring_arm - zoom.value).max(0.2);
-}
-
-fn rotate(rotate: On<Fire<Rotate>>, mut rotation: Single<&mut OrbitRotation>) {
-    ***rotation += rotate.value;
-    let min_y = 0.001; // To avoid flipping when the camera is vertical.
-    let max_y = FRAC_PI_2 - 0.01; // To avoid ground intersection.
-    rotation.y = rotation.y.clamp(min_y, max_y);
-}
-
-fn apply_transform(camera: Single<(&mut Transform, &OrbitOrigin, &OrbitRotation, &SpringArm)>) {
-    let (mut transform, orbit_origin, orbit_rotation, spring_arm) = camera.into_inner();
-    transform.translation = orbit_rotation.sphere_pos() * **spring_arm + **orbit_origin;
-    transform.look_at(**orbit_origin, Vec3::Y);
+    )
 }
 
 #[derive(Component)]

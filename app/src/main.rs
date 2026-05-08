@@ -2,7 +2,12 @@ mod cli;
 mod window_name;
 
 use avian3d::prelude::*;
-use bevy::{input_focus::InputDispatchPlugin, prelude::*, render::RenderPlugin};
+use bevy::{
+    gltf::{GltfPlugin, convert_coordinates::GltfConvertCoordinates},
+    input_focus::InputDispatchPlugin,
+    prelude::*,
+    render::RenderPlugin,
+};
 use bevy_enhanced_input::EnhancedInputPlugin;
 use bevy_mod_outline::OutlinePlugin;
 use bevy_replicon::prelude::*;
@@ -15,10 +20,18 @@ fn main() {
     let mut app = App::new();
     app.add_plugins((cli::plugin, window_name::plugin))
         .add_plugins((
-            DefaultPlugins.set(RenderPlugin {
-                synchronous_pipeline_compilation: true,
-                ..Default::default()
-            }),
+            DefaultPlugins
+                .set(RenderPlugin {
+                    synchronous_pipeline_compilation: true,
+                    ..Default::default()
+                })
+                .set(GltfPlugin {
+                    convert_coordinates: GltfConvertCoordinates {
+                        rotate_scene_entity: true,
+                        rotate_meshes: true,
+                    },
+                    ..Default::default()
+                }),
             EnhancedInputPlugin,
             InputDispatchPlugin,
             RepliconPlugins.set(ServerPlugin {

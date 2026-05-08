@@ -32,7 +32,7 @@ test-log = { version = "0.2", features = ["trace"] }
 clap = { version = "4.6", features = ["derive"] }
 ron = "0.12"
 serde = "1.0"
-trash = { version = "5.2.5", default-features = false }
+trash = { version = "5.2.6", default-features = false }
 walkdir = "2.5"
 directories = "6.0"
 

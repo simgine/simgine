@@ -23,6 +23,7 @@ fn apply_command(mut commands: Commands, mut cli: ResMut<Cli>) {
     };
 
     match command {
+        GameCommand::FamilyEditor => commands.set_state(GameState::FamilyEditor),
         GameCommand::Load { name } => commands.trigger(LoadWorld { name }),
         GameCommand::Host { name, port } => {
             commands.trigger(LoadWorld { name });
@@ -48,6 +49,7 @@ impl Default for Cli {
 
 #[derive(Subcommand, Clone)]
 enum GameCommand {
+    FamilyEditor,
     Load {
         /// World name to load.
         name: String,

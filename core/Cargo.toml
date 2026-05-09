@@ -11,13 +11,9 @@ publish.workspace = true
 avian3d.workspace = true
 bevy = { workspace = true, features = [
   "bevy_anti_alias",
-  "bevy_core_pipeline",
-  "bevy_light",
-  "bevy_pbr",
   "bevy_post_process",
   "bevy_state",
   "bevy_log",
-  "picking",
   "serialize",
 ] }
 bevy_enhanced_input.workspace = true

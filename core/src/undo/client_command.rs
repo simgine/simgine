@@ -68,7 +68,7 @@ pub(crate) trait ClientCommandExt<C> {
 impl<C> ClientCommandExt<C> for ClientCommand<C> {
     fn confirm(&self) -> ToClients<Confirm<C>> {
         ToClients {
-            mode: SendMode::Direct(self.client_id),
+            targets: SendTargets::Single(self.client_id),
             message: Confirm {
                 id: self.id,
                 marker: PhantomData,
@@ -78,7 +78,7 @@ impl<C> ClientCommandExt<C> for ClientCommand<C> {
 
     fn deny(&self) -> ToClients<Deny<C>> {
         ToClients {
-            mode: SendMode::Direct(self.client_id),
+            targets: SendTargets::Single(self.client_id),
             message: Deny {
                 id: self.id,
                 marker: PhantomData,

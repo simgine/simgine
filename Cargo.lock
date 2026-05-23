@@ -1374,9 +1374,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon"
-version = "0.39.5"
+version = "0.40.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a0d6f7d37938f1f6797950774a41adc189a459d73cffb1941804a5d9d8fd059"
+checksum = "a5f415e469cad46284a247f75092db6ed0470294aeccde98ebb5122e2aef5d15"
 dependencies = [
  "bevy",
  "bitflags 2.11.1",
@@ -1389,15 +1389,15 @@ dependencies = [
  "serde",
  "smallbitvec",
  "typeid",
- "variadics_please 1.1.0",
+ "variadics_please 2.0.0",
  "xxhash-rust",
 ]
 
 [[package]]
 name = "bevy_replicon_renet"
-version = "0.15.0"
+version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d98680a12d9506c014031194679c3b483c7dcadaf1189b9f6f62eb0a40ffe1a0"
+checksum = "958c1079d0abbcc2c3655461874881a36c2294052f94a840d842ed7d5eaee925"
 dependencies = [
  "bevy",
  "bevy_renet",

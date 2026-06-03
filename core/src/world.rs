@@ -13,8 +13,8 @@ pub mod time;
 
 use std::{fs, mem};
 
-use bevy::{prelude::*, scene::serde::SceneDeserializer};
-use bevy_replicon::{prelude::*, scene};
+use bevy::{prelude::*, world_serialization::serde::WorldDeserializer};
+use bevy_replicon::{prelude::*, world_serialization};
 use serde::{Deserialize, Serialize, de::DeserializeSeed};
 
 use crate::{
@@ -64,9 +64,9 @@ fn save(
     fs::create_dir_all(&game_paths.worlds)
         .map_err(|e| format!("unable to create {path:?}: {e}"))?;
 
-    let mut scene = DynamicScene::default();
-    scene::replicate_into(&mut scene, world);
-    let bytes = scene
+    let mut dyn_world = DynamicWorld::default();
+    world_serialization::replicate_into(&mut dyn_world, world);
+    let bytes = dyn_world
         .serialize(&registry.read())
         .expect("world should be serializable");
 
@@ -77,8 +77,9 @@ fn save(
 
 fn load(
     load: On<LoadWorld>,
-    mut scene_spawner: ResMut<SceneSpawner>,
-    mut scenes: ResMut<Assets<DynamicScene>>,
+    mut scene_spawner: ResMut<WorldInstanceSpawner>,
+    mut dyn_worlds: ResMut<Assets<DynamicWorld>>,
+    asset_server: Res<AssetServer>,
     registry: Res<AppTypeRegistry>,
     game_paths: Res<GamePaths>,
 ) -> Result<()> {
@@ -88,14 +89,15 @@ fn load(
     let bytes = fs::read(&path).map_err(|e| format!("unable to load {path:?}: {e}"))?;
     let mut deserializer = ron::Deserializer::from_bytes(&bytes)
         .map_err(|e| format!("unable to parse {path:?}: {e}"))?;
-    let scene_deserializer = SceneDeserializer {
+    let world_deserializer = WorldDeserializer {
         type_registry: &registry.read(),
+        load_from_path: &mut asset_server.clone(),
     };
-    let scene = scene_deserializer
+    let dyn_world = world_deserializer
         .deserialize(&mut deserializer)
         .map_err(|e| format!("unable to deserialize {path:?}: {e}"))?;
 
-    scene_spawner.spawn_dynamic(scenes.add(scene));
+    scene_spawner.spawn_dynamic(dyn_worlds.add(dyn_world));
 
     Ok(())
 }

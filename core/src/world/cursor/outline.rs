@@ -30,7 +30,7 @@ fn show(
 }
 
 fn hide(
-    _on: On<Replace, CursorTarget>,
+    _on: On<Discard, CursorTarget>,
     cursor_target: Single<&CursorTarget>,
     mut volumes: Query<&mut OutlineVolume>,
 ) {

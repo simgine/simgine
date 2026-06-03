@@ -1,6 +1,6 @@
 use std::iter;
 
-use bevy::{prelude::*, scene::SceneInstanceReady};
+use bevy::{prelude::*, world_serialization::WorldInstanceReady};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(init_scene).add_observer(init);
@@ -24,15 +24,15 @@ fn init(
 }
 
 fn init_scene(
-    trigger: On<SceneInstanceReady>,
+    ready: On<WorldInstanceReady>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     tints: Query<&Tint>,
     children: Query<&Children>,
     mut material_handles: Query<&mut MeshMaterial3d<StandardMaterial>>,
 ) {
-    if let Ok(tint) = tints.get(trigger.entity) {
+    if let Ok(tint) = tints.get(ready.entity) {
         set_color(
-            trigger.entity,
+            ready.entity,
             &mut materials,
             &mut material_handles,
             &children,

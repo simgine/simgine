@@ -65,7 +65,9 @@ impl FromWorld for AssetManifests {
 
             debug!("loading manifest {relative_path:?}");
 
-            let handle = asset_server.load_untyped(AssetPath::from_path(relative_path));
+            let handle = asset_server
+                .load_builder()
+                .load_untyped(AssetPath::from_path(relative_path));
             manifests.push(handle);
         }
 

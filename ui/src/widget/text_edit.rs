@@ -1,4 +1,8 @@
-use bevy::{input_focus::InputFocus, prelude::*, ui::UiSystems};
+use bevy::{
+    input_focus::{FocusCause, InputFocus},
+    prelude::*,
+    ui::UiSystems,
+};
 use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputTextFont};
 
 use crate::widget::theme::{
@@ -60,11 +64,11 @@ fn activate(
 }
 
 fn update_focus(
-    trigger: On<Insert, TextInputInactive>,
+    insert: On<Insert, TextInputInactive>,
     mut focus: ResMut<InputFocus>,
     mut text_edits: Query<&mut TextInputInactive>,
 ) {
-    let inactive = text_edits.get(trigger.entity).unwrap();
+    let inactive = text_edits.get(insert.entity).unwrap();
     if inactive.0 {
         return;
     }
@@ -75,6 +79,6 @@ fn update_focus(
         inactive.0 = true;
     }
 
-    debug!("activating `{}`", trigger.entity);
-    focus.set(trigger.entity);
+    debug!("activating `{}`", insert.entity);
+    focus.set(insert.entity, FocusCause::Pressed);
 }

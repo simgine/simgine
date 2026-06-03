@@ -4,7 +4,6 @@ mod window_name;
 use avian3d::prelude::*;
 use bevy::{
     gltf::{GltfPlugin, convert_coordinates::GltfConvertCoordinates},
-    input_focus::InputDispatchPlugin,
     prelude::*,
     render::RenderPlugin,
 };
@@ -33,7 +32,6 @@ fn main() {
                     ..Default::default()
                 }),
             EnhancedInputPlugin,
-            InputDispatchPlugin,
             RepliconPlugins.set(ServerPlugin {
                 tick_schedule: None,
                 ..Default::default()
@@ -52,7 +50,7 @@ fn main() {
                 .disable::<ForcePlugin>()
                 .disable::<SpatialQueryPlugin>()
                 .disable::<PhysicsInterpolationPlugin>(),
-            OutlinePlugin,
+            OutlinePlugin::EXTRUDE_VERTEX,
             TextInputPlugin,
             SimgineCorePlugin,
             SimgineUiPlugin,

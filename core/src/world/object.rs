@@ -6,7 +6,7 @@ use bevy::{
     ecs::{entity::MapEntities, reflect::ReflectCommandExt},
     prelude::*,
 };
-use bevy_mod_outline::{AsyncSceneInheritOutline, OutlineVolume};
+use bevy_mod_outline::{AsyncWorldInheritOutline, OutlineVolume};
 use bevy_replicon::{prelude::*, shared::backend::connected_client::NetworkId};
 use bevy_replicon_renet::netcode::NetcodeClientTransport;
 use serde::{Deserialize, Serialize};
@@ -43,7 +43,7 @@ fn init(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     manifests: Res<Assets<ObjectManifest>>,
-    mut objects: Query<(&Object, &mut Name, &mut SceneRoot)>,
+    mut objects: Query<(&Object, &mut Name, &mut WorldAssetRoot)>,
 ) {
     let (object, mut name, mut scene_root) = objects.get_mut(insert.entity).unwrap();
 
@@ -259,8 +259,8 @@ impl ConfirmableCommand for SellObject {
 #[require(
     Name,
     Replicated,
-    SceneRoot,
-    AsyncSceneInheritOutline,
+    WorldAssetRoot,
+    AsyncWorldInheritOutline,
     RigidBody::Kinematic,
     OutlineVolume = OUTLINE_VOLUME,
     CombinedCollider::Aabb,

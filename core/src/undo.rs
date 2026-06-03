@@ -127,6 +127,8 @@ struct ApplyReverisbleCommand {
 }
 
 impl Command for ApplyReverisbleCommand {
+    type Out = ();
+
     fn apply(mut self, world: &mut World) {
         let name = self.command.dyn_name();
         debug!("applying `{name}`");
@@ -159,6 +161,8 @@ struct ApplyConfirmableCommand {
 }
 
 impl Command for ApplyConfirmableCommand {
+    type Out = ();
+
     fn apply(mut self, world: &mut World) {
         let name = self.command.dyn_name();
         debug!("applying `{name}` with `{:?}`", self.id);
@@ -289,7 +293,8 @@ mod tests {
         let mut state = SystemState::<HistoryCommands>::new(app.world_mut());
 
         let entity = app.world_mut().spawn(Transform::default()).id();
-        state.get_mut(app.world_mut()).queue_reversible(Translate {
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.queue_reversible(Translate {
             entity,
             translation: Vec3::ONE,
         });
@@ -298,13 +303,15 @@ mod tests {
         let transform = app.world_mut().get::<Transform>(entity).unwrap();
         assert_eq!(transform.translation, Vec3::ONE);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         let transform = app.world_mut().get::<Transform>(entity).unwrap();
         assert_eq!(transform.translation, Vec3::ZERO);
 
-        state.get_mut(app.world_mut()).redo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.redo();
         state.apply(app.world_mut());
 
         let transform = app.world_mut().get::<Transform>(entity).unwrap();
@@ -318,20 +325,21 @@ mod tests {
 
         let mut state = SystemState::<HistoryCommands>::new(app.world_mut());
 
-        state
-            .get_mut(app.world_mut())
-            .queue_reversible(Spawn::default());
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.queue_reversible(Spawn::default());
         state.apply(app.world_mut());
 
         let mut transforms = app.world_mut().query::<&Transform>();
         assert_eq!(transforms.iter(app.world()).len(), 1);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).count(), 0);
 
-        state.get_mut(app.world_mut()).redo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.redo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).len(), 1);
@@ -344,16 +352,16 @@ mod tests {
 
         let mut state = SystemState::<HistoryCommands>::new(app.world_mut());
 
-        state
-            .get_mut(app.world_mut())
-            .queue_reversible(Spawn::default());
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.queue_reversible(Spawn::default());
         state.apply(app.world_mut());
 
         let mut transforms = app.world_mut().query::<(Entity, &Transform)>();
         let (entity, transform) = transforms.single(app.world()).unwrap();
         assert_eq!(transform.translation, Vec3::ZERO);
 
-        state.get_mut(app.world_mut()).queue_reversible(Translate {
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.queue_reversible(Translate {
             entity,
             translation: Vec3::ONE,
         });
@@ -362,43 +370,48 @@ mod tests {
         let (_, transform) = transforms.single(app.world()).unwrap();
         assert_eq!(transform.translation, Vec3::ONE);
 
-        state
-            .get_mut(app.world_mut())
-            .queue_reversible(Despawn { entity });
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.queue_reversible(Despawn { entity });
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).count(), 0);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         let (_, transform) = transforms.single(app.world()).unwrap();
         assert_eq!(transform.translation, Vec3::ONE);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         let (_, transform) = transforms.single(app.world()).unwrap();
         assert_eq!(transform.translation, Vec3::ZERO);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).count(), 0);
 
-        state.get_mut(app.world_mut()).redo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.redo();
         state.apply(app.world_mut());
 
         let (_, transform) = transforms.single(app.world()).unwrap();
         assert_eq!(transform.translation, Vec3::ZERO);
 
-        state.get_mut(app.world_mut()).redo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.redo();
         state.apply(app.world_mut());
 
         let (_, transform) = transforms.single(app.world()).unwrap();
         assert_eq!(transform.translation, Vec3::ONE);
 
-        state.get_mut(app.world_mut()).redo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.redo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).count(), 0);
@@ -412,15 +425,15 @@ mod tests {
 
         let mut state = SystemState::<HistoryCommands>::new(app.world_mut());
 
-        state
-            .get_mut(app.world_mut())
-            .queue_confirmable(PendingSpawn::default());
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.queue_confirmable(PendingSpawn::default());
         state.apply(app.world_mut());
 
         let mut transforms = app.world_mut().query::<&Transform>();
         assert_eq!(transforms.iter(app.world()).len(), 1);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).len(), 1);
@@ -429,7 +442,8 @@ mod tests {
         let mut history = app.world_mut().resource_mut::<CommandHistory>();
         history.confirm(spawn_id);
 
-        state.get_mut(app.world_mut()).undo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.undo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).count(), 0);
@@ -440,7 +454,8 @@ mod tests {
         let mut history = app.world_mut().resource_mut::<CommandHistory>();
         history.deny(despawn_id);
 
-        state.get_mut(app.world_mut()).redo();
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
+        commands.redo();
         state.apply(app.world_mut());
 
         assert_eq!(transforms.iter(app.world()).count(), 0);
@@ -454,7 +469,7 @@ mod tests {
 
         let mut state = SystemState::<HistoryCommands>::new(app.world_mut());
 
-        let mut commands = state.get_mut(app.world_mut());
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
         commands.queue_reversible(Spawn::default());
         commands.queue_reversible(Spawn::default());
         state.apply(app.world_mut());
@@ -462,7 +477,7 @@ mod tests {
         let mut transforms = app.world_mut().query::<&Transform>();
         assert_eq!(transforms.iter(app.world()).len(), 2);
 
-        let mut commands = state.get_mut(app.world_mut());
+        let mut commands = state.get_mut(app.world_mut()).unwrap();
         commands.undo();
         commands.undo();
         state.apply(app.world_mut());

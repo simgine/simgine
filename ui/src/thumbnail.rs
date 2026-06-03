@@ -1,4 +1,5 @@
 use bevy::{
+    app::SceneSpawnerSystems,
     asset::RecursiveDependencyLoadState,
     camera::{
         RenderTarget,
@@ -10,7 +11,6 @@ use bevy::{
     pbr::wireframe::NoWireframe,
     prelude::*,
     render::render_resource::TextureFormat,
-    scene,
 };
 use simgine_core::asset_manifest::object::ObjectManifest;
 
@@ -23,7 +23,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(
             SpawnScene,
             wait_for_request
-                .before(scene::scene_spawner_system)
+                .before(SceneSpawnerSystems::WorldInstanceSpawn)
                 .run_if(in_state(ThumbnailState::Inactive)),
         )
         .add_systems(
@@ -57,7 +57,7 @@ fn setup(mut commands: Commands) {
         THUMBNAIL_RENDER_LAYER,
         DirectionalLight {
             illuminance: lux::FULL_DAYLIGHT,
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             ..Default::default()
         },
         Transform::from_rotation(Quat::from_euler(EulerRot::YXZ, YAW, -PITCH, 0.0)),
@@ -86,7 +86,7 @@ fn wait_for_request(
         Name::new("Thumbnail target"),
         THUMBNAIL_RENDER_LAYER,
         ThumbnailOf(target),
-        SceneRoot(scene),
+        WorldAssetRoot(scene),
     ));
 
     commands.set_state(ThumbnailState::LoadingAsset);
@@ -96,7 +96,7 @@ fn wait_for_loading(
     mut commands: Commands,
     mut images: ResMut<Assets<Image>>,
     asset_server: Res<AssetServer>,
-    scene: Single<(Entity, &ThumbnailOf, &SceneRoot)>,
+    scene: Single<(Entity, &ThumbnailOf, &WorldAssetRoot)>,
     camera: Single<(&mut RenderTarget, &mut Transform, &Projection), With<ThumbnailCamera>>,
     nodes: Query<&Node>,
     children: Query<&Children>,

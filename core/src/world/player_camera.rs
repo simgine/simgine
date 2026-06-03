@@ -3,8 +3,8 @@ use std::f32::consts::FRAC_PI_2;
 use bevy::{
     anti_alias::taa::TemporalAntiAliasing,
     camera::Exposure,
-    light::AtmosphereEnvironmentMapLight,
-    pbr::{Atmosphere, ScatteringMedium, ScreenSpaceAmbientOcclusion},
+    light::{Atmosphere, AtmosphereEnvironmentMapLight, atmosphere::ScatteringMedium},
+    pbr::{AtmosphereSettings, ScreenSpaceAmbientOcclusion},
     post_process::bloom::Bloom,
     prelude::*,
 };
@@ -22,7 +22,7 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(
             Update,
             apply_transform
-                .run_if(in_state(GameState::World).or(in_state(GameState::FamilyEditor))),
+                .run_if(in_state(GameState::World).or_else(in_state(GameState::FamilyEditor))),
         );
 }
 
@@ -35,10 +35,13 @@ fn editor_spawn(mut commands: Commands) {
 
 fn world_spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
     debug!("spawning world camera");
+    commands.spawn(Atmosphere::earth(
+        scattering_mediums.add(ScatteringMedium::default()),
+    ));
     commands.spawn((
         OrbitOrigin::default(),
         camera(),
-        Atmosphere::earthlike(scattering_mediums.add(ScatteringMedium::default())),
+        AtmosphereSettings::default(),
         AtmosphereEnvironmentMapLight::default(),
         Exposure { ev100: 13.0 }, // Compensate for atmosphere.
     ));

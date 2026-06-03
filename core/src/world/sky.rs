@@ -16,7 +16,7 @@ fn spawn(mut commands: Commands) {
     commands.spawn((
         Sun,
         DirectionalLight {
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             illuminance: lux::RAW_SUNLIGHT,
             ..Default::default()
         },
@@ -25,7 +25,7 @@ fn spawn(mut commands: Commands) {
     commands.spawn((
         Moon,
         DirectionalLight {
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             illuminance: 400.0, // Keep nights bright.
             ..Default::default()
         },

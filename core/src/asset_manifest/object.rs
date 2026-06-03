@@ -17,11 +17,7 @@ impl AssetManifest for ObjectManifest {
     const EXTENSION: &'static str = "object.ron";
 
     fn resolve_paths(&mut self, registry: &TypeRegistry, manifest_path: &AssetPath) {
-        // TODO: Avoid `to_string`, asked in https://github.com/bevyengine/bevy/issues/22239.
-        self.scene = manifest_path
-            .resolve_embed(&self.scene.to_string())
-            .unwrap();
-
+        self.scene = manifest_path.resolve_embed(&self.scene);
         for component in &mut self.components {
             let type_path = component.reflect_type_path();
             let Some(registration) = registry.get_with_type_path(type_path) else {

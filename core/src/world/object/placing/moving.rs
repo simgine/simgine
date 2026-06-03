@@ -49,7 +49,7 @@ fn pick(
     _on: On<Start<Pick>>,
     cursor_target: Single<&CursorTarget>,
     mut commands: Commands,
-    objects: Query<(&SceneRoot, &Transform), With<Object>>,
+    objects: Query<(&WorldAssetRoot, &Transform), With<Object>>,
 ) {
     let Some(target) = ***cursor_target else {
         return;

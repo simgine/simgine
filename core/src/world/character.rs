@@ -20,7 +20,7 @@ const RADIUS: f32 = 0.4;
     FirstName,
     LastName,
     Replicated,
-    SceneRoot,
+    WorldAssetRoot,
     RigidBody::Kinematic,
     Collider::capsule_endpoints(
         RADIUS,

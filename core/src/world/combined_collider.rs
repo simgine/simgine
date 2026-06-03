@@ -1,7 +1,7 @@
 use avian3d::prelude::*;
 use bevy::{
     camera::primitives::MeshAabb, mesh::Indices, prelude::*,
-    render::render_resource::PrimitiveTopology, scene::SceneInstanceReady,
+    render::render_resource::PrimitiveTopology, world_serialization::WorldInstanceReady,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -9,7 +9,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn init(
-    ready: On<SceneInstanceReady>,
+    ready: On<WorldInstanceReady>,
     meshes: Res<Assets<Mesh>>,
     mut scenes: Query<(&Children, &CombinedCollider, &mut Collider)>,
     scene_meshes: Query<(&Transform, Option<&Mesh3d>, Option<&Children>)>,

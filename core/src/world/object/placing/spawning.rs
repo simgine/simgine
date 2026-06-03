@@ -19,7 +19,7 @@ fn init(
     insert: On<Insert, SpawningObject>,
     asset_server: Res<AssetServer>,
     manifests: Res<Assets<ObjectManifest>>,
-    mut spawning_objects: Query<(&SpawningObject, &mut SceneRoot)>,
+    mut spawning_objects: Query<(&SpawningObject, &mut WorldAssetRoot)>,
 ) {
     let (spawning, mut scene_root) = spawning_objects.get_mut(insert.entity).unwrap();
     let manifest = manifests
@@ -64,7 +64,7 @@ pub fn spawning_object(id: AssetId<ObjectManifest>) -> impl Bundle {
         Name::new("Spawning object"),
         placing_object(),
         SpawningObject { id },
-        SceneRoot::default(),
+        WorldAssetRoot::default(),
     )
 }
 

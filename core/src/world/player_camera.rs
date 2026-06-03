@@ -119,7 +119,7 @@ fn camera() -> impl Bundle {
                 Action::<Pan>::new(),
                 DeadZone::default(),
                 SmoothNudge::default(),
-                DeltaScale::default(),
+                DeltaScale::REAL,
                 Scale::splat(100.0),
                 Bindings::spawn((
                     Cardinal::wasd_keys(),
@@ -135,7 +135,7 @@ fn camera() -> impl Bundle {
             context.spawn((
                 Action::<Rotate>::new(),
                 SmoothNudge::default(),
-                DeltaScale::default(),
+                DeltaScale::REAL,
                 Scale::splat(2.0),
                 Bindings::spawn((
                     Bidirectional::new(KeyCode::Period, KeyCode::Comma),
@@ -151,7 +151,7 @@ fn camera() -> impl Bundle {
             context.spawn((
                 Action::<Zoom>::new(),
                 SmoothNudge::default(),
-                DeltaScale::default(),
+                DeltaScale::REAL,
                 Scale::splat(100.0),
                 Bindings::spawn((
                     Bidirectional::new(KeyCode::Equal, KeyCode::Minus),

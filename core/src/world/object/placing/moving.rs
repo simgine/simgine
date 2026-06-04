@@ -54,7 +54,7 @@ fn pick(
     let Some(target) = ***cursor_target else {
         return;
     };
-    let Ok((scene_root, transform)) = objects.get(target) else {
+    let Ok((asset_root, transform)) = objects.get(target) else {
         return;
     };
 
@@ -65,7 +65,7 @@ fn pick(
         MovingObject,
         ContextPriority::<MovingObject>::new(100),
         PreviewOf { target },
-        scene_root.clone(),
+        asset_root.clone(),
         *transform,
         CursorOffset::default(),
         DespawnOnExit(BuildingMode::Objects),

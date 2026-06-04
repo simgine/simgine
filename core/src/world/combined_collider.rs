@@ -11,10 +11,11 @@ pub(super) fn plugin(app: &mut App) {
 fn init(
     ready: On<WorldInstanceReady>,
     meshes: Res<Assets<Mesh>>,
-    mut scenes: Query<(&Children, &CombinedCollider, &mut Collider)>,
-    scene_meshes: Query<(&Transform, Option<&Mesh3d>, Option<&Children>)>,
+    mut combined_colliers: Query<(&Children, &CombinedCollider, &mut Collider)>,
+    child_meshes: Query<(&Transform, Option<&Mesh3d>, Option<&Children>)>,
 ) {
-    let Ok((children, constructor, mut collider)) = scenes.get_mut(ready.entity) else {
+    let Ok((children, combined_collider, mut collider)) = combined_colliers.get_mut(ready.entity)
+    else {
         return;
     };
 
@@ -27,7 +28,7 @@ fn init(
     for &child_entity in children {
         if let Err(e) = recursive_merge(
             &meshes,
-            &scene_meshes,
+            &child_meshes,
             child_entity,
             Default::default(),
             &mut combined_mesh,
@@ -37,7 +38,7 @@ fn init(
         }
     }
 
-    *collider = match constructor {
+    *collider = match combined_collider {
         CombinedCollider::Aabb => {
             let aabb = combined_mesh
                 .compute_aabb()
@@ -57,21 +58,21 @@ fn init(
 
 fn recursive_merge(
     meshes: &Assets<Mesh>,
-    scene_meshes: &Query<(&Transform, Option<&Mesh3d>, Option<&Children>)>,
+    child_meshes: &Query<(&Transform, Option<&Mesh3d>, Option<&Children>)>,
     current_entity: Entity,
     parent_transform: Transform,
     combined_mesh: &mut Mesh,
 ) -> Result<()> {
-    let (transform, mesh_handle, children) = scene_meshes
+    let (transform, mesh_handle, children) = child_meshes
         .get(current_entity)
-        .expect("all scene children should have transform");
+        .expect("all collider children should have transform");
 
     let current_transform = parent_transform * *transform;
     if let Some(mesh_handle) = mesh_handle {
         let mut mesh = meshes
             .get(mesh_handle)
             .cloned()
-            .expect("all scene children should be loaded");
+            .expect("all collider children should be loaded");
         mesh.transform_by(current_transform);
         combined_mesh.merge(&mesh)?;
     }
@@ -80,7 +81,7 @@ fn recursive_merge(
         for &child in children {
             recursive_merge(
                 meshes,
-                scene_meshes,
+                child_meshes,
                 child,
                 current_transform,
                 combined_mesh,

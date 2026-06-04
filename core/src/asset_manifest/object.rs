@@ -8,7 +8,7 @@ use super::{
 #[derive(Asset, Reflect)]
 pub struct ObjectManifest {
     pub info: ManifestInfo,
-    pub scene: AssetPath<'static>,
+    pub asset: AssetPath<'static>,
     pub category: ObjectCategory,
     pub components: Vec<ReflectedComponent>,
 }
@@ -17,7 +17,7 @@ impl AssetManifest for ObjectManifest {
     const EXTENSION: &'static str = "object.ron";
 
     fn resolve_paths(&mut self, registry: &TypeRegistry, manifest_path: &AssetPath) {
-        self.scene = manifest_path.resolve_embed(&self.scene);
+        self.asset = manifest_path.resolve_embed(&self.asset);
         for component in &mut self.components {
             let type_path = component.reflect_type_path();
             let Some(registration) = registry.get_with_type_path(type_path) else {

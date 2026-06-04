@@ -21,14 +21,14 @@ fn init(
     manifests: Res<Assets<ObjectManifest>>,
     mut spawning_objects: Query<(&SpawningObject, &mut WorldAssetRoot)>,
 ) {
-    let (spawning, mut scene_root) = spawning_objects.get_mut(insert.entity).unwrap();
+    let (spawning, mut asset_root) = spawning_objects.get_mut(insert.entity).unwrap();
     let manifest = manifests
         .get(spawning.id)
         .expect("manifests should be preloaded");
 
-    debug!("loading scene `{}`", manifest.scene);
+    debug!("loading asset `{}`", manifest.asset);
 
-    **scene_root = asset_server.load(manifest.scene.clone());
+    **asset_root = asset_server.load(manifest.asset.clone());
 }
 
 fn buy(

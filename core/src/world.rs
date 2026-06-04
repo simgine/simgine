@@ -77,7 +77,7 @@ fn save(
 
 fn load(
     load: On<LoadWorld>,
-    mut scene_spawner: ResMut<WorldInstanceSpawner>,
+    mut instance_spawner: ResMut<WorldInstanceSpawner>,
     mut dyn_worlds: ResMut<Assets<DynamicWorld>>,
     asset_server: Res<AssetServer>,
     registry: Res<AppTypeRegistry>,
@@ -97,7 +97,7 @@ fn load(
         .deserialize(&mut deserializer)
         .map_err(|e| format!("unable to deserialize {path:?}: {e}"))?;
 
-    scene_spawner.spawn_dynamic(dyn_worlds.add(dyn_world));
+    instance_spawner.spawn_dynamic(dyn_worlds.add(dyn_world));
 
     Ok(())
 }

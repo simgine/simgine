@@ -3,7 +3,7 @@ use std::iter;
 use bevy::{prelude::*, world_serialization::WorldInstanceReady};
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(init_scene).add_observer(init);
+    app.add_observer(init_asset_instance).add_observer(init);
 }
 
 fn init(
@@ -23,7 +23,7 @@ fn init(
     );
 }
 
-fn init_scene(
+fn init_asset_instance(
     ready: On<WorldInstanceReady>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     tints: Query<&Tint>,
@@ -54,7 +54,7 @@ fn set_color(
         material_handles.iter_many_mut(iter::once(entity).chain(children.iter_descendants(entity)));
     while let Some(mut material_handle) = iter.fetch_next() {
         let Some(material) = materials.get(&*material_handle) else {
-            // Skip non-loaded, their alpha color will be updated only after full scene loading anyway.
+            // Skip non-loaded, their alpha color will be updated only after full asset loading anyway.
             return;
         };
 

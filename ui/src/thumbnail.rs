@@ -17,7 +17,7 @@ use simgine_core::asset_manifest::object::ObjectManifest;
 pub(super) fn plugin(app: &mut App) {
     app.init_state::<ThumbnailState>()
         .add_systems(Startup, setup)
-        .add_systems(OnEnter(ThumbnailState::Inactive), despawn_scene)
+        .add_systems(OnEnter(ThumbnailState::Inactive), despawn_asset)
         .add_systems(OnEnter(ThumbnailState::Warmup), warmup)
         .add_systems(OnEnter(ThumbnailState::Rendering), render)
         .add_systems(
@@ -78,15 +78,15 @@ fn wait_for_request(
     let manifest = manifests
         .get(*thumbnail)
         .expect("manifests should be preloaded");
-    debug!("spawning scene '{:?}'", manifest.scene);
-    let scene = asset_server.load(manifest.scene.clone());
+    debug!("spawning asset '{:?}'", manifest.asset);
+    let asset = asset_server.load(manifest.asset.clone());
 
     commands.entity(target).insert(ThumbnailProcessed);
     commands.spawn((
         Name::new("Thumbnail target"),
         THUMBNAIL_RENDER_LAYER,
         ThumbnailOf(target),
-        WorldAssetRoot(scene),
+        WorldAssetRoot(asset),
     ));
 
     commands.set_state(ThumbnailState::LoadingAsset);
@@ -96,14 +96,14 @@ fn wait_for_loading(
     mut commands: Commands,
     mut images: ResMut<Assets<Image>>,
     asset_server: Res<AssetServer>,
-    scene: Single<(Entity, &ThumbnailOf, &WorldAssetRoot)>,
+    thumbnail_asset: Single<(Entity, &ThumbnailOf, &WorldAssetRoot)>,
     camera: Single<(&mut RenderTarget, &mut Transform, &Projection), With<ThumbnailCamera>>,
     nodes: Query<&Node>,
     children: Query<&Children>,
     meshes: Query<(Entity, &Aabb, &GlobalTransform)>,
 ) {
-    let (scene_entity, &thumbnail_of, scene) = *scene;
-    match asset_server.recursive_dependency_load_state(&**scene) {
+    let (thumbnail_entity, &thumbnail_of, asset_root) = *thumbnail_asset;
+    match asset_server.recursive_dependency_load_state(&**asset_root) {
         RecursiveDependencyLoadState::Loaded => {
             let Ok(node) = nodes.get(*thumbnail_of) else {
                 debug!("thumbnail target is no longer valid");
@@ -115,7 +115,7 @@ fn wait_for_loading(
                 panic!("width and height should be set in pixels");
             };
 
-            debug!("creating thumbnail {width}x{height} for loaded scene");
+            debug!("creating thumbnail {width}x{height} for loaded asset");
             let image = images.add(Image::new_target_texture(
                 width as u32,
                 height as u32,
@@ -129,7 +129,7 @@ fn wait_for_loading(
             let mut min = Vec3A::splat(f32::MAX);
             let mut max = Vec3A::splat(f32::MIN);
             for (child_entity, aabb, transform) in
-                meshes.iter_many(children.iter_descendants(scene_entity))
+                meshes.iter_many(children.iter_descendants(thumbnail_entity))
             {
                 commands.entity(child_entity).insert((
                     THUMBNAIL_RENDER_LAYER,
@@ -184,16 +184,16 @@ fn render(mut commands: Commands, mut camera: Single<&mut Camera, With<Thumbnail
     commands.set_state(ThumbnailState::Inactive);
 }
 
-fn despawn_scene(
+fn despawn_asset(
     mut commands: Commands,
     camera: Single<(&mut Camera, &RenderTarget), With<ThumbnailCamera>>,
-    scene: Single<(Entity, &ThumbnailOf)>,
+    thumbnail_asset: Single<(Entity, &ThumbnailOf)>,
     mut nodes: Query<&mut ImageNode>,
 ) {
     let (mut camera, render_target) = camera.into_inner();
     camera.is_active = false;
 
-    let (entity, &thumbnail_of) = *scene;
+    let (entity, &thumbnail_of) = *thumbnail_asset;
     if let Ok(mut node) = nodes.get_mut(*thumbnail_of) {
         debug!("assigning image to node");
         let image = render_target

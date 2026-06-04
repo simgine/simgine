@@ -45,7 +45,7 @@ fn init(
     manifests: Res<Assets<ObjectManifest>>,
     mut objects: Query<(&Object, &mut Name, &mut WorldAssetRoot)>,
 ) {
-    let (object, mut name, mut scene_root) = objects.get_mut(insert.entity).unwrap();
+    let (object, mut name, mut asset_root) = objects.get_mut(insert.entity).unwrap();
 
     let Some(manifest_handle) = asset_server.get_handle(&object.manifest) else {
         error!("'{}' is missing, ignoring", object.manifest);
@@ -62,7 +62,7 @@ fn init(
         .unwrap_or_else(|| panic!("'{:?}' should be loaded", object.manifest));
 
     *name = manifest.info.name.clone();
-    **scene_root = asset_server.load(manifest.scene.clone());
+    **asset_root = asset_server.load(manifest.asset.clone());
 
     let mut entity = commands.entity(insert.entity);
     for component in &manifest.components {

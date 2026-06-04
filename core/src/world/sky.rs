@@ -33,12 +33,12 @@ fn spawn(mut commands: Commands) {
 }
 
 fn move_planets(
-    game_clock: Single<(&Clock, &MinuteCarry)>,
+    clock: Res<Clock>,
+    carry: Res<MinuteCarry>,
     mut sun: Single<&mut Transform, With<Sun>>,
     mut moon: Single<&mut Transform, (With<Moon>, Without<Sun>)>,
 ) {
-    let (game_time, carry) = game_clock.into_inner();
-    let secs = game_time.secs_since_midnight() as f32 + carry.as_secs_f32();
+    let secs = clock.secs_since_midnight() as f32 + carry.as_secs_f32();
     let day_fract = secs / SECS_PER_DAY as f32;
 
     let angle = day_fract * TAU; // 0 is midnight, 1 is TAU.

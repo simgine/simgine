@@ -118,7 +118,7 @@ fn spawn(mut commands: Commands) {
 
 fn update_weekday(
     _on: On<Insert, (Weekday, WeekdayLabel)>,
-    weekday: Single<&Weekday>,
+    weekday: Res<Weekday>,
     mut text: Single<&mut Text, With<WeekdayLabel>>,
 ) {
     text.clear();
@@ -127,7 +127,7 @@ fn update_weekday(
 
 fn update_clock(
     _on: On<Insert, (Clock, ClockLabel)>,
-    clock: Single<&Clock>,
+    clock: Res<Clock>,
     mut text: Single<&mut Text, With<ClockLabel>>,
 ) {
     text.clear();

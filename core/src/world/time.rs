@@ -9,18 +9,13 @@ use bevy::prelude::*;
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    component_res::{ComponentResExt, InsertComponentResExt},
-    state::GameState,
-    world::CreateWorld,
-};
+use crate::{state::GameState, world::CreateWorld};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(speed::plugin)
-        .register_resource_component::<Weekday>()
-        .register_resource_component::<Clock>()
-        .replicate::<Clock>()
-        .replicate::<Weekday>()
+        .replicate_resource::<Clock>()
+        .replicate_resource::<MinuteCarry>()
+        .replicate_resource::<Weekday>()
         .add_observer(create_world)
         .add_systems(
             PreUpdate,
@@ -30,8 +25,9 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn create_world(_on: On<CreateWorld>, mut commands: Commands) {
-    commands.spawn(Clock::default());
-    commands.spawn(Weekday::default());
+    commands.insert_resource(Clock::default());
+    commands.insert_resource(MinuteCarry::default());
+    commands.insert_resource(Weekday::default());
 }
 
 const SECS_PER_MIN: u64 = 2;
@@ -40,10 +36,10 @@ pub(crate) const SECS_PER_DAY: u64 = 24 * 60 * SECS_PER_MIN;
 fn tick(
     mut commands: Commands,
     time: Res<Time>,
-    weekday: Single<&Weekday>,
-    game_clock: Single<(&mut MinuteCarry, &Clock)>,
+    weekday: Res<Weekday>,
+    clock: Res<Clock>,
+    mut carry: ResMut<MinuteCarry>,
 ) {
-    let (mut carry, &game_time) = game_clock.into_inner();
     **carry += time.delta();
 
     let minutes = carry.as_secs() / SECS_PER_MIN;
@@ -53,9 +49,9 @@ fn tick(
     let consumed = minutes * SECS_PER_MIN;
     **carry -= Duration::from_secs(consumed);
 
-    let mut current_weekday = **weekday;
-    let mut hour = game_time.hour as u64;
-    let mut minute = game_time.minute as u64 + minutes;
+    let mut current_weekday = *weekday;
+    let mut hour = clock.hour as u64;
+    let mut minute = clock.minute as u64 + minutes;
     if minute >= 60 {
         hour += minute / 60;
         minute %= 60;
@@ -64,32 +60,24 @@ fn tick(
         current_weekday.advance(hour / 24);
         hour %= 24;
     }
-    let current_time = Clock {
+    let current_clock = Clock {
         hour: hour as u8,
         minute: minute as u8,
     };
 
-    if current_weekday != **weekday {
-        debug!("changing weekday to {current_weekday}");
-        commands.insert_component_resource(current_weekday);
-    }
-    if current_time != game_time {
-        debug!("changing time to {current_time}");
-        commands.insert_component_resource(current_time);
-    }
+    commands.insert_resource_if_neq(current_weekday);
+    commands.insert_resource_if_neq(current_clock);
 }
 
-#[derive(Component, Default, Deref, DerefMut)]
+#[derive(Resource, Reflect, Deref, DerefMut, Default, Serialize, Deserialize)]
+#[reflect(Resource)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 pub(crate) struct MinuteCarry(Duration);
 
-#[derive(Component, Reflect, Default, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
-#[require(
-    Name::new("Weekday"),
-    Replicated,
-    DespawnOnExit::<_>(GameState::World)
-)]
+#[derive(Resource, Reflect, Default, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[component(immutable)]
-#[reflect(Component)]
+#[reflect(Resource)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 pub enum Weekday {
     #[default]
     Mon,
@@ -131,15 +119,10 @@ impl Display for Weekday {
     }
 }
 
-#[derive(Component, Reflect, Serialize, Deserialize, PartialEq, Clone, Copy)]
-#[require(
-    Name::new("Clock"),
-    Replicated,
-    MinuteCarry,
-    DespawnOnExit::<_>(GameState::World)
-)]
+#[derive(Resource, Reflect, Serialize, Deserialize, PartialEq, Clone, Copy)]
 #[component(immutable)]
-#[reflect(Component)]
+#[reflect(Resource)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 pub struct Clock {
     hour: u8,
     minute: u8,

@@ -2,56 +2,44 @@ use bevy::prelude::*;
 use bevy_replicon::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    component_res::{ComponentResExt, InsertComponentResExt},
-    state::GameState,
-    world::CreateWorld,
-};
+use crate::state::GameState;
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_resource_component::<GameSpeed>()
-        .register_resource_component::<Paused>()
-        .add_client_event::<SetPaused>(Channel::Ordered)
+    app.add_client_event::<SetPaused>(Channel::Ordered)
         .add_client_event::<SetSpeed>(Channel::Ordered)
-        .replicate::<GameSpeed>()
-        .replicate::<Paused>()
-        .add_observer(create_world)
+        .replicate_resource::<GameSpeed>()
+        .replicate_resource::<Paused>()
         .add_observer(set_paused)
         .add_observer(set_speed)
         .add_observer(apply_speed)
         .add_observer(apply_paused)
         .add_systems(
             OnEnter(GameState::World),
-            spawn.run_if(not(any_with_component::<Paused>)),
+            spawn.run_if(not(in_state(ClientState::Connected))),
         );
 }
 
 fn spawn(mut commands: Commands) {
-    commands.spawn(Paused::default());
-}
-
-fn create_world(_on: On<CreateWorld>, mut commands: Commands) {
-    commands.spawn(GameSpeed::default());
+    commands.insert_resource(GameSpeed::default());
+    commands.insert_resource(Paused::default());
 }
 
 fn set_paused(paused: On<FromClient<SetPaused>>, mut commands: Commands) {
-    commands.insert_component_resource(Paused(***paused));
+    commands.insert_resource(Paused(***paused));
 }
 
-fn set_speed(speed: On<FromClient<SetSpeed>>, mut commands: Commands, paused: Single<&Paused>) {
-    commands.insert_component_resource(***speed);
-    if ***paused {
-        commands.insert_component_resource(Paused(false));
-    }
+fn set_speed(speed: On<FromClient<SetSpeed>>, mut commands: Commands) {
+    commands.insert_resource(***speed);
+    commands.insert_resource_if_neq(Paused(false));
 }
 
 fn apply_paused(
     _on: On<Insert, Paused>,
     mut time: ResMut<Time<Virtual>>,
-    paused: Single<&Paused>,
-    game_speed: Single<&GameSpeed>,
+    paused: Res<Paused>,
+    game_speed: Res<GameSpeed>,
 ) {
-    if ***paused {
+    if **paused {
         info!("pausing the game");
         time.set_relative_speed(0.0);
     } else {
@@ -63,8 +51,8 @@ fn apply_paused(
 fn apply_speed(
     _on: On<Insert, GameSpeed>,
     mut time: ResMut<Time<Virtual>>,
-    paused: Single<&Paused>,
-    game_speed: Single<&GameSpeed>,
+    game_speed: Res<GameSpeed>,
+    paused: If<Res<Paused>>,
 ) {
     info!("setting speed to `{:?}`", *game_speed);
     if !***paused {
@@ -76,12 +64,8 @@ fn apply_speed(
 pub struct SetPaused(pub bool);
 
 // Replicated, but not serialized since the value is not reflected.
-#[derive(Component, Deref, DerefMut, Serialize, Deserialize)]
-#[require(
-    Name::new("Paused"),
-    Replicated,
-    DespawnOnExit::<_>(GameState::World)
-)]
+#[derive(Resource, Deref, DerefMut, Serialize, Deserialize, PartialEq)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 #[component(immutable)]
 pub struct Paused(bool);
 
@@ -98,14 +82,9 @@ impl Default for Paused {
 #[derive(Event, Deref, Serialize, Deserialize)]
 pub struct SetSpeed(pub GameSpeed);
 
-#[derive(Component, Reflect, Default, Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
-#[require(
-    Name::new("Game speed"),
-    Replicated,
-    DespawnOnExit::<_>(GameState::World)
-)]
+#[derive(Resource, Reflect, Default, Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
+#[require(DespawnOnExit::<_>(GameState::World))]
 #[component(immutable)]
-#[reflect(Component)]
 pub enum GameSpeed {
     #[default]
     Normal,

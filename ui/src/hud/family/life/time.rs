@@ -82,8 +82,8 @@ fn spawn(mut commands: Commands) {
                         .observe(
                             |_on: On<Fire<Activate>>,
                              mut commands: Commands,
-                             paused: Single<&Paused>| {
-                                commands.client_trigger(SetPaused(!***paused));
+                             paused: Res<Paused>| {
+                                commands.client_trigger(SetPaused(!**paused));
                             },
                         );
 
@@ -138,21 +138,21 @@ fn update_pause_button(
     _on: On<Insert, (Paused, PauseButton)>,
     mut commands: Commands,
     pause_button: Single<(Entity, &Toggled), With<PauseButton>>,
-    paused: Single<&Paused>,
+    paused: Res<Paused>,
 ) {
     let (entity, &toggled) = pause_button.into_inner();
-    if *toggled != ***paused {
-        commands.entity(entity).insert(Toggled(***paused));
+    if *toggled != **paused {
+        commands.entity(entity).insert(Toggled(**paused));
     }
 }
 
 fn update_speed_buttons(
     _on: On<Insert, (GameSpeed, SpeedNode)>,
     mut commands: Commands,
-    game_speed: Single<&GameSpeed>,
+    game_speed: Res<GameSpeed>,
     buttons: Query<(Entity, &Toggled, &SpeedButton)>,
 ) {
-    if let Some((entity, &toggled, _)) = buttons.iter().find(|&(.., s)| **s == **game_speed)
+    if let Some((entity, &toggled, _)) = buttons.iter().find(|&(.., s)| **s == *game_speed)
         && !*toggled
     {
         commands.entity(entity).insert(Toggled(true));

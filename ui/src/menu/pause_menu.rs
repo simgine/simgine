@@ -79,10 +79,10 @@ fn open(_on: On<Fire<OpenPauseMenu>>, mut commands: Commands) {
 fn pause(
     _on: On<Insert, PauseMenu>,
     mut commands: Commands,
-    paused: Single<&Paused>,
+    paused: Res<Paused>,
     mut pause_menu: Single<&mut PauseMenu>,
 ) {
-    if !***paused {
+    if !**paused {
         pause_menu.unpause_on_hide = true;
         commands.client_trigger(SetPaused(true));
     }

@@ -17,12 +17,7 @@ use bevy::{prelude::*, world_serialization::serde::WorldDeserializer};
 use bevy_replicon::{prelude::*, world_serialization};
 use serde::{Deserialize, Serialize, de::DeserializeSeed};
 
-use crate::{
-    component_res::{ComponentResExt, InsertComponentResExt},
-    error_event::trigger_error,
-    game_paths::GamePaths,
-    state::GameState,
-};
+use crate::{error_event::trigger_error, game_paths::GamePaths, state::GameState};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -38,8 +33,7 @@ pub(super) fn plugin(app: &mut App) {
         sky::plugin,
         time::plugin,
     ))
-    .register_resource_component::<WorldName>()
-    .replicate::<WorldName>()
+    .replicate_resource::<WorldName>()
     .replicate::<Transform>()
     .add_observer(create)
     .add_observer(save.pipe(trigger_error))
@@ -48,7 +42,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn create(mut create: On<CreateWorld>, mut commands: Commands) {
-    commands.insert_component_resource(WorldName(mem::take(&mut create.name)));
+    commands.insert_resource(WorldName(mem::take(&mut create.name)));
 }
 
 fn save(
@@ -120,10 +114,7 @@ pub struct LoadWorld {
     pub name: String,
 }
 
-#[derive(Component, Deref, Reflect, Serialize, Deserialize)]
-#[require(
-    Replicated,
-    DespawnOnExit::<_>(GameState::World)
-)]
-#[reflect(Component)]
+#[derive(Resource, Deref, Reflect, Serialize, Deserialize)]
+#[require(DespawnOnExit::<_>(GameState::World))]
+#[reflect(Resource)]
 pub struct WorldName(String);

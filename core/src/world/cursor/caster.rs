@@ -3,28 +3,25 @@ use bevy::{
     ecs::{lifecycle::HookContext, world::DeferredWorld},
     input::InputSystems,
     prelude::*,
-    utils::TypeIdMapExt,
 };
 use bevy_enhanced_input::prelude::*;
 
-use crate::component_res::{ComponentResExt, ResEntities};
-
 pub(super) fn plugin(app: &mut App) {
-    app.register_resource_component::<CursorCaster>()
-        .add_systems(
-            PreUpdate,
-            cast_ray
-                .pipe(update)
-                .after(InputSystems)
-                .after(EnhancedInputSystems::Apply)
-                .in_set(CursorCastSystems),
-        );
+    app.init_resource::<CursorMaskEntities>().add_systems(
+        PreUpdate,
+        cast_ray
+            .pipe(update)
+            .after(InputSystems)
+            .after(EnhancedInputSystems::Apply)
+            .in_set(CursorCastSystems),
+    );
 }
 
 fn cast_ray(
     query: SpatialQuery,
     window: Single<&Window>,
-    caster_camera: Single<(&Camera, &GlobalTransform, &CursorCaster)>,
+    mask_entities: Res<CursorMaskEntities>,
+    caster_camera: Single<(&Camera, &GlobalTransform), With<CursorCaster>>,
     masks: Query<&CursorMask>,
     disablers: Query<&CursorCastDisabler>,
 ) -> Option<(Entity, Vec3)> {
@@ -32,10 +29,10 @@ fn cast_ray(
         return None;
     }
 
-    let (camera, transform, caster) = *caster_camera;
     let cursor_pos = window.cursor_position()?;
-    let mask_entity = *caster.masks.last()?;
+    let mask_entity = *mask_entities.last()?;
     let mask = **masks.get(mask_entity).ok()?;
+    let (camera, transform) = *caster_camera;
     let ray = camera.viewport_to_world(transform, cursor_pos).ok()?;
     let hit = query.cast_ray(
         ray.origin,
@@ -67,11 +64,13 @@ fn update(
 #[derive(SystemSet, Debug, PartialEq, Eq, Hash, Clone)]
 pub(super) struct CursorCastSystems;
 
+/// List of entities with masks in their spawn order.
+#[derive(Resource, Default, Deref, DerefMut)]
+struct CursorMaskEntities(Vec<Entity>);
+
 #[derive(Component, Default)]
 #[require(CursorTarget, CursorHit)]
-pub(crate) struct CursorCaster {
-    masks: Vec<Entity>,
-}
+pub(crate) struct CursorCaster;
 
 #[derive(Component, Deref, Default)]
 #[component(immutable)]
@@ -94,22 +93,14 @@ impl CursorMask {
 }
 
 fn on_mask_add(mut world: DeferredWorld, context: HookContext) {
-    let res_entities = world.resource_mut::<ResEntities>();
-    let caster_entity = *res_entities.get_type::<CursorCaster>().unwrap();
-    let mut caster = world.get_mut::<CursorCaster>(caster_entity).unwrap();
-    caster.masks.push(context.entity);
+    let mut caster = world.resource_mut::<CursorMaskEntities>();
+    caster.push(context.entity);
 }
 
 fn on_mask_remove(mut world: DeferredWorld, context: HookContext) {
-    let res_entities = world.resource_mut::<ResEntities>();
-    let caster_entity = *res_entities.get_type::<CursorCaster>().unwrap();
-    let mut caster = world.get_mut::<CursorCaster>(caster_entity).unwrap();
-    let index = caster
-        .masks
-        .iter()
-        .position(|&e| e == context.entity)
-        .unwrap();
-    caster.masks.remove(index);
+    let mut caster = world.resource_mut::<CursorMaskEntities>();
+    let index = caster.iter().position(|&e| e == context.entity).unwrap();
+    caster.remove(index);
 }
 
 #[derive(Component)]

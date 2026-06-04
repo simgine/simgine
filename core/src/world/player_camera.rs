@@ -94,7 +94,7 @@ fn camera() -> impl Bundle {
     (
         Name::new("Player camera"),
         PlayerCamera,
-        CursorCaster::default(),
+        CursorCaster,
         OrbitRotation::default(),
         SpringArm::default(),
         Camera3d::default(),

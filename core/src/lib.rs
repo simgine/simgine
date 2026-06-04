@@ -1,5 +1,4 @@
 pub mod asset_manifest;
-pub mod component_res;
 pub mod error_event;
 pub mod family_editor;
 pub mod game_paths;
@@ -16,7 +15,6 @@ impl Plugin for SimgineCorePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(GlobalAmbientLight::NONE).add_plugins((
             asset_manifest::plugin,
-            component_res::plugin,
             family_editor::plugin,
             game_paths::plugin,
             network::plugin,

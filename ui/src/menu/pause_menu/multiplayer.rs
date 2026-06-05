@@ -1,6 +1,5 @@
-use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
+use bevy::{ecs::relationship::RelatedSpawner, prelude::*, text::EditableText};
 use bevy_replicon::prelude::*;
-use bevy_simple_text_input::TextInputValue;
 use simgine_core::{
     error_event::trigger_error,
     network::{DEFAULT_PORT, Host, StopServer},
@@ -45,21 +44,19 @@ pub(super) fn multiplayer_menu() -> impl Bundle {
                 },
                 Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
                     parent.spawn((Text::new("Port"), TextFont::from_font_size(NORMAL_TEXT)));
-                    let port_edit = parent
-                        .spawn((text_edit(), TextInputValue(DEFAULT_PORT.to_string())))
-                        .id();
+                    let port_edit = parent.spawn(text_edit(DEFAULT_PORT.to_string())).id();
                     let start_stop = move |_on: On<Pointer<Click>>,
                                            mut commands: Commands,
                                            server_state: Res<State<ServerState>>,
-                                           input_values: Query<&TextInputValue>|
+                                           texts: Query<&EditableText>|
                           -> Result<()> {
                         match **server_state {
                             ServerState::Stopped => {
-                                let text = input_values.get(port_edit).unwrap();
-                                let port: u16 = text
-                                    .0
-                                    .parse()
-                                    .map_err(|e| format!("invalid port {}: {e}", text.0))?;
+                                let text = texts.get(port_edit).unwrap();
+                                let port: u16 =
+                                    text.value().to_string().parse().map_err(|e| {
+                                        format!("invalid port {}: {e}", text.value())
+                                    })?;
                                 commands.trigger(Host { port })
                             }
                             ServerState::Running => commands.trigger(StopServer),

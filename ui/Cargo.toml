@@ -9,14 +9,12 @@ publish.workspace = true
 
 [dependencies]
 bevy = { workspace = true, features = [
-  "bevy_input_focus",
-  "bevy_ui",
+  "bevy_ui_widgets",
   "ui_picking",
   "default_font",
 ] }
 bevy_enhanced_input.workspace = true
 bevy_replicon.workspace = true
-bevy_simple_text_input.workspace = true
 simgine_core.workspace = true
 trash.workspace = true
 

@@ -11,7 +11,6 @@ use bevy_enhanced_input::EnhancedInputPlugin;
 use bevy_mod_outline::OutlinePlugin;
 use bevy_replicon::prelude::*;
 use bevy_replicon_renet::RepliconRenetPlugins;
-use bevy_simple_text_input::TextInputPlugin;
 use simgine_core::SimgineCorePlugin;
 use simgine_ui::SimgineUiPlugin;
 
@@ -51,7 +50,6 @@ fn main() {
                 .disable::<SpatialQueryPlugin>()
                 .disable::<PhysicsInterpolationPlugin>(),
             OutlinePlugin::EXTRUDE_VERTEX,
-            TextInputPlugin,
             SimgineCorePlugin,
             SimgineUiPlugin,
         ));

@@ -22,7 +22,6 @@ avian3d = { git = "https://github.com/olukowski/avian", default-features = false
 bevy = { version = "0.19.0-rc.2", default-features = false }
 bevy_enhanced_input = "0.26.0-rc.1"
 bevy_mod_outline = { git = "https://github.com/komadori/bevy_mod_outline" }
-bevy_simple_text_input = { git = "https://github.com/rparrett/bevy_simple_text_input", branch = "bevy-0.19" }
 bevy_replicon = "0.41.0-rc.1"
 bevy_replicon_renet = { git = "https://github.com/simgine/bevy_replicon_renet", branch = "bevy-0.19" }
 smallvec = "1.15"

@@ -1,21 +1,20 @@
 use bevy::{
-    input_focus::{FocusCause, InputFocus},
+    picking::hover::Hovered,
     prelude::*,
+    text::{EditableText, TextCursorStyle},
     ui::UiSystems,
 };
-use bevy_simple_text_input::{TextInput, TextInputInactive, TextInputTextFont};
 
-use crate::widget::theme::{
-    ACTIVE, HOWERED, HOWERED_ACTIVE, INACTIVE, NORMAL_TEXT, OUTER_RADIUS, RADIUS_GAP,
+use super::{
+    focus::Focused,
+    theme::{ACTIVE, HOWERED, HOWERED_ACTIVE, INACTIVE, NORMAL_TEXT, OUTER_RADIUS, RADIUS_GAP},
 };
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_observer(activate)
-        .add_observer(update_focus)
-        .add_systems(PreUpdate, update_style.after(UiSystems::Focus));
+    app.add_systems(PreUpdate, update_style.after(UiSystems::Focus));
 }
 
-pub(crate) fn text_edit() -> impl Bundle {
+pub(crate) fn text_edit(initial_text: impl AsRef<str>) -> impl Bundle {
     (
         Node {
             align_self: AlignSelf::Center,
@@ -25,60 +24,31 @@ pub(crate) fn text_edit() -> impl Bundle {
             padding: RADIUS_GAP,
             ..Default::default()
         },
-        TextInput,
-        TextInputTextFont(TextFont::from_font_size(NORMAL_TEXT)),
+        EditableText::new(initial_text),
+        TextFont::from_font_size(NORMAL_TEXT),
+        TextCursorStyle {
+            color: Color::WHITE,
+            selection_color: ACTIVE.into(),
+            unfocused_selection_color: INACTIVE.into(),
+            ..Default::default()
+        },
+        Hovered::default(),
+        Focused::default(),
     )
 }
 
 fn update_style(
     mut text_edits: Query<
-        (&Interaction, &TextInputInactive, &mut BorderColor),
-        Or<(Changed<Interaction>, Changed<TextInputInactive>)>,
+        (&Focused, &Hovered, &mut BorderColor),
+        Or<(Changed<Focused>, Changed<Hovered>)>,
     >,
 ) {
-    for (interaction, inactive, mut border_color) in &mut text_edits {
-        *border_color = match (interaction, inactive.0) {
-            (Interaction::Pressed, _) | (Interaction::None, false) => ACTIVE.into(),
-            (Interaction::Hovered, false) => HOWERED_ACTIVE.into(),
-            (Interaction::Hovered, true) => HOWERED.into(),
-            (Interaction::None, true) => INACTIVE.into(),
+    for (focused, hovered, mut border_color) in &mut text_edits {
+        *border_color = match (**focused, hovered.get()) {
+            (true, true) => HOWERED_ACTIVE.into(),
+            (true, false) => ACTIVE.into(),
+            (false, true) => HOWERED.into(),
+            (false, false) => INACTIVE.into(),
         };
     }
-}
-
-fn activate(
-    mut trigger: On<Pointer<Click>>,
-    mut commands: Commands,
-    text_edits: Query<&TextInputInactive>,
-) {
-    let Ok(inactive) = text_edits.get(trigger.entity) else {
-        return;
-    };
-
-    trigger.propagate(false);
-    if inactive.0 {
-        commands
-            .entity(trigger.entity)
-            .insert(TextInputInactive(false));
-    }
-}
-
-fn update_focus(
-    insert: On<Insert, TextInputInactive>,
-    mut focus: ResMut<InputFocus>,
-    mut text_edits: Query<&mut TextInputInactive>,
-) {
-    let inactive = text_edits.get(insert.entity).unwrap();
-    if inactive.0 {
-        return;
-    }
-
-    if let Some(previous) = focus.get()
-        && let Ok(mut inactive) = text_edits.get_mut(previous)
-    {
-        inactive.0 = true;
-    }
-
-    debug!("activating `{}`", insert.entity);
-    focus.set(insert.entity, FocusCause::Pressed);
 }

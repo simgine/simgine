@@ -1058,6 +1058,7 @@ dependencies = [
  "bevy_transform",
  "bevy_ui",
  "bevy_ui_render",
+ "bevy_ui_widgets",
  "bevy_utils",
  "bevy_window",
  "bevy_winit",
@@ -1514,14 +1515,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_simple_text_input"
-version = "0.14.2"
-source = "git+https://github.com/rparrett/bevy_simple_text_input?branch=bevy-0.19#4cc10ab9e53b0a87df591b72b1f67574e6e2ac74"
-dependencies = [
- "bevy",
-]
-
-[[package]]
 name = "bevy_sprite"
 version = "0.19.0-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1764,6 +1757,30 @@ dependencies = [
  "derive_more",
  "indexmap",
  "tracing",
+]
+
+[[package]]
+name = "bevy_ui_widgets"
+version = "0.19.0-rc.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82793b5903f53e72034318907d4a708287678eb77b3ef720e0fe4a6b83cfa7ed"
+dependencies = [
+ "accesskit",
+ "bevy_a11y",
+ "bevy_app",
+ "bevy_camera",
+ "bevy_ecs",
+ "bevy_input",
+ "bevy_input_focus",
+ "bevy_log",
+ "bevy_math",
+ "bevy_picking",
+ "bevy_reflect",
+ "bevy_text",
+ "bevy_ui",
+ "bevy_window",
+ "parley",
+ "smol_str",
 ]
 
 [[package]]
@@ -5105,7 +5122,6 @@ dependencies = [
  "bevy_mod_outline",
  "bevy_replicon",
  "bevy_replicon_renet",
- "bevy_simple_text_input",
  "clap",
  "simgine_core",
  "simgine_ui",
@@ -5136,7 +5152,6 @@ dependencies = [
  "bevy",
  "bevy_enhanced_input",
  "bevy_replicon",
- "bevy_simple_text_input",
  "simgine_core",
  "trash",
 ]

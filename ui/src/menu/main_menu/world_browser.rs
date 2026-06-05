@@ -2,8 +2,7 @@ mod world_nodes;
 
 use std::net::SocketAddr;
 
-use bevy::{ecs::relationship::RelatedSpawner, prelude::*};
-use bevy_simple_text_input::TextInputValue;
+use bevy::{ecs::relationship::RelatedSpawner, prelude::*, text::EditableText};
 use simgine_core::{
     error_event::trigger_error,
     network::{Connect, DEFAULT_PORT},
@@ -103,7 +102,8 @@ fn create_dialog() -> impl Bundle {
         DespawnOnExit(MenuState::WorldBrowser),
         Children::spawn(SpawnWith(|parent: &mut RelatedSpawner<_>| {
             parent.spawn(dialog_title("Create world"));
-            let name_edit = parent.spawn(text_edit()).id();
+            let _name_edit = parent.spawn(text_edit("")).id();
+            let name_edit = parent.spawn(text_edit("")).id();
             parent.spawn((
                 Node {
                     align_self: AlignSelf::Center,
@@ -115,10 +115,10 @@ fn create_dialog() -> impl Bundle {
                     parent.spawn(dialog_button("Create")).observe(
                         move |_on: On<Pointer<Click>>,
                               mut commands: Commands,
-                              input_values: Query<&TextInputValue>| {
-                            let name = input_values.get(name_edit).unwrap();
+                              texts: Query<&EditableText>| {
+                            let text = texts.get(name_edit).unwrap();
                             commands.trigger(CreateWorld {
-                                name: name.0.clone(),
+                                name: text.value().to_string(),
                             });
                         },
                     );
@@ -136,20 +136,18 @@ fn join_dialog() -> impl Bundle {
             parent.spawn(dialog_title("Join game"));
             parent.spawn((Text::new("Address"), TextFont::from_font_size(NORMAL_TEXT)));
             let addr_edit = parent
-                .spawn((
-                    text_edit(),
-                    TextInputValue(format!("127.0.0.1:{DEFAULT_PORT}")),
-                ))
+                .spawn(text_edit(format!("127.0.0.1:{DEFAULT_PORT}")))
                 .id();
             let connect = move |_on: On<Pointer<Click>>,
                                 mut commands: Commands,
-                                input_values: Query<&TextInputValue>|
+                                texts: Query<&EditableText>|
                   -> Result<()> {
-                let text = input_values.get(addr_edit).unwrap();
+                let text = texts.get(addr_edit).unwrap();
                 let addr: SocketAddr = text
-                    .0
+                    .value()
+                    .to_string()
                     .parse()
-                    .map_err(|e| format!("invalid address {}: {e}", text.0))?;
+                    .map_err(|e| format!("invalid address {}: {e}", text.value()))?;
                 commands.trigger(Connect {
                     ip: addr.ip(),
                     port: addr.port(),

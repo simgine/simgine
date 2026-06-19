@@ -398,7 +398,7 @@ checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
 [[package]]
 name = "avian3d"
 version = "0.7.0-dev"
-source = "git+https://github.com/olukowski/avian#a3b0799fccb2eada60c494f7e967abf00ddec0c9"
+source = "git+https://github.com/olukowski/avian#5785f7e23a13a773d3bf3f502c255568bfb37fa6"
 dependencies = [
  "approx",
  "avian_derive",
@@ -421,9 +421,9 @@ dependencies = [
 [[package]]
 name = "avian_derive"
 version = "0.2.2"
-source = "git+https://github.com/olukowski/avian#a3b0799fccb2eada60c494f7e967abf00ddec0c9"
+source = "git+https://github.com/olukowski/avian#5785f7e23a13a773d3bf3f502c255568bfb37fa6"
 dependencies = [
- "proc-macro-error2",
+ "proc-macro-error3",
  "proc-macro2",
  "quote",
  "syn",
@@ -940,7 +940,7 @@ dependencies = [
 [[package]]
 name = "bevy_heavy"
 version = "0.5.0-dev"
-source = "git+https://github.com/olukowski/bevy_heavy#7ef6466bb66a3faa5df80e51e9293e0bfdc25566"
+source = "git+https://github.com/avianphysics/bevy_heavy#24bab45a1177290a23f68669f88a00965e1d8e47"
 dependencies = [
  "bevy_math",
  "bevy_reflect",
@@ -1309,7 +1309,7 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-time",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1682,7 +1682,7 @@ dependencies = [
 [[package]]
 name = "bevy_transform_interpolation"
 version = "0.5.0-dev"
-source = "git+https://github.com/olukowski/bevy_transform_interpolation#3dd6228442015d41e4554329216a459fff2e75a1"
+source = "git+https://github.com/Jondolf/bevy_transform_interpolation#ad8c2eaa3087079182649250bcabcb01267c9e93"
 dependencies = [
  "bevy",
 ]
@@ -2530,7 +2530,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2706,7 +2706,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2985,7 +2985,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -3014,7 +3014,7 @@ dependencies = [
 [[package]]
 name = "glam_matrix_extras"
 version = "0.3.0-dev"
-source = "git+https://github.com/olukowski/glam_matrix_extras#444ba270a3c27e40720999c0bf2512fda6048101"
+source = "git+https://github.com/Jondolf/glam_matrix_extras#588240df48ff7ce37292ccc70668c1bbd8b02190"
 dependencies = [
  "bevy_reflect",
  "glam 0.32.1",
@@ -3079,7 +3079,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 2.0.18",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -3451,7 +3451,7 @@ checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
 dependencies = [
  "hermit-abi",
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3840,7 +3840,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4572,22 +4572,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "proc-macro-error-attr2"
-version = "2.0.0"
+name = "proc-macro-error-attr3"
+version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96de42df36bb9bba5542fe9f1a054b8cc87e172759a1868aa05c1f3acc89dfc5"
+checksum = "34e4dd828515431dd6c4a030d26f7eaed7dd4778226e9d2bb968d65ca4ec3d4d"
 dependencies = [
  "proc-macro2",
  "quote",
 ]
 
 [[package]]
-name = "proc-macro-error2"
-version = "2.0.1"
+name = "proc-macro-error3"
+version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11ec05c52be0a07b08061f7dd003e7d7092e0472bc731b4af7bb1ef876109802"
+checksum = "5ee475e440453418ff1335189eddf7101ba502cd818ab7ae04209bc83aa925aa"
 dependencies = [
- "proc-macro-error-attr2",
+ "proc-macro-error-attr3",
  "proc-macro2",
  "quote",
  "syn",
@@ -4946,7 +4946,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.12.1",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -6254,7 +6254,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

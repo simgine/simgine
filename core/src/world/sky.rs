@@ -1,6 +1,9 @@
 use std::f32::consts::{FRAC_PI_2, TAU};
 
-use bevy::{light::light_consts::lux, prelude::*};
+use bevy::{
+    light::{Atmosphere, atmosphere::ScatteringMedium, light_consts::lux},
+    prelude::*,
+};
 
 use crate::{
     state::GameState,
@@ -12,7 +15,11 @@ pub(super) fn plugin(app: &mut App) {
         .add_systems(Update, move_planets.run_if(in_state(GameState::World)));
 }
 
-fn spawn(mut commands: Commands) {
+fn spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
+    commands.spawn(Atmosphere::earth(
+        scattering_mediums.add(ScatteringMedium::default()),
+    ));
+
     commands.spawn((
         Sun,
         DirectionalLight {

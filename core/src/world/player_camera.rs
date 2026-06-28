@@ -3,7 +3,7 @@ use std::f32::consts::FRAC_PI_2;
 use bevy::{
     anti_alias::taa::TemporalAntiAliasing,
     camera::Exposure,
-    light::{Atmosphere, AtmosphereEnvironmentMapLight, atmosphere::ScatteringMedium},
+    light::AtmosphereEnvironmentMapLight,
     pbr::{AtmosphereSettings, ScreenSpaceAmbientOcclusion},
     post_process::bloom::Bloom,
     prelude::*,
@@ -33,11 +33,8 @@ fn editor_spawn(mut commands: Commands) {
     commands.spawn(camera());
 }
 
-fn world_spawn(mut commands: Commands, mut scattering_mediums: ResMut<Assets<ScatteringMedium>>) {
+fn world_spawn(mut commands: Commands) {
     debug!("spawning world camera");
-    commands.spawn(Atmosphere::earth(
-        scattering_mediums.add(ScatteringMedium::default()),
-    ));
     commands.spawn((
         OrbitOrigin::default(),
         camera(),

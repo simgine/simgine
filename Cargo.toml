@@ -14,16 +14,16 @@ repository = "https://github.com/simgine/simgine"
 publish = false
 
 [workspace.dependencies]
-avian3d = { git = "https://github.com/olukowski/avian", default-features = false, features = [
+avian3d = { version = "0.7", default-features = false, features = [
   "3d",
   "parry-f32",
   "collider-from-mesh",
 ] }
-bevy = { version = "0.19.0-rc.2", default-features = false }
-bevy_enhanced_input = "0.26.0-rc.1"
+bevy = { version = "0.19", default-features = false }
+bevy_enhanced_input = "0.26"
 bevy_mod_outline = { git = "https://github.com/komadori/bevy_mod_outline" }
-bevy_replicon = "0.41.0-rc.1"
-bevy_replicon_renet = { git = "https://github.com/simgine/bevy_replicon_renet", branch = "bevy-0.19" }
+bevy_replicon = "0.41"
+bevy_replicon_renet = "0.17"
 smallvec = "1.15"
 simgine_core = { path = "core" }
 simgine_ui = { path = "ui" }

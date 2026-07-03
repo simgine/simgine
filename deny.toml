@@ -26,8 +26,8 @@ ignore = [
 [bans]
 skip-tree = ["bevy"]
 skip = [
-    { crate = "itertools@0.14.0", reason = "comes from avian" },
-    { crate = "itertools@0.15.0", reason = "comes from avian" },
+  { crate = "itertools@0.14.0", reason = "comes from avian" },
+  { crate = "itertools@0.15.0", reason = "comes from avian" },
 ]
 
 [sources]

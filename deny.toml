@@ -16,14 +16,19 @@ allow = [
 
 [advisories]
 ignore = [
-  # paste was announced as unmaintained with no explanation or replacement
-  # See: https://rustsec.org/advisories/RUSTSEC-2024-0436
-  # Bevy relies on this in multiple indirect ways, so ignoring it is the only feasible current solution
+  # All from Bevy, doesn't affect us.
   "RUSTSEC-2024-0436",
+  "RUSTSEC-2026-0192",
+  "RUSTSEC-2026-0195",
+  "RUSTSEC-2026-0194",
 ]
 
 [bans]
 skip-tree = ["bevy"]
+skip = [
+    { crate = "itertools@0.14.0", reason = "comes from avian" },
+    { crate = "itertools@0.15.0", reason = "comes from avian" },
+]
 
 [sources]
 unknown-git = "allow"

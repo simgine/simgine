@@ -1216,7 +1216,7 @@ checksum = "bff34eb29ff4b8a8688bc7299f14fb6b597461ca80fec03ed7d22939ab33e48f"
 [[package]]
 name = "bevy_mod_outline"
 version = "0.13.0"
-source = "git+https://github.com/komadori/bevy_mod_outline#8d990de7fa8ceaf11b8215c8414e47956082fba1"
+source = "git+https://github.com/komadori/bevy_mod_outline#61151fbdce82f40f06e19379457285b3f76f22c2"
 dependencies = [
  "bevy",
  "bitfield",
@@ -2992,7 +2992,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -3087,7 +3087,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 2.0.18",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]

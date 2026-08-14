@@ -19,8 +19,6 @@ ignore = [
   # All from Bevy, doesn't affect us.
   "RUSTSEC-2024-0436",
   "RUSTSEC-2026-0192",
-  "RUSTSEC-2026-0195",
-  "RUSTSEC-2026-0194",
 ]
 
 [bans]

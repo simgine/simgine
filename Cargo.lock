@@ -1486,9 +1486,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon"
-version = "0.42.2"
+version = "0.42.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5766f093d9727ec851afe7c861bd1ecc59ebb38bd36969787d70bdc7f110fb7"
+checksum = "d07671a5de948b8a01fe0f53fbab92934dc76c6e270820e80d2cdf0522f595fb"
 dependencies = [
  "bevy",
  "bitflags 2.13.1",
@@ -3039,7 +3039,7 @@ dependencies = [
  "vec_map",
  "wasm-bindgen",
  "web-sys",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]
@@ -3134,7 +3134,7 @@ dependencies = [
  "log",
  "presser",
  "thiserror 2.0.20",
- "windows 0.62.2",
+ "windows 0.56.0",
 ]
 
 [[package]]

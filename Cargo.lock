@@ -1486,9 +1486,30 @@ dependencies = [
 
 [[package]]
 name = "bevy_replicon"
-version = "0.42.2"
+version = "0.42.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5766f093d9727ec851afe7c861bd1ecc59ebb38bd36969787d70bdc7f110fb7"
+checksum = "d07671a5de948b8a01fe0f53fbab92934dc76c6e270820e80d2cdf0522f595fb"
+dependencies = [
+ "bevy",
+ "bitflags 2.13.1",
+ "bytes",
+ "deterministic-hash",
+ "log",
+ "petgraph",
+ "postcard",
+ "serde",
+ "smallbitvec",
+ "smallvec",
+ "typeid",
+ "variadics_please 2.0.0",
+ "xxhash-rust",
+]
+
+[[package]]
+name = "bevy_replicon"
+version = "0.43.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "335b5708921d2155f69f632d6e51bf49ef3b1ea9cf0f24a50ee2018cd95e4edc"
 dependencies = [
  "bevy",
  "bitflags 2.13.1",
@@ -1513,7 +1534,7 @@ checksum = "588fb4b5f7dc9df25674ff9482c28b0238cd46dab2e4189d418c545a7e9b96a8"
 dependencies = [
  "bevy",
  "bevy_renet",
- "bevy_replicon",
+ "bevy_replicon 0.42.3",
 ]
 
 [[package]]
@@ -5209,7 +5230,7 @@ dependencies = [
  "bevy",
  "bevy_enhanced_input",
  "bevy_mod_outline",
- "bevy_replicon",
+ "bevy_replicon 0.43.0",
  "bevy_replicon_renet",
  "clap",
  "simgine_core",
@@ -5224,7 +5245,7 @@ dependencies = [
  "bevy",
  "bevy_enhanced_input",
  "bevy_mod_outline",
- "bevy_replicon",
+ "bevy_replicon 0.43.0",
  "bevy_replicon_renet",
  "directories",
  "ron",
@@ -5240,7 +5261,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_enhanced_input",
- "bevy_replicon",
+ "bevy_replicon 0.43.0",
  "simgine_core",
  "trash",
 ]

@@ -145,19 +145,18 @@ func _generate_smooth_normals(source_vertices: PackedVector3Array) -> PackedVect
 
 		# Use the opposite winding from the render indices to produce
 		# outward-facing normals.
+		var edge_1 := source_vertices[i1] - source_vertices[i0]
+		var edge_2 := source_vertices[i2] - source_vertices[i0]
+		var edge_3 := source_vertices[i3] - source_vertices[i0]
 
 		# Triangle 1: 0, 1, 2.
-		var normal_1 := (source_vertices[i1] - source_vertices[i0]).cross(
-			source_vertices[i2] - source_vertices[i0]
-		)
+		var normal_1 := edge_1.cross(edge_2)
 		normals[i0] += normal_1
 		normals[i2] += normal_1
 		normals[i1] += normal_1
 
 		# Triangle 2: 0, 2, 3.
-		var normal_2 := (source_vertices[i2] - source_vertices[i0]).cross(
-			source_vertices[i3] - source_vertices[i0]
-		)
+		var normal_2 := edge_2.cross(edge_3)
 		normals[i0] += normal_2
 		normals[i3] += normal_2
 		normals[i2] += normal_2

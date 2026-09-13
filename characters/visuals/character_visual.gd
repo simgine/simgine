@@ -192,3 +192,10 @@ func get_left_modifier_suffix() -> StringName
 ## Returns the suffix used to reference the right value of a sided modifier.
 @abstract
 func get_right_modifier_suffix() -> StringName
+
+
+## Sets a modifier value.
+##
+## The node should be ready before calling this.
+@abstract
+func set_modifier(key: StringName, value: float) -> void

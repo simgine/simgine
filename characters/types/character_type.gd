@@ -1,4 +1,4 @@
-class_name Race
+class_name CharacterType
 extends Resource
 ## A playable race.
 ##
@@ -15,7 +15,7 @@ extends Resource
 ## Creates a character outside the scene tree.
 ##
 ## Returns null if the scene cannot be loaded or has an invalid root.
-func create_character() -> Character:
+func create() -> Character:
 	var scene := ResourceLoader.load(scene_path) as PackedScene
 	if not scene:
 		Log.error("Unable to load character scene '%s'", scene_path)
@@ -33,10 +33,10 @@ func create_character() -> Character:
 
 
 ## Returns list of all races from the project resources.
-static func get_available_races() -> Array[Race]:
+static func get_available() -> Array[CharacterType]:
 	const RACES_DIR := "res://characters/races"
 
-	var races: Array[Race] = []
+	var races: Array[CharacterType] = []
 	var entries := ResourceLoader.list_directory(RACES_DIR)
 	entries.sort()
 
@@ -44,10 +44,10 @@ static func get_available_races() -> Array[Race]:
 		if file_name.get_extension() != "tres":
 			continue
 
-		var race := ResourceLoader.load(RACES_DIR.path_join(file_name)) as Race
+		var race := ResourceLoader.load(RACES_DIR.path_join(file_name)) as CharacterType
 		if race:
 			races.append(race)
 		else:
-			Log.warn("Loaded resource '%s' is not a Race, skipping", file_name)
+			Log.warn("Loaded resource '%s' is not a CharacterType, skipping", file_name)
 
 	return races

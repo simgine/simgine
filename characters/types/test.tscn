@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://knl4ge1yyv5r"]
 
-[ext_resource type="PackedScene" uid="uid://ds0qx12afqy4m" path="res://characters/races/human.tscn" id="1_e211d"]
+[ext_resource type="PackedScene" uid="uid://ds0qx12afqy4m" path="res://characters/types/human.tscn" id="1_e211d"]
 [ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/visuals/look_item.gd" id="2_c4skc"]
 [ext_resource type="Resource" uid="uid://ca0nd50uxdas5" path="res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.tres" id="3_hw4yx"]
 [ext_resource type="Resource" uid="uid://bs4s8kk2p8ry2" path="res://characters/visuals/make_human/items/hair/ponytail01/ponytail01.tres" id="4_5aagr"]

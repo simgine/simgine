@@ -118,8 +118,8 @@ func _import(
 
 static func _parse_quad(parts: PackedStringArray, line_index: int) -> MHQuad:
 	var quad := MHQuad.new()
-	for i in range(1, parts.size()):
-		var corner := parts[i]
+	for index in range(1, parts.size()):
+		var corner := parts[index]
 		var items := corner.split("/")
 		if items.size() != 2:
 			push_error("Unsupported corner at %d: '%s'" % [line_index, corner])

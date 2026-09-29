@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="Race" format=3 uid="uid://bwalqoogwgpvt"]
+[gd_resource type="Resource" script_class="CharacterType" format=3 uid="uid://bwalqoogwgpvt"]
 
 [ext_resource type="Script" uid="uid://dk3fnjdvdsdvd" path="res://characters/types/character_type.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 name = "Human"
-scene_path = "res://characters/races/human.tscn"
+scene_path = "uid://ds0qx12afqy4m"

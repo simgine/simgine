@@ -34,17 +34,17 @@ func create() -> Character:
 
 ## Returns list of all races from the project resources.
 static func get_available() -> Array[CharacterType]:
-	const RACES_DIR := "res://characters/races"
+	const TYPES_DIR := "res://characters/types"
 
 	var races: Array[CharacterType] = []
-	var entries := ResourceLoader.list_directory(RACES_DIR)
+	var entries := ResourceLoader.list_directory(TYPES_DIR)
 	entries.sort()
 
 	for file_name in entries:
 		if file_name.get_extension() != "tres":
 			continue
 
-		var race := ResourceLoader.load(RACES_DIR.path_join(file_name)) as CharacterType
+		var race := ResourceLoader.load(TYPES_DIR.path_join(file_name)) as CharacterType
 		if race:
 			races.append(race)
 		else:

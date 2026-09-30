@@ -30,6 +30,7 @@ theme_override_constants/margin_bottom = 24
 
 [node name="Content" type="Control" parent="UI" unique_id=1664694898]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="FamilyList" type="HBoxContainer" parent="UI/Content" unique_id=1943292476]
 layout_mode = 1

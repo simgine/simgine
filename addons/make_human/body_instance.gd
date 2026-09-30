@@ -260,6 +260,7 @@ func _rebuild_morphed_vertices() -> void:
 	body.macro_registry.apply(morphed_vertices, _modifiers)
 	body.target_registry.apply(morphed_vertices, _modifiers)
 	_move_to_ground()
+	_apply_scale()
 
 
 func _move_to_ground() -> void:
@@ -274,6 +275,13 @@ func _move_to_ground() -> void:
 	# Move all geometry, including helpers since they affect proxies.
 	for vertex_index in morphed_vertices.size():
 		morphed_vertices[vertex_index].y -= lowest_y
+
+
+func _apply_scale() -> void:
+	## MakeHuman base mesh coordinates are in decimeters (1 unit = 0.1 m).
+	const SCALE_TO_METERS := 0.1
+	for vertex_index in range(morphed_vertices.size()):
+		morphed_vertices[vertex_index] *= SCALE_TO_METERS
 
 
 func _rebuild_skeleton() -> void:

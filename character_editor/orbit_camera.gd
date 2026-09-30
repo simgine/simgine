@@ -8,11 +8,11 @@ const MAX_PITCH := deg_to_rad(80.0)
 @export var smoothing_speed := 12.0
 
 @export var min_distance := 0.5
-@export var max_distance := 15.0
+@export var max_distance := 2.0
 
 var _yaw := 0.0
 var _pitch := deg_to_rad(15.0)
-var _distance := 3.0
+var _distance := 2.0
 
 var _target_yaw := _yaw
 var _target_pitch := _pitch

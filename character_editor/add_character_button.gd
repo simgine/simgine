@@ -8,14 +8,16 @@ var _types: Array[CharacterType]
 
 func _ready() -> void:
 	super()
+	get_popup().id_pressed.connect(_emit_type_selected)
 
-	_types = CharacterType.get_available()
+
+## Fills the menu with the given character types.
+func set_types(types: Array[CharacterType]) -> void:
+	_types = types
 	for index in _types.size():
 		var type_name := _types[index].name
 		get_popup().add_item(type_name, index)
 		Log.debug("Added '%s' to menu", type_name)
-
-	get_popup().id_pressed.connect(_emit_type_selected)
 
 
 func _emit_type_selected(id: int) -> void:

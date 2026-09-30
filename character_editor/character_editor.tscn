@@ -1,11 +1,13 @@
-[gd_scene format=3 uid="uid://c05l4emlmyt7k"]
+[gd_scene format=3 uid="uid://bxne8g80d42bv"]
 
 [ext_resource type="Script" uid="uid://4rctuhb58qnu" path="res://character_editor/world.gd" id="1_o28u3"]
+[ext_resource type="Script" uid="uid://f67r17aofeb6" path="res://character_editor/character_editor.gd" id="1_ubl36"]
 [ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://character_editor/add_character_button.gd" id="2"]
 [ext_resource type="Script" uid="uid://dsva1tcwobly" path="res://character_editor/family_list.gd" id="3"]
 [ext_resource type="Script" uid="uid://br4nnis7qmest" path="res://character_editor/orbit_camera.gd" id="4_g6vct"]
 
 [node name="CharacterEditor" type="Node" unique_id=165775639]
+script = ExtResource("1_ubl36")
 
 [node name="World" type="Node3D" parent="." unique_id=1648785725]
 script = ExtResource("1_o28u3")
@@ -43,9 +45,11 @@ grow_vertical = 0
 script = ExtResource("3")
 
 [node name="AddCharacter" type="MenuButton" parent="UI/Content/FamilyList" unique_id=445914976]
+unique_name_in_owner = true
 layout_mode = 2
 text = "+"
 script = ExtResource("2")
 
 [connection signal="character_spawned" from="World" to="UI/Content/FamilyList" method="_create_button"]
-[connection signal="type_selected" from="UI/Content/FamilyList/AddCharacter" to="World" method="_spawn_character"]
+[connection signal="character_selected" from="UI/Content/FamilyList" to="World" method="set_selected_character"]
+[connection signal="type_selected" from="UI/Content/FamilyList/AddCharacter" to="World" method="spawn_character"]

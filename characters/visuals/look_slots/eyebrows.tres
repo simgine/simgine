@@ -1,7 +1,0 @@
-[gd_resource type="Resource" script_class="LookSlot" format=3 uid="uid://c8qdbjvc8foto"]
-
-[ext_resource type="Script" uid="uid://v4rpudpmubdt" path="res://characters/visuals/look_slots/look_slot.gd" id="1_n6iyp"]
-
-[resource]
-script = ExtResource("1_n6iyp")
-metadata/_custom_type_script = "uid://v4rpudpmubdt"

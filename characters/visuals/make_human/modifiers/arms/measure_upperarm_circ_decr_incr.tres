@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="BodyModifier" format=3 uid="uid://sfm5705ffiyfx"]
+[gd_resource type="Resource" script_class="BodyModifier" format=3 uid="uid://cx0oushe5phev"]
 
-[ext_resource type="Resource" uid="uid://opa1jrkzimz5y" path="res://characters/visuals/modifier_categories/arms.tres" id="1_category"]
-[ext_resource type="Script" uid="uid://dycl2kaao42bx" path="res://characters/visuals/body_modifier.gd" id="2_modifier"]
+[ext_resource type="Resource" uid="uid://c32frls8s1evo" path="res://characters/modifier_categories/arms.tres" id="1_category"]
+[ext_resource type="Script" uid="uid://dycl2kaao42bx" path="res://characters/body_modifier.gd" id="2_modifier"]
 
 [resource]
 script = ExtResource("2_modifier")

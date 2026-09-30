@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="ModifierCategory" format=3 uid="uid://bpy6yhu8fvjuw"]
-
-[ext_resource type="Script" uid="uid://cec6c3npidie6" path="res://characters/visuals/modifier_categories/modifier_category.gd" id="1_category"]
-
-[resource]
-script = ExtResource("1_category")
-name = "Breast"
-metadata/_custom_type_script = "uid://cec6c3npidie6"

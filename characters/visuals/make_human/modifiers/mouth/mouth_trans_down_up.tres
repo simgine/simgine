@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="BodyModifier" format=3 uid="uid://sc78x5gixsx9r"]
+[gd_resource type="Resource" script_class="BodyModifier" format=3 uid="uid://cvlrlwrio0g8p"]
 
-[ext_resource type="Resource" uid="uid://xvsy0d043zrul" path="res://characters/visuals/modifier_categories/mouth.tres" id="1_category"]
-[ext_resource type="Script" uid="uid://dycl2kaao42bx" path="res://characters/visuals/body_modifier.gd" id="2_modifier"]
+[ext_resource type="Resource" uid="uid://pdrg1impsjb0" path="res://characters/modifier_categories/mouth.tres" id="1_category"]
+[ext_resource type="Script" uid="uid://dycl2kaao42bx" path="res://characters/body_modifier.gd" id="2_modifier"]
 
 [resource]
 script = ExtResource("2_modifier")

@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="LookSlot" format=3 uid="uid://dpyv537stxsj1"]
+
+[ext_resource type="Script" uid="uid://v4rpudpmubdt" path="res://characters/look_slots/look_slot.gd" id="1_mk5vn"]
+
+[resource]
+script = ExtResource("1_mk5vn")
+metadata/_custom_type_script = "uid://v4rpudpmubdt"

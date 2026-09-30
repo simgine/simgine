@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="LookItem" format=3 uid="uid://pww8kxjbh0jm"]
 
-[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/visuals/look_item.gd" id="1_xlx5n"]
-[ext_resource type="Resource" uid="uid://dpyv537stxsj1" path="res://characters/visuals/look_slots/skin.tres" id="2_tnqq6"]
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_xlx5n"]
+[ext_resource type="Resource" uid="uid://dpyv537stxsj1" path="res://characters/look_slots/skin.tres" id="2_tnqq6"]
 
 [resource]
 script = ExtResource("1_xlx5n")

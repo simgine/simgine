@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://c05l4emlmyt7k"]
+
+[ext_resource type="Script" uid="uid://4rctuhb58qnu" path="res://character_editor/world.gd" id="1_o28u3"]
+[ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://character_editor/add_character_button.gd" id="2"]
+[ext_resource type="Script" uid="uid://dsva1tcwobly" path="res://character_editor/family_list.gd" id="3"]
+[ext_resource type="Script" uid="uid://br4nnis7qmest" path="res://character_editor/orbit_camera.gd" id="4_g6vct"]
+
+[node name="CharacterEditor" type="Node" unique_id=165775639]
+
+[node name="World" type="Node3D" parent="." unique_id=1648785725]
+script = ExtResource("1_o28u3")
+
+[node name="Light" type="DirectionalLight3D" parent="World" unique_id=1588814314]
+transform = Transform3D(0.8253356, 0.47513026, -0.30507764, 0, 0.5403023, 0.841471, 0.5646425, -0.694496, 0.44593072, 0, 0, 0)
+
+[node name="Camera" type="Camera3D" parent="World" unique_id=786505628]
+current = true
+script = ExtResource("4_g6vct")
+
+[node name="UI" type="MarginContainer" parent="." unique_id=1674944528]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="Control" parent="UI" unique_id=1664694898]
+layout_mode = 2
+
+[node name="FamilyList" type="HBoxContainer" parent="UI/Content" unique_id=1943292476]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -8.0
+offset_right = 32.0
+grow_vertical = 0
+script = ExtResource("3")
+
+[node name="AddCharacter" type="MenuButton" parent="UI/Content/FamilyList" unique_id=445914976]
+layout_mode = 2
+text = "+"
+script = ExtResource("2")
+
+[connection signal="character_spawned" from="World" to="UI/Content/FamilyList" method="_create_button"]
+[connection signal="type_selected" from="UI/Content/FamilyList/AddCharacter" to="World" method="_spawn_character"]

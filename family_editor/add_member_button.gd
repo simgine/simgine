@@ -1,4 +1,4 @@
-class_name AddCharacterButton
+class_name AddMemberButton
 extends UpMenuButton
 
 signal type_selected(character_type: CharacterType)

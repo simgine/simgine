@@ -12,13 +12,13 @@ var current_member: Character:
 
 
 func create_member(character_type: CharacterType) -> void:
-	var character := character_type.create()
-	if not character:
+	var member := character_type.create()
+	if not member:
 		return
 
-	add_child(character)
-	Log.debug("Created character '%s'", character.name)
-	member_added.emit(character)
+	add_child(member)
+	Log.debug("Created member '%s'", member.name)
+	member_added.emit(member)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -27,15 +27,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		current_member.rotation.y += mouse_motion.relative.x * rotate_speed
 
 
-func set_current_member(character: Character) -> void:
-	if current_member == character:
+func set_current_member(member: Character) -> void:
+	assert(member.get_parent() == self)
+
+	if current_member == member:
 		return
 
 	if current_member:
 		current_member.visible = false
 
-	current_member = character
-
-	if character:
-		assert(character.get_parent() == self)
-		character.visible = true
+	current_member = member
+	current_member.visible = true

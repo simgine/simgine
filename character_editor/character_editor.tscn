@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://f67r17aofeb6" path="res://character_editor/character_editor.gd" id="1_ubl36"]
 [ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://character_editor/add_character_button.gd" id="2"]
 [ext_resource type="Script" uid="uid://dsva1tcwobly" path="res://character_editor/family_list.gd" id="3"]
-[ext_resource type="Script" uid="uid://br4nnis7qmest" path="res://character_editor/orbit_camera.gd" id="4_g6vct"]
+[ext_resource type="Script" uid="uid://br4nnis7qmest" path="res://character_editor/camera.gd" id="4_g6vct"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
 
@@ -18,6 +18,7 @@ script = ExtResource("1_o28u3")
 transform = Transform3D(0.8253356, 0.47513026, -0.30507764, 0, 0.5403023, 0.841471, 0.5646425, -0.694496, 0.44593072, 0, 0, 0)
 
 [node name="Camera" type="Camera3D" parent="World" unique_id=786505628]
+transform = Transform3D(1, 0, 0, 0, 0.9659259, 0.25881907, 0, -0.25881907, 0.9659258, 0, 1.3, 2)
 current = true
 script = ExtResource("4_g6vct")
 

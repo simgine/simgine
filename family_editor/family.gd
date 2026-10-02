@@ -7,8 +7,7 @@ signal member_added(character: Character)
 ## The character currently shown on the scene.
 ##
 ## Setting it hides the previously active character.
-var current_member: Character:
-	set = set_current_member
+var _current_member: Character
 
 
 func create_member(character_type: CharacterType) -> void:
@@ -23,18 +22,18 @@ func create_member(character_type: CharacterType) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	var mouse_motion := event as InputEventMouseMotion
-	if current_member and mouse_motion and Input.is_action_pressed("rotate_character"):
-		current_member.rotation.y += mouse_motion.relative.x * rotate_speed
+	if _current_member and mouse_motion and Input.is_action_pressed("rotate_character"):
+		_current_member.rotation.y += mouse_motion.relative.x * rotate_speed
 
 
-func set_current_member(member: Character) -> void:
-	assert(member.get_parent() == self)
+func _set_current_member(index: int) -> void:
+	var member: Character = get_child(index)
 
-	if current_member == member:
+	if _current_member == member:
 		return
 
-	if current_member:
-		current_member.visible = false
+	if _current_member:
+		_current_member.visible = false
 
-	current_member = member
-	current_member.visible = true
+	_current_member = member
+	_current_member.visible = true

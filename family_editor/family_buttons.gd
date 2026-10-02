@@ -1,6 +1,6 @@
 extends HBoxContainer
 
-signal member_pressed(character: Character)
+signal button_pressed(index: int)
 
 var _group := ButtonGroup.new()
 
@@ -11,12 +11,14 @@ func _create_button(character: Character) -> void:
 	button.button_group = _group
 	button.toggle_mode = true
 	button.button_pressed = true
-	button.pressed.connect(member_pressed.emit.bind(character))
+	button.pressed.connect(_emit_button_pressed.bind(button))
 
 	# Insert as second-to-last, so the add button stays last.
 	add_child(button)
 	move_child(button, -2)
 
-	# Setting `button_pressed` programmatically doesn't emit `pressed`,
-	# so trigger the selection explicitly.
-	member_pressed.emit(character)
+	_emit_button_pressed(button)
+
+
+func _emit_button_pressed(button: Button) -> void:
+	button_pressed.emit(button.get_index())

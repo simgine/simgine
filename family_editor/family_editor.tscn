@@ -108,5 +108,5 @@ button_group = SubResource("ButtonGroup_ubl36")
 text = "NB"
 
 [connection signal="member_added" from="Family" to="UI/Content/FamilyButtons" method="_create_button"]
-[connection signal="member_pressed" from="UI/Content/FamilyButtons" to="Family" method="set_current_member"]
+[connection signal="button_pressed" from="UI/Content/FamilyButtons" to="Family" method="_set_current_member"]
 [connection signal="type_selected" from="UI/Content/FamilyButtons/AddMember" to="Family" method="create_member"]

@@ -5,9 +5,9 @@ signal button_pressed(index: int)
 var _group := ButtonGroup.new()
 
 
-func _create_button(character: Character) -> void:
+func _create_button(_character: Character) -> void:
 	var button := Button.new()
-	button.text = character.name
+	button.custom_minimum_size = Vector2(48, 48)
 	button.button_group = _group
 	button.toggle_mode = true
 	button.button_pressed = true

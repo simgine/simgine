@@ -13,16 +13,16 @@ func _ready() -> void:
 	_target_distance = position.z
 
 
-func _process(delta: float) -> void:
-	var weight := 1.0 - exp(-smoothing_speed * delta)
-	position.z = lerpf(position.z, _target_distance, weight)
-
-
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("camera_zoom_in"):
 		_zoom(-zoom_step)
 	elif event.is_action_pressed("camera_zoom_out"):
 		_zoom(zoom_step)
+
+
+func _process(delta: float) -> void:
+	var weight := 1.0 - exp(-smoothing_speed * delta)
+	position.z = lerpf(position.z, _target_distance, weight)
 
 
 func _zoom(delta: float) -> void:

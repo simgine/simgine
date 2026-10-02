@@ -1,6 +1,7 @@
 extends Node3D
 
 signal member_added(character: Character)
+signal current_member_changed(character: Character)
 
 @export var rotate_speed := 0.005
 
@@ -44,3 +45,12 @@ func _set_current_member(index: int) -> void:
 
 	_current_member = member
 	_current_member.visible = true
+	current_member_changed.emit(member)
+
+
+func _set_first_name(value: String) -> void:
+	_current_member.first_name = value
+
+
+func _set_last_name(value: String) -> void:
+	_current_member.last_name = value

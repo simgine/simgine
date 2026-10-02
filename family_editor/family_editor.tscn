@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://dxyi1sfnaxv8w" path="res://family_editor/family.gd" id="3_eg80o"]
 [ext_resource type="Script" uid="uid://dsva1tcwobly" path="res://family_editor/family_buttons.gd" id="4_l8kvl"]
 [ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://family_editor/add_member_button.gd" id="5_m6gdk"]
+[ext_resource type="Script" path="res://family_editor/profile.gd" id="6_profile"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
 
@@ -57,6 +58,7 @@ script = ExtResource("5_m6gdk")
 layout_mode = 0
 offset_right = 300.0
 offset_bottom = 115.0
+script = ExtResource("6_profile")
 
 [node name="Title" type="Label" parent="UI/Content/Profile" unique_id=1291411134]
 layout_mode = 2
@@ -73,11 +75,13 @@ layout_mode = 2
 text = "Name"
 
 [node name="FirstName" type="LineEdit" parent="UI/Content/Profile/NameRow" unique_id=1228595706]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "First Name"
 
 [node name="LastName" type="LineEdit" parent="UI/Content/Profile/NameRow" unique_id=533521698]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "Last Name"
@@ -110,4 +114,7 @@ text = "NB"
 [connection signal="member_added" from="Family" to="UI/Content/FamilyButtons" method="_create_button"]
 [connection signal="button_pressed" from="UI/Content/FamilyButtons" to="Family" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyButtons" to="Family" method="_remove_member"]
+[connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="set_character"]
+[connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="Family" method="_set_first_name"]
+[connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="Family" method="_set_last_name"]
 [connection signal="type_selected" from="UI/Content/FamilyButtons/AddMember" to="Family" method="_create_member"]

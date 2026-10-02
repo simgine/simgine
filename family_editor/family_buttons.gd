@@ -12,7 +12,10 @@ func _create_button(character: Character) -> void:
 	button.toggle_mode = true
 	button.button_pressed = true
 	button.pressed.connect(member_pressed.emit.bind(character))
+
+	# Insert as second-to-last, so the add button stays last.
 	add_child(button)
+	move_child(button, -2)
 
 	# Setting `button_pressed` programmatically doesn't emit `pressed`,
 	# so trigger the selection explicitly.

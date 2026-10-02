@@ -10,7 +10,7 @@ signal member_added(character: Character)
 var _current_member: Character
 
 
-func create_member(character_type: CharacterType) -> void:
+func _create_member(character_type: CharacterType) -> void:
 	var member := character_type.create()
 	if not member:
 		return

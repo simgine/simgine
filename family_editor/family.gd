@@ -26,6 +26,13 @@ func _create_member(character_type: CharacterType) -> void:
 	member_added.emit(member)
 
 
+func _remove_member(index: int) -> void:
+	var member: Character = get_child(index)
+	remove_child(member)
+	member.queue_free()
+	Log.debug("Removed member '%s'", member.name)
+
+
 func _set_current_member(index: int) -> void:
 	var member: Character = get_child(index)
 

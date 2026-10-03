@@ -18,7 +18,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _create_member(character_type: CharacterType) -> void:
-	Log.debug("Creating '%s'", character_type.name)
+	Log.info("Creating '%s'", character_type.name)
 	var member := character_type.create()
 	if not member:
 		return
@@ -29,7 +29,7 @@ func _create_member(character_type: CharacterType) -> void:
 
 func _remove_member(index: int) -> void:
 	var member: Character = get_child(index)
-	Log.debug("Removing '%s'", member.name)
+	Log.info("Removing '%s'", member.name)
 	remove_child(member)
 	member.queue_free()
 
@@ -43,7 +43,7 @@ func _set_current_member(index: int) -> void:
 	if _current_member:
 		_current_member.visible = false
 
-	Log.debug("Selecting '%s'", member.name)
+	Log.info("Selecting '%s'", member.name)
 	_current_member = member
 	_current_member.visible = true
 	current_member_changed.emit(member)

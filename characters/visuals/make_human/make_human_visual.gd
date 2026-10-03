@@ -173,5 +173,9 @@ func get_right_modifier_suffix() -> StringName:
 	return "/right"
 
 
+func get_modifier(key: StringName) -> float:
+	return body_instance.get_modifier(key)
+
+
 func set_modifier(key: StringName, value: float) -> void:
 	body_instance.set_modifier(key, value)

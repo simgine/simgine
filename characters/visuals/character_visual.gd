@@ -194,6 +194,13 @@ func get_left_modifier_suffix() -> StringName
 func get_right_modifier_suffix() -> StringName
 
 
+## Returns the current value of a modifier.
+##
+## The node should be ready before calling this.
+@abstract
+func get_modifier(key: StringName) -> float
+
+
 ## Sets a modifier value.
 ##
 ## The node should be ready before calling this.

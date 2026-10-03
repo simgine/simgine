@@ -111,7 +111,7 @@ func _slider(path: String, modifier_range: Vector2) -> Dictionary:
 func _get(property: StringName) -> Variant:
 	if property.begins_with(MODIFIERS_PREFIX):
 		var modifier_name := _property_to_modifier_name(property)
-		return _modifiers.get(modifier_name, body.get_default_modifier(modifier_name))
+		return get_modifier(modifier_name)
 
 	return null
 
@@ -169,6 +169,15 @@ func set_skeleton_node(value: MHSkeleton) -> void:
 		skeleton = NodePath()
 
 	_queue_rebuild(Dirty.SKELETON)
+
+
+## Returns the current value of a modifier, or its default if unset.
+func get_modifier(modifier_name: StringName) -> float:
+	if not body or not body.is_complete():
+		push_error("modifiers can only be read on instances with fully configured bodies")
+		return 0.0
+
+	return _modifiers.get(modifier_name, body.get_default_modifier(modifier_name))
 
 
 func set_modifier(modifier_name: StringName, value: float) -> void:

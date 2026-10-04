@@ -55,3 +55,8 @@ func _set_first_name(value: String) -> void:
 
 func _set_last_name(value: String) -> void:
 	_current_member.last_name = value
+
+
+func _set_modifier(key: StringName, value: float) -> void:
+	Log.debug("Changing modifier '%s' to %.2f", key, value)
+	_current_member.visual.set_modifier(key, value)

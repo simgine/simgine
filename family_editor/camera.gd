@@ -14,6 +14,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Ignore scroll if cursor is over any UI control.
+	if get_viewport().gui_get_hovered_control():
+		return
+
 	if event.is_action_pressed("camera_zoom_in"):
 		_zoom(-zoom_step)
 	elif event.is_action_pressed("camera_zoom_out"):

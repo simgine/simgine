@@ -181,6 +181,9 @@ func _get_modifiers_dir() -> String
 
 ## Attaches value parameters to the loaded modifier resources.
 ##
+## The returned parameters are grouped by category. I.e. all parameters of a
+## category are contiguous. The character editor relies on this ordering.
+##
 ## All matched modifiers will be removed from [param modifiers].
 @abstract
 func _resolve_modifier_params(

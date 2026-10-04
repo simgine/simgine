@@ -1,0 +1,82 @@
+[gd_scene format=3 uid="uid://dbf7qjx37ggv1"]
+
+[ext_resource type="Script" uid="uid://y1flg1vq7g0o" path="res://family_editor/modifier_box.gd" id="1_qlwdh"]
+
+[node name="ModifierBox" type="VBoxContainer" unique_id=1457052885]
+script = ExtResource("1_qlwdh")
+
+[node name="LabelBox" type="HBoxContainer" parent="." unique_id=499003895]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LabelBox" unique_id=1789436455]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Link" type="Button" parent="LabelBox" unique_id=149975140]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+tooltip_text = "Link left and right"
+toggle_mode = true
+button_pressed = true
+text = "🔗"
+
+[node name="SliderBox" type="HBoxContainer" parent="." unique_id=1337350600]
+layout_mode = 2
+
+[node name="Slider" type="HSlider" parent="SliderBox" unique_id=2022781329]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 0.01
+
+[node name="SpinBox" type="SpinBox" parent="SliderBox" unique_id=1666043528]
+unique_name_in_owner = true
+layout_mode = 2
+step = 0.01
+
+[node name="LeftSliderBox" type="HBoxContainer" parent="." unique_id=78788205]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="LeftSliderBox" unique_id=863134759]
+layout_mode = 2
+text = "L:"
+
+[node name="LeftSlider" type="HSlider" parent="LeftSliderBox" unique_id=1133702664]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 0.01
+
+[node name="LeftSpinBox" type="SpinBox" parent="LeftSliderBox" unique_id=1722531962]
+unique_name_in_owner = true
+layout_mode = 2
+step = 0.01
+
+[node name="RightSliderBox" type="HBoxContainer" parent="." unique_id=687644643]
+visible = false
+layout_mode = 2
+
+[node name="Label" type="Label" parent="RightSliderBox" unique_id=1457720885]
+layout_mode = 2
+text = "R:"
+
+[node name="RightSlider" type="HSlider" parent="RightSliderBox" unique_id=1099362178]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+step = 0.01
+
+[node name="RightSpinBox" type="SpinBox" parent="RightSliderBox" unique_id=1131040414]
+unique_name_in_owner = true
+layout_mode = 2
+step = 0.01
+
+[connection signal="toggled" from="LabelBox/Link" to="." method="_set_linked"]
+[connection signal="value_changed" from="SliderBox/SpinBox" to="." method="_emit_modifier_changed"]
+[connection signal="value_changed" from="LeftSliderBox/LeftSpinBox" to="." method="_emit_left_modifier_changed"]
+[connection signal="value_changed" from="RightSliderBox/RightSpinBox" to="." method="_emit_right_modifier_changed"]

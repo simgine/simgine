@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://c6bdjetiuolql"]
+
+[ext_resource type="Script" uid="uid://6r567gvsc1jh" path="res://family_editor/modifiers_tab.gd" id="1_mn52h"]
+
+[node name="ModifiersTab" type="ScrollContainer" unique_id=1577132112]
+script = ExtResource("1_mn52h")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1975148490]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="Content" type="VBoxContainer" parent="Margin" unique_id=1032363659]
+unique_name_in_owner = true
+layout_mode = 2

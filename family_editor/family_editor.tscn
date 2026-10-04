@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://dsva1tcwobly" path="res://family_editor/family_buttons.gd" id="4_l8kvl"]
 [ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://family_editor/add_member_button.gd" id="5_m6gdk"]
 [ext_resource type="Script" uid="uid://vb6sg6ro8f0o" path="res://family_editor/profile.gd" id="6_profile"]
+[ext_resource type="Script" uid="uid://b8tvb5236maib" path="res://family_editor/body_box.gd" id="7_modifiers"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
 
@@ -29,6 +30,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
@@ -111,10 +113,27 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_ubl36")
 text = "NB"
 
+[node name="Body" type="VBoxContainer" parent="UI/Content" unique_id=1872450931]
+layout_mode = 0
+anchor_bottom = 1.0
+offset_top = 120.0
+offset_right = 300.0
+offset_bottom = -60.0
+script = ExtResource("7_modifiers")
+
+[node name="Title" type="Label" parent="UI/Content/Body" unique_id=1394820157]
+layout_mode = 2
+text = "Body"
+
+[node name="Separator" type="HSeparator" parent="UI/Content/Body" unique_id=1728304965]
+layout_mode = 2
+
 [connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="set_character"]
+[connection signal="current_member_changed" from="Family" to="UI/Content/Body" method="set_character"]
 [connection signal="member_added" from="Family" to="UI/Content/FamilyButtons" method="_create_button"]
 [connection signal="button_pressed" from="UI/Content/FamilyButtons" to="Family" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyButtons" to="Family" method="_remove_member"]
 [connection signal="type_selected" from="UI/Content/FamilyButtons/AddMember" to="Family" method="_create_member"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="Family" method="_set_first_name"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="Family" method="_set_last_name"]
+[connection signal="modifier_changed" from="UI/Content/Body" to="Family" method="_set_modifier"]

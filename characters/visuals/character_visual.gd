@@ -163,6 +163,10 @@ static func _load_modifiers_recursively(
 			Log.warn("BodyModifier '%s' has an empty key, skipping", path)
 			continue
 
+		if not modifier.category:
+			Log.warn("BodyModifier '%s' has no category, skipping", path)
+			continue
+
 		if modifiers.has(modifier.key):
 			Log.warn("Duplicate BodyModifier key '%s' in '%s', skipping", modifier.key, path)
 			continue

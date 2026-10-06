@@ -36,7 +36,7 @@ func set_proxy(value: MHProxy) -> void:
 
 func rebuild_standalone() -> void:
 	if not proxy or not proxy.geometry:
-		_clear()
+		clear()
 		return
 
 	_set_surface(proxy.geometry.build_surface())
@@ -51,12 +51,19 @@ func rebuild_fitted(
 	skeleton_node: Skeleton3D,
 ) -> void:
 	if not proxy or not proxy.geometry:
-		_clear()
+		clear()
 		return
 
 	_set_surface(proxy.build_fitted_surface(body_vertices, skinning))
 	skin = body_skin
 	skeleton = get_path_to(skeleton_node)
+
+
+## Clears generated geometry and skeleton bindings without changing [member proxy].
+func clear() -> void:
+	mesh = null
+	skin = null
+	skeleton = NodePath()
 
 
 func _set_surface(arrays: Array) -> void:
@@ -77,9 +84,3 @@ func _set_surface(arrays: Array) -> void:
 
 	if proxy.material:
 		array_mesh.surface_set_material(0, proxy.material)
-
-
-func _clear() -> void:
-	mesh = null
-	skin = null
-	skeleton = NodePath()

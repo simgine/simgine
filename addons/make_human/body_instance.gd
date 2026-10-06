@@ -237,8 +237,7 @@ func _on_child_proxy_changed(instance: MHProxyInstance) -> void:
 	if _dirty & Dirty.CHILD_PROXIES:
 		return
 
-	if body and body.is_complete():
-		_rebuild_child_proxy(instance)
+	_update_child_proxy(instance)
 
 
 ## Schedules a deferred rebuild, combining multiple changes into a single update.
@@ -257,7 +256,7 @@ func _rebuild() -> void:
 		_dirty = Dirty.NONE
 		mesh = null
 		skin = null
-		_rebuild_child_proxies()
+		_update_child_proxies()
 		return
 
 	if not mesh:
@@ -287,7 +286,7 @@ func _rebuild() -> void:
 		_rebuild_surface()
 
 	if _dirty & Dirty.CHILD_PROXIES:
-		_rebuild_child_proxies()
+		_update_child_proxies()
 
 	_dirty = Dirty.NONE
 
@@ -390,14 +389,18 @@ func _rebuild_surface() -> void:
 	array_mesh.surface_set_name(0, "Body")
 
 
-func _rebuild_child_proxies() -> void:
+func _update_child_proxies() -> void:
 	for child in get_children():
 		var instance := child as MHProxyInstance
 		if instance:
-			_rebuild_child_proxy(instance)
+			_update_child_proxy(instance)
 
 
-func _rebuild_child_proxy(instance: MHProxyInstance) -> void:
+func _update_child_proxy(instance: MHProxyInstance) -> void:
+	if not body or not body.is_complete():
+		instance.clear()
+		return
+
 	var skinning: MHSkinning
 	if instance.proxy and instance.proxy.geometry:
 		skinning = body.get_proxy_skinning(instance.proxy)

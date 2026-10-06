@@ -10,7 +10,7 @@
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
 
-[node name="CharacterEditor" type="Node" unique_id=165775639]
+[node name="FamilyEditor" type="Node" unique_id=165775639]
 script = ExtResource("1_c2sgl")
 
 [node name="Light" type="DirectionalLight3D" parent="." unique_id=1588814314]

@@ -72,7 +72,7 @@ func add_look_item(item: LookItem) -> void:
 
 
 func remove_look_item(item: LookItem) -> void:
-	Log.debug("Removing %s", item)
+	Log.debug("Removing '%s'", item)
 	_look.erase(item)
 	_detach_item(item)
 

@@ -9,7 +9,7 @@ var _removal_allowed := false
 
 
 func _create_button(_character: Character) -> void:
-	const MEMBER_BUTTON := preload("res://family_editor/member_button.tscn")
+	const MEMBER_BUTTON := preload("res://family_editor/members/member_button.tscn")
 	var button: MemberButton = MEMBER_BUTTON.instantiate()
 	button.button_group = _group
 	button.pressed.connect(_emit_button_pressed.bind(button))

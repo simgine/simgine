@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://moyikf4q2rs5"]
 
-[ext_resource type="Script" uid="uid://b5funy2uetpsm" path="res://family_editor/member_button.gd" id="1"]
+[ext_resource type="Script" uid="uid://b5funy2uetpsm" path="res://family_editor/members/member_button.gd" id="1"]
 
 [node name="MemberButton" type="Button" unique_id=278841506]
 custom_minimum_size = Vector2(48, 48)

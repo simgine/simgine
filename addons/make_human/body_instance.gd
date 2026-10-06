@@ -260,6 +260,10 @@ func _rebuild() -> void:
 		_rebuild_child_proxies()
 		return
 
+	if not mesh:
+		# Rebuild all derived state after an incomplete body becomes complete.
+		_dirty |= Dirty.ALL
+
 	if _dirty & Dirty.MACROS:
 		_rebuild_macro_vertices()
 

@@ -2,10 +2,8 @@ extends HBoxContainer
 
 signal button_pressed(index: int)
 signal button_removed(index: int)
-signal removal_allowed_changed(allowed: bool)
 
 var _group := ButtonGroup.new()
-var _removal_allowed := false
 
 
 func _create_button(_character: Character) -> void:
@@ -14,7 +12,6 @@ func _create_button(_character: Character) -> void:
 	button.button_group = _group
 	button.pressed.connect(_emit_button_pressed.bind(button))
 	button.remove_pressed.connect(_remove_button.bind(button))
-	removal_allowed_changed.connect(button.set_removal_allowed)
 
 	# Insert as second-to-last, so the add button stays last.
 	add_child(button)
@@ -22,15 +19,13 @@ func _create_button(_character: Character) -> void:
 
 	button.press()
 
-	# Set the initial because the signal only fires on change.
-	button.set_removal_allowed(_removal_allowed)
 	_update_removal_allowed()
 
 
 func _remove_button(button: MemberButton) -> void:
 	var index := button.get_index()
 	remove_child(button)
-	removal_allowed_changed.disconnect(button.set_removal_allowed)
+
 	_update_removal_allowed()
 	button_removed.emit(index)
 
@@ -46,10 +41,11 @@ func _remove_button(button: MemberButton) -> void:
 
 ## A member can only be removed when there is more than one.
 func _update_removal_allowed() -> void:
-	var allowed := _get_member_count() > 1
-	if allowed != _removal_allowed:
-		_removal_allowed = allowed
-		removal_allowed_changed.emit(allowed)
+	var member_count := _get_member_count()
+	var allowed := member_count > 1
+	for index in member_count:
+		var button: MemberButton = get_child(index)
+		button.set_removal_allowed(allowed)
 
 
 func _get_member_count() -> int:

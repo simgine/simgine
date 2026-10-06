@@ -86,11 +86,15 @@ func make_mask_conservative(mask: PackedByteArray) -> void:
 ## Builds arrays for an [ArrayMesh] surface.
 ##
 ## Uses [member vertices] when [param source_vertices] is empty.
+##
 ## If [param mask] is provided, masked faces are excluded from the index array.
+## This requires passing [param filtered_indices] produced by [method filter_indices],
+## which can be cached across calls with the same mask.
 func build_surface(
 	source_vertices: PackedVector3Array = [],
 	skinning: MHSkinning = null,
 	mask: PackedByteArray = [],
+	filtered_indices: PackedInt32Array = [],
 ) -> Array:
 	if not source_vertices:
 		source_vertices = vertices
@@ -122,7 +126,8 @@ func build_surface(
 	arrays[Mesh.ARRAY_TEX_UV] = topology.uvs
 
 	if mask:
-		arrays[Mesh.ARRAY_INDEX] = _filter_indices(mask)
+		assert(filtered_indices)
+		arrays[Mesh.ARRAY_INDEX] = filtered_indices
 	else:
 		arrays[Mesh.ARRAY_INDEX] = topology.indices
 
@@ -231,7 +236,8 @@ func _get_or_create_vertex(
 	return render_index
 
 
-func _filter_indices(mask: PackedByteArray) -> PackedInt32Array:
+## Returns the [member topology] indices with masked faces removed.
+func filter_indices(mask: PackedByteArray) -> PackedInt32Array:
 	var indices: PackedInt32Array
 	for quad_index in quads.size():
 		var quad := quads[quad_index]

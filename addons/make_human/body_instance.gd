@@ -27,6 +27,13 @@ var _mask: PackedByteArray
 ## Delete mask transferred from [member _mask] to [member proxy] geometry.
 var _proxy_mask: PackedByteArray
 
+## Triangle indices for the current surface with masked faces removed.
+##
+## Derived from [member _mask] (or [member _proxy_mask] when [member proxy] is
+## set) and rebuilt only when the mask changes, so vertex-only updates reuse it
+## instead of re-filtering every quad on each slider drag.
+var _filtered_indices: PackedInt32Array
+
 enum Dirty {
 	NONE = 0,
 	VERTICES = 1 << 0,
@@ -252,6 +259,7 @@ func _rebuild() -> void:
 
 	if _dirty & (Dirty.PROXY | Dirty.MASK):
 		_rebuild_proxy_mask()
+		_rebuild_filtered_indices()
 
 	if _dirty & Dirty.SURFACE:
 		_rebuild_surface()
@@ -319,6 +327,13 @@ func _rebuild_proxy_mask() -> void:
 		proxy.transfer_delete_mask(_mask, _proxy_mask)
 
 
+func _rebuild_filtered_indices() -> void:
+	if proxy and proxy.geometry:
+		_filtered_indices = proxy.geometry.filter_indices(_proxy_mask)
+	else:
+		_filtered_indices = body.geometry.filter_indices(_mask)
+
+
 func _rebuild_surface() -> void:
 	var array_mesh := mesh as ArrayMesh
 	if not array_mesh:
@@ -328,9 +343,19 @@ func _rebuild_surface() -> void:
 	var arrays: Array
 	if proxy:
 		var proxy_skinning := body.get_proxy_skinning(proxy)
-		arrays = proxy.build_fitted_surface(morphed_vertices, proxy_skinning, _proxy_mask)
+		arrays = proxy.build_fitted_surface(
+			morphed_vertices,
+			proxy_skinning,
+			_proxy_mask,
+			_filtered_indices,
+		)
 	else:
-		arrays = body.geometry.build_surface(morphed_vertices, body.skinning, _mask)
+		arrays = body.geometry.build_surface(
+			morphed_vertices,
+			body.skinning,
+			_mask,
+			_filtered_indices,
+		)
 
 	array_mesh.clear_surfaces()
 	array_mesh.add_surface_from_arrays(

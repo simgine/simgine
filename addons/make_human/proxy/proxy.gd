@@ -109,9 +109,10 @@ func build_fitted_surface(
 	body_vertices: PackedVector3Array,
 	skinning: MHSkinning = null,
 	mask: PackedByteArray = [],
+	filtered_indices: PackedInt32Array = [],
 ) -> Array:
 	var proxy_vertices := _fit_vertices(body_vertices)
-	return geometry.build_surface(proxy_vertices, skinning, mask)
+	return geometry.build_surface(proxy_vertices, skinning, mask, filtered_indices)
 
 
 ## Reconstructs proxy vertex positions for the given body vertices.

@@ -45,7 +45,7 @@ func set_vertex_groups(value: MHVertexGroups) -> void:
 		return
 
 	vertex_groups = value
-	body_changed.emit(MHBodyInstance.Dirty.VERTICES)
+	body_changed.emit(MHBodyInstance.Dirty.VERTEX_GROUPS)
 
 
 func set_target_registry(value: MHTargetRegistry) -> void:
@@ -53,7 +53,7 @@ func set_target_registry(value: MHTargetRegistry) -> void:
 		return
 
 	target_registry = value
-	body_changed.emit(MHBodyInstance.Dirty.VERTICES)
+	body_changed.emit(MHBodyInstance.Dirty.TARGETS)
 
 
 func set_macro_registry(value: MHMacroRegistry) -> void:
@@ -61,7 +61,7 @@ func set_macro_registry(value: MHMacroRegistry) -> void:
 		return
 
 	macro_registry = value
-	body_changed.emit(MHBodyInstance.Dirty.VERTICES)
+	body_changed.emit(MHBodyInstance.Dirty.MACROS)
 
 
 func set_rig(value: MHRig) -> void:
@@ -97,14 +97,19 @@ func is_complete() -> bool:
 	return geometry and vertex_groups and target_registry and macro_registry and rig and rig_weights
 
 
-func get_default_modifier(modifier_name: StringName) -> float:
+func get_modifier_info(modifier_name: StringName) -> ModifierInfo:
+	var info := ModifierInfo.new()
 	if macro_registry.macrotargets.has(modifier_name):
-		return MHMacroRegistry.DEFAULT_VALUE
+		info.default_value = MHMacroRegistry.DEFAULT_VALUE
+		info.is_macro = true
+	elif modifier_name in MHMacroRegistry.RACES:
+		info.default_value = MHMacroRegistry.DEFAULT_RACE_VALUE
+		info.is_macro = true
+	else:
+		info.default_value = MHTargetRegistry.DEFAULT_VALUE
+		info.is_macro = false
 
-	if modifier_name in MHMacroRegistry.RACES:
-		return MHMacroRegistry.DEFAULT_RACE_VALUE
-
-	return MHTargetRegistry.DEFAULT_VALUE
+	return info
 
 
 func get_proxy_skinning(proxy: MHProxy) -> MHSkinning:
@@ -118,3 +123,8 @@ func get_proxy_skinning(proxy: MHProxy) -> MHSkinning:
 		# https://github.com/godotengine/godot/pull/122655
 
 	return proxy_skinning
+
+
+class ModifierInfo:
+	var default_value: float
+	var is_macro: bool

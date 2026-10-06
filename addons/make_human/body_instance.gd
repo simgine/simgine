@@ -16,7 +16,7 @@ const MODIFIERS_PREFIX := "modifiers/"
 ## Body shape modifier values.
 @export_storage var _modifiers: Dictionary[StringName, float]
 
-## Body vertices after applying the current modifier values.
+## Body vertices after applying all modifiers, scaled and moved to ground level.
 ##
 ## Stored to fit [member MHProxy.geometry] to the morphed body.
 var morphed_vertices: PackedVector3Array
@@ -34,14 +34,25 @@ var _proxy_mask: PackedByteArray
 ## instead of re-filtering every quad on each slider drag.
 var _filtered_indices: PackedInt32Array
 
+## Base vertices with macro modifiers applied, before target modifiers and scaling.
+##
+## The macro step is expensive, so caching it lets us skip reapplying
+## macro modifiers when only regular target modifiers change.
+## See [member morphed_vertices] for the scaled vertices with all modifiers applied.
+var _macro_vertices: PackedVector3Array
+
 enum Dirty {
 	NONE = 0,
-	VERTICES = 1 << 0,
-	MASK = 1 << 1,
-	RIG = 1 << 2,
-	WEIGHTS = 1 << 3,
-	SKELETON = 1 << 4,
-	PROXY = 1 << 5,
+	MACROS = 1 << 0,
+	TARGETS = 1 << 1,
+	VERTEX_GROUPS = 1 << 2,
+	MASK = 1 << 3,
+	RIG = 1 << 4,
+	WEIGHTS = 1 << 5,
+	SKELETON = 1 << 6,
+	PROXY = 1 << 7,
+	MORPHS = MACROS | TARGETS,
+	VERTICES = MORPHS | VERTEX_GROUPS,
 	CHILD_PROXIES = VERTICES | RIG | WEIGHTS | SKELETON,
 	SURFACE = VERTICES | MASK | RIG | WEIGHTS | PROXY,
 	ALL = SURFACE | SKELETON,
@@ -184,7 +195,8 @@ func get_modifier(modifier_name: StringName) -> float:
 		push_error("modifiers can only be read on instances with fully configured bodies")
 		return 0.0
 
-	return _modifiers.get(modifier_name, body.get_default_modifier(modifier_name))
+	var info := body.get_modifier_info(modifier_name)
+	return _modifiers.get(modifier_name, info.default_value)
 
 
 func set_modifier(modifier_name: StringName, value: float) -> void:
@@ -192,13 +204,13 @@ func set_modifier(modifier_name: StringName, value: float) -> void:
 		push_error("modifiers can only be set on instances with fully configured bodies")
 		return
 
-	var default := body.get_default_modifier(modifier_name)
-	if is_equal_approx(value, default):
+	var info := body.get_modifier_info(modifier_name)
+	if is_equal_approx(value, info.default_value):
 		_modifiers.erase(modifier_name)
 	else:
 		_modifiers[modifier_name] = value
 
-	_queue_rebuild(Dirty.VERTICES)
+	_queue_rebuild(Dirty.MACROS if info.is_macro else Dirty.TARGETS)
 
 
 func _on_child_entered_tree(child: Node) -> void:
@@ -248,8 +260,14 @@ func _rebuild() -> void:
 		_rebuild_child_proxies()
 		return
 
-	if _dirty & Dirty.VERTICES:
+	if _dirty & Dirty.MACROS:
+		_rebuild_macro_vertices()
+
+	if _dirty & Dirty.MORPHS:
 		_rebuild_morphed_vertices()
+
+	if _dirty & Dirty.VERTICES:
+		_move_to_ground()
 
 	if _dirty & (Dirty.VERTICES | Dirty.RIG | Dirty.SKELETON):
 		_rebuild_skeleton()
@@ -270,14 +288,21 @@ func _rebuild() -> void:
 	_dirty = Dirty.NONE
 
 
+func _rebuild_macro_vertices() -> void:
+	_macro_vertices.clear()
+	_macro_vertices.append_array(body.geometry.vertices)
+	body.macro_registry.apply(_macro_vertices, _modifiers)
+
+
 func _rebuild_morphed_vertices() -> void:
 	morphed_vertices.clear()
-	morphed_vertices.append_array(body.geometry.vertices)
-
-	body.macro_registry.apply(morphed_vertices, _modifiers)
+	morphed_vertices.append_array(_macro_vertices)
 	body.target_registry.apply(morphed_vertices, _modifiers)
-	_move_to_ground()
-	_apply_scale()
+
+	# MakeHuman base mesh coordinates are in decimeters (1 unit = 0.1 m).
+	const SCALE_TO_METERS := 0.1
+	for vertex_index in range(morphed_vertices.size()):
+		morphed_vertices[vertex_index] *= SCALE_TO_METERS
 
 
 func _move_to_ground() -> void:
@@ -292,13 +317,6 @@ func _move_to_ground() -> void:
 	# Move all geometry, including helpers since they affect proxies.
 	for vertex_index in morphed_vertices.size():
 		morphed_vertices[vertex_index].y -= lowest_y
-
-
-func _apply_scale() -> void:
-	## MakeHuman base mesh coordinates are in decimeters (1 unit = 0.1 m).
-	const SCALE_TO_METERS := 0.1
-	for vertex_index in range(morphed_vertices.size()):
-		morphed_vertices[vertex_index] *= SCALE_TO_METERS
 
 
 func _rebuild_skeleton() -> void:

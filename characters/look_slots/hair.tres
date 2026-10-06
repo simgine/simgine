@@ -4,4 +4,5 @@
 
 [resource]
 script = ExtResource("1_qygnx")
+name = "Hair"
 metadata/_custom_type_script = "uid://v4rpudpmubdt"

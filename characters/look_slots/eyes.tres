@@ -4,4 +4,6 @@
 
 [resource]
 script = ExtResource("1_ukwmk")
+name = "Eyes"
+permanent = true
 metadata/_custom_type_script = "uid://v4rpudpmubdt"

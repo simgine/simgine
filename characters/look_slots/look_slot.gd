@@ -1,6 +1,15 @@
 @tool
 class_name LookSlot
 extends Resource
+## A slot for [LookItem].
+
+## Display name.
+@export var name: String
+
+## Whether the slot is part of the character's permanent look.
+##
+## Permanent slots are always filled with an item and are excluded from look sets.
+@export var permanent: bool
 
 @export var conflicts: Array[LookSlot]
 

@@ -4,4 +4,5 @@
 
 [resource]
 script = ExtResource("1_vqm44")
+name = "Full Body"
 metadata/_custom_type_script = "uid://v4rpudpmubdt"

@@ -136,7 +136,7 @@ layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="Shape" type="VBoxContainer" parent="UI/Content/Appearance/Tabs" unique_id=1323027048]
+[node name="Body" type="VBoxContainer" parent="UI/Content/Appearance/Tabs" unique_id=1323027048]
 unique_name_in_owner = true
 layout_mode = 2
 metadata/_tab_index = 0

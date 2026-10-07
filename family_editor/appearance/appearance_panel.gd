@@ -7,7 +7,7 @@ var _current_tabs: TabContainer
 ## Lazily initialized containers for different [CharacterVisual] types.
 var _cached_tabs: Dictionary[GDScript, TabContainer]
 
-@onready var _shape_tab: VBoxContainer = %Shape
+@onready var _body_tab: VBoxContainer = %Body
 
 
 ## Shows the modifiers of the given character.
@@ -19,7 +19,7 @@ func set_character(character: Character) -> void:
 		var new_tabs := TabContainer.new()
 		new_tabs.name = character.name
 		new_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		_shape_tab.add_child(new_tabs)
+		_body_tab.add_child(new_tabs)
 		_populate_tabs(new_tabs, character.visual)
 		_cached_tabs[key] = new_tabs
 

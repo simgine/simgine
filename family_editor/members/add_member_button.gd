@@ -3,7 +3,7 @@ extends UpMenuButton
 
 signal type_selected(character_type: CharacterType)
 
-var _types: Array[CharacterType] = CharacterType.get_available()
+var _types: Array[CharacterType] = CharacterType.load_all()
 
 
 func _ready() -> void:

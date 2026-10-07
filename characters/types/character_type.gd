@@ -32,8 +32,8 @@ func create() -> Character:
 	return character
 
 
-## Returns list of all races from the project resources.
-static func get_available() -> Array[CharacterType]:
+## Loads all character types.
+static func load_all() -> Array[CharacterType]:
 	const TYPES_DIR := "res://characters/types"
 
 	var races: Array[CharacterType] = []

@@ -143,7 +143,7 @@ layout_mode = 2
 script = ExtResource("8_body_tab")
 metadata/_tab_index = 0
 
-[node name="Parts" type="Control" parent="UI/Content/Appearance/Tabs" unique_id=1531538647]
+[node name="Features" type="Control" parent="UI/Content/Appearance/Tabs" unique_id=1531538647]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

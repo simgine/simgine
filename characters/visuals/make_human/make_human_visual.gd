@@ -85,7 +85,7 @@ func get_item_dir() -> String:
 	return "res://characters/visuals/make_human/items/"
 
 
-func _get_modifiers_dir() -> String:
+func get_modifiers_dir() -> String:
 	return "res://characters/visuals/make_human/modifiers/"
 
 

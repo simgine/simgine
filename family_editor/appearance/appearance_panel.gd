@@ -11,7 +11,7 @@ var _cached_tabs: Dictionary[GDScript, TabContainer]
 
 
 ## Shows the modifiers of the given character.
-func set_character(character: Character) -> void:
+func _show_character(character: Character) -> void:
 	Log.debug("Loading modifiers for '%s'", character.name)
 
 	var key: GDScript = character.visual.get_script()

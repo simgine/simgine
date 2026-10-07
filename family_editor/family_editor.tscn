@@ -153,8 +153,8 @@ visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="set_character"]
-[connection signal="current_member_changed" from="Family" to="UI/Content/Appearance" method="set_character"]
+[connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="_show_character"]
+[connection signal="current_member_changed" from="Family" to="UI/Content/Appearance" method="_show_character"]
 [connection signal="member_added" from="Family" to="UI/Content/FamilyBox" method="_create_button"]
 [connection signal="button_pressed" from="UI/Content/FamilyBox" to="Family" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyBox" to="Family" method="_remove_member"]

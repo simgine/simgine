@@ -5,6 +5,6 @@ extends VBoxContainer
 
 
 ## Fills the fields when the current member changes.
-func set_character(character: Character) -> void:
+func _show_character(character: Character) -> void:
 	_first_name_edit.text = character.first_name
 	_last_name_edit.text = character.last_name

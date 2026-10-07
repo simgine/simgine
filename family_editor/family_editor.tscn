@@ -131,6 +131,28 @@ text = "Appearance"
 [node name="Separator" type="HSeparator" parent="UI/Content/Appearance" unique_id=1728304965]
 layout_mode = 2
 
+[node name="Tabs" type="TabContainer" parent="UI/Content/Appearance" unique_id=1031484172]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Shape" type="VBoxContainer" parent="UI/Content/Appearance/Tabs" unique_id=1323027048]
+unique_name_in_owner = true
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Parts" type="ScrollContainer" parent="UI/Content/Appearance/Tabs" unique_id=1531538647]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="Wardrobe" type="ScrollContainer" parent="UI/Content/Appearance/Tabs" unique_id=1812882396]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
 [connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="set_character"]
 [connection signal="current_member_changed" from="Family" to="UI/Content/Appearance" method="set_character"]
 [connection signal="member_added" from="Family" to="UI/Content/FamilyBox" method="_create_button"]

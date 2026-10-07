@@ -29,5 +29,33 @@ func conflicts_with(other: LookItem) -> bool:
 	return slot.conflicts_with(other.slot)
 
 
+## Loads all item in the given directory recursively.
+static func load_from(dir: String) -> Array[LookItem]:
+	var items: Array[LookItem] = []
+	_load_recursively(dir, items)
+	return items
+
+
+static func _load_recursively(dir_path: String, items: Array[LookItem]) -> void:
+	var entries := ResourceLoader.list_directory(dir_path)
+	entries.sort()
+
+	for entry in entries:
+		var path := dir_path.path_join(entry)
+
+		if entry.ends_with("/"):
+			_load_recursively(path, items)
+			continue
+
+		if entry.get_extension() not in ["tres", "res"]:
+			continue
+
+		var item := ResourceLoader.load(path) as LookItem
+		if item:
+			items.append(item)
+		else:
+			Log.warn("Loaded resource '%s' is not a LookItem, skipping", path)
+
+
 func _to_string() -> String:
 	return "LookItem('%s', '%s')" % [name, asset_path]

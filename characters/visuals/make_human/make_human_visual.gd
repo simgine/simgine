@@ -81,7 +81,7 @@ func _detach_item(item: LookItem) -> void:
 	_attachments.erase(item)
 
 
-func _get_items_dir() -> String:
+func get_item_dir() -> String:
 	return "res://characters/visuals/make_human/items/"
 
 

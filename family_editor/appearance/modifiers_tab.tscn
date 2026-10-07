@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c6bdjetiuolql"]
 
-[ext_resource type="Script" uid="uid://6r567gvsc1jh" path="res://family_editor/body/modifiers_tab.gd" id="1_mn52h"]
+[ext_resource type="Script" uid="uid://6r567gvsc1jh" path="res://family_editor/appearance/modifiers_tab.gd" id="1_mn52h"]
 
 [node name="ModifiersTab" type="ScrollContainer" unique_id=1577132112]
 script = ExtResource("1_mn52h")

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dbf7qjx37ggv1"]
 
-[ext_resource type="Script" uid="uid://y1flg1vq7g0o" path="res://family_editor/body/modifier_box.gd" id="1_qlwdh"]
+[ext_resource type="Script" uid="uid://y1flg1vq7g0o" path="res://family_editor/appearance/modifier_box.gd" id="1_qlwdh"]
 
 [node name="ModifierBox" type="VBoxContainer" unique_id=1457052885]
 script = ExtResource("1_qlwdh")

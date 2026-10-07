@@ -41,7 +41,7 @@ func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
 		if param.modifier.category != current_category:
 			current_category = param.modifier.category
 
-			const MODIFIERS_TAB := preload("res://family_editor/body/modifiers_tab.tscn")
+			const MODIFIERS_TAB := preload("res://family_editor/appearance/modifiers_tab.tscn")
 			var tab: ModifiersTab = MODIFIERS_TAB.instantiate()
 			tab.name = current_category.name
 			tabs.add_child(tab)
@@ -57,7 +57,7 @@ func _create_modifier(
 	visual: CharacterVisual,
 	param: BodyModifierParams,
 ) -> void:
-	const MODIFIER_BOX := preload("res://family_editor/body/modifier_box.tscn")
+	const MODIFIER_BOX := preload("res://family_editor/appearance/modifier_box.tscn")
 	var modifier: ModifierBox = MODIFIER_BOX.instantiate()
 	modifier.setup(param, visual.get_left_modifier_suffix(), visual.get_right_modifier_suffix())
 

@@ -137,13 +137,13 @@ layout_mode = 2
 size_flags_vertical = 3
 current_tab = 0
 
-[node name="Body" type="VBoxContainer" parent="UI/Content/Appearance/Tabs" unique_id=1323027048]
+[node name="Body" type="Control" parent="UI/Content/Appearance/Tabs" unique_id=1323027048]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("8_body_tab")
 metadata/_tab_index = 0
 
-[node name="Parts" type="ScrollContainer" parent="UI/Content/Appearance/Tabs" unique_id=1531538647]
+[node name="Parts" type="Control" parent="UI/Content/Appearance/Tabs" unique_id=1531538647]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2

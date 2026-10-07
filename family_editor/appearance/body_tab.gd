@@ -1,5 +1,5 @@
 class_name BodyTab
-extends VBoxContainer
+extends Control
 
 signal modifier_changed(key: StringName, value: float)
 
@@ -13,7 +13,7 @@ func show_character(visual: CharacterVisual) -> void:
 	var key: GDScript = visual.get_script()
 	if not _cached_tabs.has(key):
 		var new_tabs := TabContainer.new()
-		new_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		new_tabs.set_anchors_preset(Control.PRESET_FULL_RECT)
 		add_child(new_tabs)
 		_populate_tabs(new_tabs, visual)
 		_cached_tabs[key] = new_tabs

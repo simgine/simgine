@@ -31,7 +31,7 @@ func show_character(visual: CharacterVisual) -> void:
 
 func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
 	var current_category: ModifierCategory = null
-	var tab_content: VBoxContainer
+	var list: ModifierList
 	var modifiers := BodyModifier.load_from(visual.get_modifiers_dir())
 	var params := visual.resolve_modifier_params(modifiers)
 	for modifier_name in modifiers:
@@ -41,37 +41,31 @@ func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
 			modifier.resource_path,
 		)
 
+	var left_suffix := visual.get_left_modifier_suffix()
+	var right_suffix := visual.get_right_modifier_suffix()
 	for param in params:
 		# Backends emit modifiers grouped by category,
 		# so a new tab starts when the category changes.
 		if param.modifier.category != current_category:
 			current_category = param.modifier.category
 
-			const MODIFIER_LIST := preload("res://family_editor/appearance/modifier_list.tscn")
-			var list: ModifierList = MODIFIER_LIST.instantiate()
-			list.name = current_category.name
-			tabs.add_child(list)
-			tab_content = list.content
+			list = _create_modifier_list(tabs, current_category)
 
-		_create_modifier(tab_content, visual, param)
+		list.add_modifier(param, left_suffix, right_suffix)
 
 	Log.debug("Created %d modifier category tabs", tabs.get_tab_count())
 
 
-func _create_modifier(
-	content: VBoxContainer,
-	visual: CharacterVisual,
-	param: BodyModifierParams,
-) -> void:
-	const MODIFIER_SLIDER := preload("res://family_editor/appearance/modifier_slider.tscn")
-	var slider: ModifierSlider = MODIFIER_SLIDER.instantiate()
-	slider.setup(param, visual.get_left_modifier_suffix(), visual.get_right_modifier_suffix())
+func _create_modifier_list(tabs: TabContainer, category: ModifierCategory) -> ModifierList:
+	const MODIFIER_LIST := preload("res://family_editor/appearance/modifier_list.tscn")
+	var list: ModifierList = MODIFIER_LIST.instantiate()
+	list.name = category.name
 
-	slider.modifier_changed.connect(modifier_changed.emit)
-	content.add_child(slider)
+	list.modifier_changed.connect(modifier_changed.emit)
+	tabs.add_child(list)
+	return list
 
 
 func _load_values(visual: CharacterVisual) -> void:
 	for list: ModifierList in _current_tabs.get_children():
-		for slider: ModifierSlider in list.content.get_children():
-			slider.load_value(visual)
+		list.load_values(visual)

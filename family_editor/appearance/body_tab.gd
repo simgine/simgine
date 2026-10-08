@@ -30,8 +30,6 @@ func show_character(visual: CharacterVisual) -> void:
 
 
 func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
-	# Backends emit modifiers grouped by category,
-	# so a new tab starts when the category changes.
 	var current_category: ModifierCategory = null
 	var tab_content: VBoxContainer
 	var modifiers := BodyModifier.load_from(visual.get_modifiers_dir())
@@ -44,6 +42,8 @@ func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
 		)
 
 	for param in params:
+		# Backends emit modifiers grouped by category,
+		# so a new tab starts when the category changes.
 		if param.modifier.category != current_category:
 			current_category = param.modifier.category
 

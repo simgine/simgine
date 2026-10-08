@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://vb6sg6ro8f0o" path="res://family_editor/profile.gd" id="6_profile"]
 [ext_resource type="Script" uid="uid://b8tvb5236maib" path="res://family_editor/appearance/appearance_panel.gd" id="7_appearance"]
 [ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://family_editor/appearance/body_tab.gd" id="8_body_tab"]
+[ext_resource type="Script" uid="uid://v16rynqppstb" path="res://family_editor/appearance/features_tab.gd" id="9_features_tab"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
 
@@ -120,7 +121,7 @@ anchors_preset = 11
 anchor_left = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -300.0
+offset_left = -340.0
 grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("7_appearance")
@@ -147,6 +148,7 @@ metadata/_tab_index = 0
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+script = ExtResource("9_features_tab")
 metadata/_tab_index = 1
 
 [node name="Wardrobe" type="ScrollContainer" parent="UI/Content/Appearance/Tabs" unique_id=1812882396]
@@ -164,3 +166,4 @@ metadata/_tab_index = 2
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="Family" method="_set_first_name"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="Family" method="_set_last_name"]
 [connection signal="modifier_changed" from="UI/Content/Appearance/Tabs/Body" to="Family" method="_set_modifier"]
+[connection signal="item_selected" from="UI/Content/Appearance/Tabs/Features" to="Family" method="_add_look_item"]

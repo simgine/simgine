@@ -60,3 +60,8 @@ func _set_last_name(value: String) -> void:
 func _set_modifier(key: StringName, value: float) -> void:
 	Log.debug("Changing modifier '%s' to %.2f", key, value)
 	_current_member.visual.set_modifier(key, value)
+
+
+func _add_look_item(item: LookItem) -> void:
+	Log.debug("Adding look item '%s'", item.name)
+	_current_member.visual.add_look_item(item)

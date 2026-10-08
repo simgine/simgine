@@ -73,6 +73,17 @@ func remove_look_item(item: LookItem) -> void:
 	_detach_item(item)
 
 
+## Returns the currently equipped item of the given slot.
+##
+## Returns `null` if the slot is empty.
+func get_look_item(slot: LookSlot) -> LookItem:
+	for item in _look:
+		if item and item.slot == slot:
+			return item
+
+	return null
+
+
 ## Displays item's visual.
 ##
 ## Returns `false` if nothing was attached.

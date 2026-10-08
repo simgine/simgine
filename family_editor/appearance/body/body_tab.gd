@@ -34,7 +34,7 @@ func populate(visual: CharacterVisual) -> void:
 
 
 func _create_modifier_list(tabs: TabContainer, category: ModifierCategory) -> ModifierList:
-	const MODIFIER_LIST := preload("res://family_editor/appearance/modifier_list.tscn")
+	const MODIFIER_LIST := preload("res://family_editor/appearance/body/modifier_list.tscn")
 	var list: ModifierList = MODIFIER_LIST.instantiate()
 	list.name = category.name
 

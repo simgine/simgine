@@ -11,7 +11,7 @@ func add_modifier(
 	left_suffix: StringName,
 	right_suffix: StringName,
 ) -> void:
-	const MODIFIER_SLIDER := preload("res://family_editor/appearance/modifier_slider.tscn")
+	const MODIFIER_SLIDER := preload("res://family_editor/appearance/body/modifier_slider.tscn")
 	var slider: ModifierSlider = MODIFIER_SLIDER.instantiate()
 	slider.setup(params, left_suffix, right_suffix)
 

@@ -29,7 +29,7 @@ func populate(items: Array[LookItem]) -> void:
 
 
 func _create_look_item_list(tabs: TabContainer, slot: LookSlot) -> LookItemList:
-	const LOOK_ITEM_LIST := preload("res://family_editor/appearance/look_item_list.tscn")
+	const LOOK_ITEM_LIST := preload("res://family_editor/appearance/items/look_item_list.tscn")
 	var list: LookItemList = LOOK_ITEM_LIST.instantiate()
 	list.name = slot.name
 	list.setup(slot)

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ce74mqh7dvlm1"]
 
-[ext_resource type="Script" uid="uid://dphs6ae1pyofj" path="res://family_editor/appearance/look_item_list.gd" id="1_look_item_list"]
+[ext_resource type="Script" uid="uid://dphs6ae1pyofj" path="res://family_editor/appearance/items/look_item_list.gd" id="1_look_item_list"]
 
 [node name="LookItemList" type="ItemList" unique_id=224020655]
 theme_override_constants/h_separation = 8

@@ -30,9 +30,13 @@ func conflicts_with(other: LookItem) -> bool:
 
 
 ## Loads all items in the given directory recursively.
+##
+## The result is sorted by slot, then item name.
+## Items without a slot come last.
 static func load_from(dir: String) -> Array[LookItem]:
 	var items: Array[LookItem] = []
 	_load_recursively(dir, items)
+	items.sort_custom(_sort_by_slot_and_name)
 	return items
 
 
@@ -55,6 +59,21 @@ static func _load_recursively(dir_path: String, items: Array[LookItem]) -> void:
 			items.append(item)
 		else:
 			Log.warn("Loaded resource '%s' is not a LookItem, skipping", path)
+
+
+static func _sort_by_slot_and_name(a: LookItem, b: LookItem) -> bool:
+	# Items without a slot come last.
+	if not a.slot and not b.slot:
+		return a.name.naturalnocasecmp_to(b.name) < 0
+	if not a.slot:
+		return false
+	if not b.slot:
+		return true
+
+	if a.slot != b.slot:
+		return a.slot.name.naturalnocasecmp_to(b.slot.name) < 0
+
+	return a.name.naturalnocasecmp_to(b.name) < 0
 
 
 func _to_string() -> String:

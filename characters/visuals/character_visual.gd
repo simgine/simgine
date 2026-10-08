@@ -39,13 +39,10 @@ static func _remove_conflicts(items: Array[LookItem]) -> void:
 	# Iterate backwards so conflicting items can be removed safely.
 	for index in range(items.size() - 1, -1, -1):
 		var item := items[index]
-		if not item:
-			# Keep null items for editing from the inspector.
+		if not item or not item.slot:
+			# Keep invalid items for editing from the inspector.
 			if not Engine.is_editor_hint():
 				items.remove_at(index)
-			continue
-
-		if not item.slot:
 			continue
 
 		for later_index in range(index + 1, items.size()):
@@ -60,12 +57,11 @@ func add_look_item(item: LookItem) -> void:
 	if not _attach_item(item):
 		return
 
-	if item.slot:
-		for index in range(_look.size() - 1, -1, -1):
-			var existing_item := _look[index]
-			if item.conflicts_with(existing_item):
-				_detach_item(existing_item)
-				_look.remove_at(index)
+	for index in range(_look.size() - 1, -1, -1):
+		var existing_item := _look[index]
+		if item.conflicts_with(existing_item):
+			_detach_item(existing_item)
+			_look.remove_at(index)
 
 	Log.debug("Adding %s", item)
 	_look.append(item)

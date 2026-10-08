@@ -12,7 +12,7 @@ extends Resource
 
 ## Occupied slot.
 ##
-## If unset, this item conflicts with nothing.
+## Items without a slot are skipped at load time.
 @export var slot: LookSlot
 
 ## Visual asset to load.
@@ -23,7 +23,7 @@ extends Resource
 
 ## Returns whether the items occupy conflicting slots.
 func conflicts_with(other: LookItem) -> bool:
-	if not other or not slot:
+	if not other:
 		return false
 
 	return slot.conflicts_with(other.slot)
@@ -32,7 +32,6 @@ func conflicts_with(other: LookItem) -> bool:
 ## Loads all items in the given directory recursively.
 ##
 ## The result is sorted by slot, then item name.
-## Items without a slot come last.
 static func load_from(dir: String) -> Array[LookItem]:
 	var items: Array[LookItem] = []
 	_load_recursively(dir, items)
@@ -55,21 +54,15 @@ static func _load_recursively(dir_path: String, items: Array[LookItem]) -> void:
 			continue
 
 		var item := ResourceLoader.load(path) as LookItem
-		if item:
-			items.append(item)
-		else:
+		if not item:
 			Log.warn("Loaded resource '%s' is not a LookItem, skipping", path)
+		elif not item.slot:
+			Log.warn("'%s' has no slot, skipping", path)
+		else:
+			items.append(item)
 
 
 static func _sort_by_slot_and_name(a: LookItem, b: LookItem) -> bool:
-	# Items without a slot come last.
-	if not a.slot and not b.slot:
-		return a.name.naturalnocasecmp_to(b.name) < 0
-	if not a.slot:
-		return false
-	if not b.slot:
-		return true
-
 	if a.slot != b.slot:
 		return a.slot.name.naturalnocasecmp_to(b.slot.name) < 0
 

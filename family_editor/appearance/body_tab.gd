@@ -47,11 +47,11 @@ func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
 		if param.modifier.category != current_category:
 			current_category = param.modifier.category
 
-			const MODIFIERS_TAB := preload("res://family_editor/appearance/modifiers_tab.tscn")
-			var tab: ModifiersTab = MODIFIERS_TAB.instantiate()
-			tab.name = current_category.name
-			tabs.add_child(tab)
-			tab_content = tab.content
+			const MODIFIER_LIST := preload("res://family_editor/appearance/modifier_list.tscn")
+			var list: ModifierList = MODIFIER_LIST.instantiate()
+			list.name = current_category.name
+			tabs.add_child(list)
+			tab_content = list.content
 
 		_create_modifier(tab_content, visual, param)
 
@@ -63,15 +63,15 @@ func _create_modifier(
 	visual: CharacterVisual,
 	param: BodyModifierParams,
 ) -> void:
-	const MODIFIER_BOX := preload("res://family_editor/appearance/modifier_box.tscn")
-	var modifier: ModifierBox = MODIFIER_BOX.instantiate()
-	modifier.setup(param, visual.get_left_modifier_suffix(), visual.get_right_modifier_suffix())
+	const MODIFIER_SLIDER := preload("res://family_editor/appearance/modifier_slider.tscn")
+	var slider: ModifierSlider = MODIFIER_SLIDER.instantiate()
+	slider.setup(param, visual.get_left_modifier_suffix(), visual.get_right_modifier_suffix())
 
-	modifier.modifier_changed.connect(modifier_changed.emit)
-	content.add_child(modifier)
+	slider.modifier_changed.connect(modifier_changed.emit)
+	content.add_child(slider)
 
 
 func _load_values(visual: CharacterVisual) -> void:
-	for tab: ModifiersTab in _current_tabs.get_children():
-		for modifier_box: ModifierBox in tab.content.get_children():
-			modifier_box.load_value(visual)
+	for list: ModifierList in _current_tabs.get_children():
+		for slider: ModifierSlider in list.content.get_children():
+			slider.load_value(visual)

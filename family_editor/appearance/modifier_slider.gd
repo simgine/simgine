@@ -1,4 +1,4 @@
-class_name ModifierBox
+class_name ModifierSlider
 extends VBoxContainer
 
 signal modifier_changed(key: StringName, value: float)

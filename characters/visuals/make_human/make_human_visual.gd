@@ -89,7 +89,7 @@ func get_modifiers_dir() -> String:
 	return "res://characters/visuals/make_human/modifiers/"
 
 
-func _resolve_modifier_params(
+func resolve_modifier_params(
 	modifiers: Dictionary[StringName, BodyModifier]
 ) -> Array[BodyModifierParams]:
 	var params: Array[BodyModifierParams] = []

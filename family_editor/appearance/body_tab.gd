@@ -34,7 +34,16 @@ func _populate_tabs(tabs: TabContainer, visual: CharacterVisual) -> void:
 	# so a new tab starts when the category changes.
 	var current_category: ModifierCategory = null
 	var tab_content: VBoxContainer
-	for param in visual.get_available_modifiers():
+	var modifiers := BodyModifier.load_from(visual.get_modifiers_dir())
+	var params := visual.resolve_modifier_params(modifiers)
+	for modifier_name in modifiers:
+		var modifier := modifiers[modifier_name]
+		Log.warn(
+			"BodyModifier '%s' is not supported by the visual, skipping",
+			modifier.resource_path,
+		)
+
+	for param in params:
 		if param.modifier.category != current_category:
 			current_category = param.modifier.category
 

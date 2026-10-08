@@ -7,8 +7,6 @@
 [ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://family_editor/members/add_member_button.gd" id="5_m6gdk"]
 [ext_resource type="Script" uid="uid://vb6sg6ro8f0o" path="res://family_editor/profile.gd" id="6_profile"]
 [ext_resource type="Script" uid="uid://b8tvb5236maib" path="res://family_editor/appearance/appearance_panel.gd" id="7_appearance"]
-[ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://family_editor/appearance/body_tab.gd" id="8_body_tab"]
-[ext_resource type="Script" uid="uid://v16rynqppstb" path="res://family_editor/appearance/features_tab.gd" id="9_features_tab"]
 
 [sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
 
@@ -133,30 +131,6 @@ text = "Appearance"
 [node name="Separator" type="HSeparator" parent="UI/Content/Appearance" unique_id=1728304965]
 layout_mode = 2
 
-[node name="Tabs" type="TabContainer" parent="UI/Content/Appearance" unique_id=1031484172]
-layout_mode = 2
-size_flags_vertical = 3
-current_tab = 0
-
-[node name="Body" type="Control" parent="UI/Content/Appearance/Tabs" unique_id=1323027048]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("8_body_tab")
-metadata/_tab_index = 0
-
-[node name="Features" type="Control" parent="UI/Content/Appearance/Tabs" unique_id=1531538647]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-script = ExtResource("9_features_tab")
-metadata/_tab_index = 1
-
-[node name="Wardrobe" type="ScrollContainer" parent="UI/Content/Appearance/Tabs" unique_id=1812882396]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-metadata/_tab_index = 2
-
 [connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="_show_character"]
 [connection signal="current_member_changed" from="Family" to="UI/Content/Appearance" method="_show_character"]
 [connection signal="member_added" from="Family" to="UI/Content/FamilyBox" method="_create_button"]
@@ -165,5 +139,5 @@ metadata/_tab_index = 2
 [connection signal="type_selected" from="UI/Content/FamilyBox/AddMember" to="Family" method="_create_member"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="Family" method="_set_first_name"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="Family" method="_set_last_name"]
-[connection signal="modifier_changed" from="UI/Content/Appearance/Tabs/Body" to="Family" method="_set_modifier"]
-[connection signal="item_selected" from="UI/Content/Appearance/Tabs/Features" to="Family" method="_add_look_item"]
+[connection signal="item_selected" from="UI/Content/Appearance" to="Family" method="_add_look_item"]
+[connection signal="modifier_changed" from="UI/Content/Appearance" to="Family" method="_set_modifier"]

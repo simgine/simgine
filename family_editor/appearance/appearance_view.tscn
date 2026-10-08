@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://cfwryc806q502"]
+
+[ext_resource type="Script" uid="uid://cfaaaq0t8oyog" path="res://family_editor/appearance/appearance_view.gd" id="1_appearance_view"]
+[ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://family_editor/appearance/body_tab.gd" id="2_body_tab"]
+[ext_resource type="Script" uid="uid://bqsh54hcofd35" path="res://family_editor/appearance/look_items_tab.gd" id="3_look_items_tab"]
+
+[node name="AppearanceView" type="TabContainer" unique_id=1586993996]
+size_flags_vertical = 3
+current_tab = 0
+script = ExtResource("1_appearance_view")
+
+[node name="Body" type="Control" parent="." unique_id=870442469]
+layout_mode = 2
+script = ExtResource("2_body_tab")
+metadata/_tab_index = 0
+
+[node name="Tabs" type="TabContainer" parent="Body" unique_id=741079900]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Features" type="Control" parent="." unique_id=1772322629]
+visible = false
+layout_mode = 2
+script = ExtResource("3_look_items_tab")
+permanent = true
+metadata/_tab_index = 1
+
+[node name="Tabs" type="TabContainer" parent="Features" unique_id=19533097]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

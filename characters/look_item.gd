@@ -29,7 +29,7 @@ func conflicts_with(other: LookItem) -> bool:
 	return slot.conflicts_with(other.slot)
 
 
-## Loads all item in the given directory recursively.
+## Loads all items in the given directory recursively.
 static func load_from(dir: String) -> Array[LookItem]:
 	var items: Array[LookItem] = []
 	_load_recursively(dir, items)

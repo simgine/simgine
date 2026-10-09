@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://dyfc3ihu0xqov"
+path="res://.godot/imported/turtleneck_halter.mhmat-879434ad85f2ce9f0ff54abefd340ae2.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/turtleneck_halter/turtleneck_halter.mhmat"
+dest_files=["res://.godot/imported/turtleneck_halter.mhmat-879434ad85f2ce9f0ff54abefd340ae2.res"]
+
+[params]
+

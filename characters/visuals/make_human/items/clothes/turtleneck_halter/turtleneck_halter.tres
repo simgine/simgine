@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LookItem" format=3]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_turtleneck_halter"]
+[ext_resource type="Resource" path="res://characters/look_slots/top.tres" id="2_top"]
+
+[resource]
+script = ExtResource("1_turtleneck_halter")
+slot = ExtResource("2_top")
+name = "Turtleneck Halter"
+asset_path = "uid://w5hi35lua0u8"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://b4ov05wytxm3w"
+path="res://.godot/imported/turtleneck_halter.obj-10e1178ae8c82790349c57cf9bf51688.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/turtleneck_halter/turtleneck_halter.obj"
+dest_files=["res://.godot/imported/turtleneck_halter.obj-10e1178ae8c82790349c57cf9bf51688.res"]
+
+[params]
+

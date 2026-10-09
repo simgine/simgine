@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://w5hi35lua0u8"
+path="res://.godot/imported/turtleneck_halter.mhclo-53caa946c989aa049df6b7f5a666ac3c.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/turtleneck_halter/turtleneck_halter.mhclo"
+dest_files=["res://.godot/imported/turtleneck_halter.mhclo-53caa946c989aa049df6b7f5a666ac3c.res"]
+
+[params]
+

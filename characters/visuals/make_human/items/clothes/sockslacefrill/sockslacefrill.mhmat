@@ -1,0 +1,25 @@
+# MakeHuman Material definition
+
+name lacefrillsocks
+
+// Color shading attributes
+diffuseColor  0.8 0.8 0.8
+specularColor  0 0 0
+shininess 0.1961
+opacity 0
+
+// Textures and properties
+diffuseTexture sock_uv.png
+// In the original file it was bumpTexture, but the texture is an RGB normal map.
+normalmapTexture sock_uv_norm.png
+
+// Shader programme
+shader data/shaders/glsl/phong
+
+// Configure built-in shader defines
+shaderConfig diffuse true
+shaderConfig bump true
+shaderConfig normal  false
+shaderConfig displacement  false
+shaderConfig spec  false
+shaderConfig vertexColors false

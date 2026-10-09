@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LookItem" format=3]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_sockslacefrill"]
+[ext_resource type="Resource" path="res://characters/look_slots/socks.tres" id="2_socks"]
+
+[resource]
+script = ExtResource("1_sockslacefrill")
+slot = ExtResource("2_socks")
+name = "Socks Lace Frill"
+asset_path = "uid://de0ybeu15vatb"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

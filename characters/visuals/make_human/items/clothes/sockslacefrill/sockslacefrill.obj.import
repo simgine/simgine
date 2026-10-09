@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://b1bchdiv4m1ba"
+path="res://.godot/imported/sockslacefrill.obj-08aa152e232839cacd13c30ef70b6fe0.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/sockslacefrill/sockslacefrill.obj"
+dest_files=["res://.godot/imported/sockslacefrill.obj-08aa152e232839cacd13c30ef70b6fe0.res"]
+
+[params]
+

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LookItem" format=3]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_flats_ballet_bow"]
+[ext_resource type="Resource" path="res://characters/look_slots/shoes.tres" id="2_shoes"]
+
+[resource]
+script = ExtResource("1_flats_ballet_bow")
+slot = ExtResource("2_shoes")
+name = "Flats Ballet Bow"
+asset_path = "uid://cdxyglidhs06k"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

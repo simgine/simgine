@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://cdxyglidhs06k"
+path="res://.godot/imported/flats_ballet_bow.mhclo-2a1660a95b7696862b6e476a57ce29eb.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/flats_ballet_bow/flats_ballet_bow.mhclo"
+dest_files=["res://.godot/imported/flats_ballet_bow.mhclo-2a1660a95b7696862b6e476a57ce29eb.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://ddqdm1phhgw6u"
+path="res://.godot/imported/flats_ballet_bow.mhmat-cbfd47d731995bab813a72fcdf1f5541.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/flats_ballet_bow/flats_ballet_bow.mhmat"
+dest_files=["res://.godot/imported/flats_ballet_bow.mhmat-cbfd47d731995bab813a72fcdf1f5541.res"]
+
+[params]
+

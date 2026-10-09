@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://bmuu0dordt7as"
+path="res://.godot/imported/flats_ballet_bow.obj-e2133cc9105e3bf55148d06e2900ea8c.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/flats_ballet_bow/flats_ballet_bow.obj"
+dest_files=["res://.godot/imported/flats_ballet_bow.obj-e2133cc9105e3bf55148d06e2900ea8c.res"]
+
+[params]
+

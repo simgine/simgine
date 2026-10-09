@@ -54,6 +54,8 @@ func _import(
 	var base_dir := source_file.get_base_dir()
 	var material := StandardMaterial3D.new()
 	var transparent := false
+	var roughness: float = INF
+	var shininess: float = INF
 	var line_index := 0
 	while not file.eof_reached():
 		line_index += 1
@@ -151,9 +153,9 @@ func _import(
 			"metallic":
 				material.metallic = value.to_float()
 			"roughness":
-				material.roughness = value.to_float()
+				roughness = clampf(value.to_float(), 0.0, 1.0)
 			"shininess":
-				pass
+				shininess = clampf(value.to_float(), 0.0, 1.0)
 			"opacity":
 				# MakeHuman's Phong and litsphere shaders use diffuse-texture alpha,
 				# ignoring scalar opacity.
@@ -195,6 +197,13 @@ func _import(
 			_:
 				push_error("Unknown tag at %d: '%s'" % [line_index, line])
 				continue
+
+	# Explicit PBR roughness takes precedence over the shininess approximation.
+	if roughness != INF:
+		material.roughness = roughness
+	elif shininess != INF:
+		# Approximate MakeHuman's shininess using inverse PBR roughness.
+		material.roughness = 1.0 - shininess
 
 	if transparent:
 		if material.alpha_antialiasing_mode == BaseMaterial3D.ALPHA_ANTIALIASING_ALPHA_TO_COVERAGE:

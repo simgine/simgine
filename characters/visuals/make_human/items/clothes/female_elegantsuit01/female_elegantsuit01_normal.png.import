@@ -2,7 +2,7 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dev3wvivsui0y"
+uid="uid://dic1d6d55y0sg"
 path.s3tc="res://.godot/imported/female_elegantsuit01_normal.png-763537b0ba63e0c5e2d8bdeeba877671.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -27,7 +27,7 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=1
-roughness/src_normal="res://characters/human/assets/clothes/female_elegantsuit01/female_elegantsuit01_normal.png"
+roughness/src_normal="res://characters/visuals/make_human/items/clothes/female_elegantsuit01/female_elegantsuit01_normal.png"
 process/channel_remap/red=0
 process/channel_remap/green=1
 process/channel_remap/blue=2

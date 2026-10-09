@@ -3,18 +3,10 @@ extends Node3D
 signal member_added(character: Character)
 signal current_member_changed(character: Character)
 
-@export var rotate_speed := 0.005
-
 ## The character currently shown on the scene.
 ##
 ## Setting it hides the previously active character.
 var _current_member: Character
-
-
-func _unhandled_input(event: InputEvent) -> void:
-	var mouse_motion := event as InputEventMouseMotion
-	if _current_member and mouse_motion and Input.is_action_pressed("rotate_character"):
-		_current_member.rotation.y += mouse_motion.relative.x * rotate_speed
 
 
 func _create_member(character_type: CharacterType) -> void:

@@ -1,0 +1,23 @@
+# MakeHuman Material definition
+
+name shadespinkMaterial
+
+// Color shading attributes
+diffuseColor  0.8 0.8 0.8
+specularColor  0 0 0
+shininess 0.1961
+opacity 1
+
+// Textures and properties
+diffuseTexture ../turtleneck_halter/shades_tex_pink.png
+
+// Shader programme
+shader data/shaders/glsl/phong
+
+// Configure built-in shader defines
+shaderConfig diffuse true
+shaderConfig bump false
+shaderConfig normal  false
+shaderConfig displacement  false
+shaderConfig spec  false
+shaderConfig vertexColors false

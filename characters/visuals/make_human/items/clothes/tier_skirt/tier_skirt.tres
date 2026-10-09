@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LookItem" format=3]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_tier_skirt"]
+[ext_resource type="Resource" path="res://characters/look_slots/bottom.tres" id="2_bottom"]
+
+[resource]
+script = ExtResource("1_tier_skirt")
+slot = ExtResource("2_bottom")
+name = "Tier Skirt"
+asset_path = "uid://8th63bsv226m"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

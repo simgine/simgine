@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://8th63bsv226m"
+path="res://.godot/imported/tier_skirt.mhclo-f29f1b96ad7e773bb867a1f3abce80bf.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/tier_skirt/tier_skirt.mhclo"
+dest_files=["res://.godot/imported/tier_skirt.mhclo-f29f1b96ad7e773bb867a1f3abce80bf.res"]
+
+[params]
+

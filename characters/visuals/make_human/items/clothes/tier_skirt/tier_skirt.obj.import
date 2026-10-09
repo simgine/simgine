@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://dvo3powgg536v"
+path="res://.godot/imported/tier_skirt.obj-01dd35a37fdc7f5eebd50fff840997a5.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/tier_skirt/tier_skirt.obj"
+dest_files=["res://.godot/imported/tier_skirt.obj-01dd35a37fdc7f5eebd50fff840997a5.res"]
+
+[params]
+

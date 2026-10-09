@@ -43,7 +43,12 @@ func _create_view(visual: CharacterVisual) -> AppearanceView:
 	view.body_tab.modifier_changed.connect(modifier_changed.emit)
 	view.body_tab.populate(visual)
 
+	var items := LookItem.load_from(visual.get_item_dir())
+
 	view.features_tab.item_selected.connect(item_selected.emit)
-	view.features_tab.populate(LookItem.load_from(visual.get_item_dir()))
+	view.features_tab.populate(items)
+
+	view.wardrobe_tab.item_selected.connect(item_selected.emit)
+	view.wardrobe_tab.populate(items)
 
 	return view

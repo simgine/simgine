@@ -36,3 +36,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Wardrobe" type="Control" parent="." unique_id=1828982093]
+visible = false
+layout_mode = 2
+script = ExtResource("3_look_items_tab")
+metadata/_tab_index = 2
+
+[node name="Tabs" type="TabContainer" parent="Wardrobe" unique_id=695569001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

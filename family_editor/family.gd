@@ -13,7 +13,7 @@ var _current_member: Character
 
 func _unhandled_input(event: InputEvent) -> void:
 	var mouse_motion := event as InputEventMouseMotion
-	if _current_member and mouse_motion and Input.is_action_pressed("editor_rotate"):
+	if _current_member and mouse_motion and Input.is_action_pressed("rotate_character"):
 		_current_member.rotation.y += mouse_motion.relative.x * rotate_speed
 
 

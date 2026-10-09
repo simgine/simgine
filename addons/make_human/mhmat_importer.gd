@@ -155,8 +155,10 @@ func _import(
 			"shininess":
 				pass
 			"opacity":
-				var opacity := value.to_float()
-				material.albedo_color.a = opacity
+				# MakeHuman's Phong and litsphere shaders use diffuse-texture alpha,
+				# ignoring scalar opacity.
+				if value.to_float() < 1.0:
+					transparent = true
 			"ior", "translucency", "litsphereTexture", "blendMaterial":
 				pass
 			# Boolean Flags
@@ -168,7 +170,7 @@ func _import(
 			"wireframe":
 				pass
 			"transparent":
-				transparent = _parse_bool(value)
+				transparent = transparent or _parse_bool(value)
 			"alphaToCoverage":
 				if _parse_bool(value):
 					material.alpha_antialiasing_mode = BaseMaterial3D.ALPHA_ANTIALIASING_ALPHA_TO_COVERAGE

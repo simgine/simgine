@@ -1,7 +1,27 @@
 @tool
 class_name Log
 extends Object
+## Lightweight logging inspired by Rust's [url=https://docs.rs/log/latest/log]log[/url] API.
+##
+## The logging level can be configured in project settings or overridden
+## using the [code]GODOT_LOG[/code] environment variable at startup.
+##
+## Filters are comma-separated. A filter can specify a global logging
+## level or override the level for a particular source path.
+##
+## For example, [code]`GODOT_LOG=info,characters/visual=debug[/code] enables INFO globally
+## and DEBUG for scripts under [code]res://characters/visual/[/code].
+##
+## All logging methods accept a format string and optional arguments
+## that are formatted into it using the [code]%[/code] operator.
+##
+## Example:
+## [codeblock]
+## 	Log.info("Player %s spawned at %s", player.name, position)
+## 	Log.debug("Loaded %d items", items.size())
+## [/codeblock]
 
+## Logging severity levels, ordered from least to most verbose.
 enum Level {
 	OFF,
 	ERROR,
@@ -26,22 +46,37 @@ static func _get_settings() -> Settings:
 	return Settings.new(project_filters)
 
 
+## Logs a message at the error level.
+##
+## The message is passed to [method @GlobalScope.push_error].
 static func error(format: String, ...args: Array) -> void:
 	_log(Level.ERROR, format, args)
 
 
+## Logs a message at the warn level.
+##
+## The message is passed to [method @GlobalScope.push_warning].
 static func warn(format: String, ...args: Array) -> void:
 	_log(Level.WARN, format, args)
 
 
+## Logs a message at the info level.
+##
+## Recommended for observable events to track what's happening in the game.
 static func info(format: String, ...args: Array) -> void:
 	_log(Level.INFO, format, args)
 
 
+## Logs a message at the debug level.
+##
+## Recommended for diagnostic information about implementation details.
 static func debug(format: String, ...args: Array) -> void:
 	_log(Level.DEBUG, format, args)
 
 
+## Logs a message at the trace level.
+##
+## Like [method debug], but intended for noisy diagnostics.
 static func trace(format: String, ...args: Array) -> void:
 	_log(Level.TRACE, format, args)
 

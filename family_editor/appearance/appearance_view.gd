@@ -8,5 +8,9 @@ extends TabContainer
 
 func load_state(visual: CharacterVisual) -> void:
 	body_tab.load_state(visual)
+	load_look_state(visual)
+
+
+func load_look_state(visual: CharacterVisual) -> void:
 	features_tab.load_state(visual)
 	wardrobe_tab.load_state(visual)

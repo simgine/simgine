@@ -2,6 +2,7 @@ class_name LookItemList
 extends ItemList
 
 signal look_item_selected(item: LookItem)
+signal look_item_deselected(item: LookItem)
 
 var _slot: LookSlot
 var _items: Array[LookItem]
@@ -18,7 +19,7 @@ static func _create_placeholder() -> Texture2D:
 
 func setup(slot: LookSlot) -> void:
 	_slot = slot
-	item_selected.connect(_emit_look_item_selected)
+	multi_selected.connect(_on_multi_selected)
 
 
 func add_look_item(item: LookItem) -> void:
@@ -33,8 +34,18 @@ func load_selected(visual: CharacterVisual) -> void:
 	if item and _item_indices.has(item):
 		select(_item_indices[item])
 	else:
-		deselect_all()
+		# Unlike `deselect_all()`, `deselect()` preserves the navigation cursor.
+		for index in get_selected_items():
+			deselect(index)
 
 
-func _emit_look_item_selected(index: int) -> void:
-	look_item_selected.emit(_items[index])
+func _on_multi_selected(index: int, selected: bool) -> void:
+	if not selected and _slot.permanent:
+		# Deny deselection if the represented slot is required.
+		select(index)
+		return
+
+	if selected:
+		look_item_selected.emit(_items[index])
+	else:
+		look_item_deselected.emit(_items[index])

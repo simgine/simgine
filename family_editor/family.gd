@@ -2,6 +2,7 @@ extends Node3D
 
 signal member_added(character: Character)
 signal current_member_changed(character: Character)
+signal current_look_updated(visual: CharacterVisual)
 
 ## The character currently shown on the scene.
 ##
@@ -57,3 +58,11 @@ func _set_modifier(key: StringName, value: float) -> void:
 func _add_look_item(item: LookItem) -> void:
 	Log.debug("Adding look item '%s'", item.name)
 	_current_member.visual.add_look_item(item)
+	current_look_updated.emit(_current_member.visual)
+
+
+func _remove_look_item(item: LookItem) -> void:
+	assert(not item.slot.permanent, "Permanent look items cannot be removed")
+	Log.debug("Removing look item '%s'", item.name)
+	_current_member.visual.remove_look_item(item)
+	current_look_updated.emit(_current_member.visual)

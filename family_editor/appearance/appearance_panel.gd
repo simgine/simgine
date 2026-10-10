@@ -1,11 +1,12 @@
 extends VBoxContainer
 ## The appearance section of the family editor.
 ##
-## Shows an [AppearanceView] per [CharacterVisual] type and
-## loads the member's current state into it.
+## Shows an [AppearanceView] per [CharacterVisual] type and keeps it in
+## sync with the member's look.
 
 signal modifier_changed(key: StringName, value: float)
 signal item_selected(item: LookItem)
+signal item_deselected(item: LookItem)
 
 var _current_view: AppearanceView
 
@@ -46,9 +47,15 @@ func _create_view(visual: CharacterVisual) -> AppearanceView:
 	var items := LookItem.load_from(visual.get_item_dir())
 
 	view.features_tab.item_selected.connect(item_selected.emit)
+	view.features_tab.item_deselected.connect(item_deselected.emit)
 	view.features_tab.populate(items)
 
 	view.wardrobe_tab.item_selected.connect(item_selected.emit)
+	view.wardrobe_tab.item_deselected.connect(item_deselected.emit)
 	view.wardrobe_tab.populate(items)
 
 	return view
+
+
+func _load_look_state(visual: CharacterVisual) -> void:
+	_current_view.load_look_state(visual)

@@ -136,6 +136,7 @@ layout_mode = 2
 
 [connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="_show_character"]
 [connection signal="current_member_changed" from="Family" to="UI/Content/Appearance" method="_show_character"]
+[connection signal="current_look_updated" from="Family" to="UI/Content/Appearance" method="_load_look_state"]
 [connection signal="member_added" from="Family" to="UI/Content/FamilyBox" method="_create_button"]
 [connection signal="button_pressed" from="UI/Content/FamilyBox" to="Family" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyBox" to="Family" method="_remove_member"]
@@ -143,4 +144,5 @@ layout_mode = 2
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="Family" method="_set_first_name"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="Family" method="_set_last_name"]
 [connection signal="item_selected" from="UI/Content/Appearance" to="Family" method="_add_look_item"]
+[connection signal="item_deselected" from="UI/Content/Appearance" to="Family" method="_remove_look_item"]
 [connection signal="modifier_changed" from="UI/Content/Appearance" to="Family" method="_set_modifier"]

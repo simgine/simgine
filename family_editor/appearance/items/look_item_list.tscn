@@ -5,6 +5,7 @@
 [node name="LookItemList" type="ItemList" unique_id=224020655]
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
+select_mode = 2
 max_columns = 2
 icon_mode = 0
 fixed_icon_size = Vector2i(150, 200)

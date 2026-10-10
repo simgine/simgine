@@ -59,7 +59,7 @@ static func _log(level: Level, format: String, args: Array) -> void:
 
 	var time := Time.get_time_string_from_system()
 	var level_str: String = Level.find_key(level)
-	var user_msg := format % args
+	var user_msg := format if args.is_empty() else format % args
 
 	var msg: String
 	if source:

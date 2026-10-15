@@ -6,7 +6,7 @@ extends TextureRect
 @export var _distance: float = 0.6
 
 @onready var _viewport: SubViewport = $Viewport
-@onready var _camera: Camera3D = $Viewport/Camera
+@onready var _camera: Camera3D = %Camera
 
 
 func _ready() -> void:

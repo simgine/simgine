@@ -173,17 +173,17 @@ func get_right_modifier_suffix() -> StringName:
 	return "/right"
 
 
-func get_head_position() -> Vector3:
+func get_bone_position(bone_name: String) -> Vector3:
 	var skeleton := body_instance.skeleton_node
 	if not skeleton:
 		return Vector3.ZERO
 
-	var bone := skeleton.find_bone("head")
-	if bone < 0:
+	var bone_idx := skeleton.find_bone(bone_name)
+	if bone_idx < 0:
 		return Vector3.ZERO
 
-	var head_transform := skeleton.get_bone_global_pose(bone)
-	return skeleton.global_transform * head_transform.origin
+	var bone_transform := skeleton.get_bone_global_pose(bone_idx)
+	return skeleton.global_transform * bone_transform.origin
 
 
 func get_modifier(key: StringName) -> float:

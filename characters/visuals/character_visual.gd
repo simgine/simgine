@@ -144,9 +144,9 @@ func get_left_modifier_suffix() -> StringName
 func get_right_modifier_suffix() -> StringName
 
 
-## Returns the character's head position in world space.
+## Returns the position of the given bone in world space.
 @abstract
-func get_head_position() -> Vector3
+func get_bone_position(bone: String) -> Vector3
 
 
 ## Returns the current value of a modifier.

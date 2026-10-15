@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://f67r17aofeb6" path="res://family_editor/family_editor.gd" id="1_c2sgl"]
 [ext_resource type="Script" uid="uid://br4nnis7qmest" path="res://family_editor/camera.gd" id="2_7iwil"]
-[ext_resource type="Script" uid="uid://dxyi1sfnaxv8w" path="res://family_editor/family.gd" id="3_eg80o"]
+[ext_resource type="Script" uid="uid://dxyi1sfnaxv8w" path="res://family_editor/editor_family.gd" id="3_eg80o"]
 [ext_resource type="Script" uid="uid://dsva1tcwobly" path="res://family_editor/members/family_box.gd" id="4_l8kvl"]
 [ext_resource type="Script" uid="uid://cwpr1mt6hhfu1" path="res://family_editor/members/add_member_button.gd" id="5_m6gdk"]
 [ext_resource type="Script" uid="uid://vb6sg6ro8f0o" path="res://family_editor/profile.gd" id="6_profile"]
@@ -24,7 +24,7 @@ script = ExtResource("2_7iwil")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.01362105, 2.0742023)
 current = true
 
-[node name="Family" type="Node3D" parent="." unique_id=1648785725]
+[node name="EditorFamily" type="Node3D" parent="." unique_id=1648785725]
 script = ExtResource("3_eg80o")
 
 [node name="UI" type="MarginContainer" parent="." unique_id=1674944528]
@@ -134,15 +134,15 @@ text = "Appearance"
 [node name="Separator" type="HSeparator" parent="UI/Content/Appearance" unique_id=1728304965]
 layout_mode = 2
 
-[connection signal="current_member_changed" from="Family" to="UI/Content/Profile" method="_show_character"]
-[connection signal="current_member_changed" from="Family" to="UI/Content/Appearance" method="_show_character"]
-[connection signal="current_look_updated" from="Family" to="UI/Content/Appearance" method="_load_look_state"]
-[connection signal="member_added" from="Family" to="UI/Content/FamilyBox" method="_create_button"]
-[connection signal="button_pressed" from="UI/Content/FamilyBox" to="Family" method="_set_current_member"]
-[connection signal="button_removed" from="UI/Content/FamilyBox" to="Family" method="_remove_member"]
-[connection signal="type_selected" from="UI/Content/FamilyBox/AddMember" to="Family" method="_create_member"]
-[connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="Family" method="_set_first_name"]
-[connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="Family" method="_set_last_name"]
-[connection signal="item_selected" from="UI/Content/Appearance" to="Family" method="_add_look_item"]
-[connection signal="item_deselected" from="UI/Content/Appearance" to="Family" method="_remove_look_item"]
-[connection signal="modifier_changed" from="UI/Content/Appearance" to="Family" method="_set_modifier"]
+[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/Profile" method="_show_character"]
+[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/Appearance" method="_show_character"]
+[connection signal="current_look_updated" from="EditorFamily" to="UI/Content/Appearance" method="_load_look_state"]
+[connection signal="member_added" from="EditorFamily" to="UI/Content/FamilyBox" method="_create_button"]
+[connection signal="button_pressed" from="UI/Content/FamilyBox" to="EditorFamily" method="_set_current_member"]
+[connection signal="button_removed" from="UI/Content/FamilyBox" to="EditorFamily" method="_remove_member"]
+[connection signal="type_selected" from="UI/Content/FamilyBox/AddMember" to="EditorFamily" method="_create_member"]
+[connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="EditorFamily" method="_set_first_name"]
+[connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="EditorFamily" method="_set_last_name"]
+[connection signal="item_selected" from="UI/Content/Appearance" to="EditorFamily" method="_add_look_item"]
+[connection signal="item_deselected" from="UI/Content/Appearance" to="EditorFamily" method="_remove_look_item"]
+[connection signal="modifier_changed" from="UI/Content/Appearance" to="EditorFamily" method="_set_modifier"]

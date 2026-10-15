@@ -193,4 +193,4 @@ func get_modifier(key: StringName) -> float:
 func set_modifier(key: StringName, value: float) -> void:
 	body_instance.set_modifier(key, value)
 	# The body rebuilds deferred, so let listeners observe the updated pose.
-	changed.emit.call_deferred()
+	body_changed.emit.call_deferred()

@@ -4,8 +4,14 @@ class_name CharacterVisual
 extends Node3D
 ## Visual representation of a character.
 
-## Emitted when the visual appearance changes (look or body modifiers).
-signal changed
+## Emitted when the look items change.
+signal look_changed
+
+## Emitted when the body shape changes (body modifiers).
+##
+## Implementations emit the signal, so it looks unused from this class.
+@warning_ignore("unused_signal")
+signal body_changed
 
 @export var _look: Array[LookItem]:
 	set = set_look
@@ -36,7 +42,7 @@ func set_look(new_look: Array[LookItem]) -> void:
 					new_look.remove_at(index)
 
 	_look = new_look
-	changed.emit()
+	look_changed.emit()
 
 
 static func _remove_conflicts(items: Array[LookItem]) -> void:
@@ -69,7 +75,7 @@ func add_look_item(item: LookItem) -> void:
 
 	Log.debug("Adding %s", item)
 	_look.append(item)
-	changed.emit()
+	look_changed.emit()
 
 
 func remove_look_item(item: LookItem) -> void:
@@ -79,7 +85,7 @@ func remove_look_item(item: LookItem) -> void:
 	Log.debug("Removing '%s'", item)
 	_look.erase(item)
 	_detach_item(item)
-	changed.emit()
+	look_changed.emit()
 
 
 ## Returns the currently equipped item of the given slot.

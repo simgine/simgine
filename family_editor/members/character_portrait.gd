@@ -15,7 +15,8 @@ func _ready() -> void:
 
 ## Shows the given visual.
 func setup(visual: CharacterVisual) -> void:
-	visual.changed.connect(_refresh.bind(visual))
+	visual.look_changed.connect(_refresh.bind(visual))
+	visual.body_changed.connect(_refresh.bind(visual))
 	# The skeleton is built deferred, so the initial refresh waits for it.
 	_refresh.call_deferred(visual)
 

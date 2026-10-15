@@ -7,10 +7,7 @@ extends Node3D
 ## Emitted when the look items change.
 signal look_changed
 
-## Emitted when the body shape changes (body modifiers).
-##
-## Implementations emit the signal, so it looks unused from this class.
-@warning_ignore("unused_signal")
+## Emitted when the body modifiers change.
 signal body_changed
 
 @export var _look: Array[LookItem]:
@@ -162,5 +159,11 @@ func get_modifier(key: StringName) -> float
 ## Sets a modifier value.
 ##
 ## The node should be ready before calling this.
+func set_modifier(key: StringName, value: float) -> void:
+	_apply_modifier(key, value)
+	body_changed.emit()
+
+
+## Applies a modifier value to the visual.
 @abstract
-func set_modifier(key: StringName, value: float) -> void
+func _apply_modifier(key: StringName, value: float) -> void

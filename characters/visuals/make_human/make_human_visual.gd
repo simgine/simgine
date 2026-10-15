@@ -190,7 +190,5 @@ func get_modifier(key: StringName) -> float:
 	return body_instance.get_modifier(key)
 
 
-func set_modifier(key: StringName, value: float) -> void:
+func _apply_modifier(key: StringName, value: float) -> void:
 	body_instance.set_modifier(key, value)
-	# The body rebuilds deferred, so let listeners observe the updated pose.
-	body_changed.emit.call_deferred()

@@ -3,6 +3,7 @@ extends Button
 
 signal remove_pressed
 
+@onready var portrait: CharacterPortrait = $Portrait
 @onready var _remove_button: Button = $RemoveButton
 
 var _removal_allowed := false

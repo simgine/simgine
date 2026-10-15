@@ -6,7 +6,7 @@ signal button_removed(index: int)
 var _group := ButtonGroup.new()
 
 
-func _create_button(_character: Character) -> void:
+func _create_button(character: Character) -> void:
 	const MEMBER_BUTTON := preload("res://family_editor/members/member_button.tscn")
 	var button: MemberButton = MEMBER_BUTTON.instantiate()
 	button.button_group = _group
@@ -17,6 +17,7 @@ func _create_button(_character: Character) -> void:
 	add_child(button)
 	move_child(button, -2)
 
+	button.portrait.setup(character.visual)
 	button.press()
 
 	_update_removal_allowed()

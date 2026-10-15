@@ -4,6 +4,9 @@ class_name CharacterVisual
 extends Node3D
 ## Visual representation of a character.
 
+## Emitted when the visual appearance changes (look or body modifiers).
+signal changed
+
 @export var _look: Array[LookItem]:
 	set = set_look
 
@@ -33,6 +36,7 @@ func set_look(new_look: Array[LookItem]) -> void:
 					new_look.remove_at(index)
 
 	_look = new_look
+	changed.emit()
 
 
 static func _remove_conflicts(items: Array[LookItem]) -> void:
@@ -65,12 +69,17 @@ func add_look_item(item: LookItem) -> void:
 
 	Log.debug("Adding %s", item)
 	_look.append(item)
+	changed.emit()
 
 
 func remove_look_item(item: LookItem) -> void:
+	if not _look.has(item):
+		return
+
 	Log.debug("Removing '%s'", item)
 	_look.erase(item)
 	_detach_item(item)
+	changed.emit()
 
 
 ## Returns the currently equipped item of the given slot.
@@ -130,6 +139,11 @@ func get_left_modifier_suffix() -> StringName
 ## Returns the suffix used to reference the right value of a sided modifier.
 @abstract
 func get_right_modifier_suffix() -> StringName
+
+
+## Returns the character's head position in world space.
+@abstract
+func get_head_position() -> Vector3
 
 
 ## Returns the current value of a modifier.

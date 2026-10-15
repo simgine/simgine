@@ -173,9 +173,24 @@ func get_right_modifier_suffix() -> StringName:
 	return "/right"
 
 
+func get_head_position() -> Vector3:
+	var skeleton := body_instance.skeleton_node
+	if not skeleton:
+		return Vector3.ZERO
+
+	var bone := skeleton.find_bone("head")
+	if bone < 0:
+		return Vector3.ZERO
+
+	var head_transform := skeleton.get_bone_global_pose(bone)
+	return skeleton.global_transform * head_transform.origin
+
+
 func get_modifier(key: StringName) -> float:
 	return body_instance.get_modifier(key)
 
 
 func set_modifier(key: StringName, value: float) -> void:
 	body_instance.set_modifier(key, value)
+	# The body rebuilds deferred, so let listeners observe the updated pose.
+	changed.emit.call_deferred()

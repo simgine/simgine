@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://djtt03dmtc0t7"]
+
+[ext_resource type="Script" uid="uid://bsfwshqqcrg5k" path="res://family_editor/members/character_portrait.gd" id="1_portrait"]
+
+[node name="CharacterPortrait" type="TextureRect" unique_id=206497409]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+script = ExtResource("1_portrait")
+
+[node name="Viewport" type="SubViewport" parent="." unique_id=1895651874]
+transparent_bg = true
+msaa_3d = 1
+size = Vector2i(96, 96)
+render_target_update_mode = 0
+
+[node name="Camera" type="Camera3D" parent="Viewport" unique_id=1429444696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.6)
+cull_mask = 1
+current = true
+fov = 40.0

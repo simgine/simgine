@@ -34,11 +34,13 @@ func _set_current_member(index: int) -> void:
 		return
 
 	if _current_member:
+		_current_member.visual.look_changed.disconnect(current_look_updated.emit)
 		_current_member.visible = false
 
 	Log.info("Selecting '%s'", member.name)
 	_current_member = member
 	_current_member.visible = true
+	member.visual.look_changed.connect(current_look_updated.emit.bind(member.visual))
 	current_member_changed.emit(member)
 
 
@@ -58,11 +60,9 @@ func _set_modifier(key: StringName, value: float) -> void:
 func _add_look_item(item: LookItem) -> void:
 	Log.debug("Adding look item '%s'", item.name)
 	_current_member.visual.add_look_item(item)
-	current_look_updated.emit(_current_member.visual)
 
 
 func _remove_look_item(item: LookItem) -> void:
 	assert(not item.slot.permanent, "Permanent look items cannot be removed")
 	Log.debug("Removing look item '%s'", item.name)
 	_current_member.visual.remove_look_item(item)
-	current_look_updated.emit(_current_member.visual)

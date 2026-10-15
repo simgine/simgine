@@ -40,12 +40,13 @@ func load_selected(visual: CharacterVisual) -> void:
 
 
 func _on_multi_selected(index: int, selected: bool) -> void:
-	if not selected and _slot.permanent:
-		# Deny deselection if the represented slot is required.
-		select(index)
-		return
-
+	# Undo the selection and only emit signals.
+	# The state later reloads from CharacterVisual because attachment can fail.
 	if selected:
+		deselect(index)
 		look_item_selected.emit(_items[index])
 	else:
-		look_item_deselected.emit(_items[index])
+		select(index)
+		# Ignore deselection if the slot is required.
+		if not _slot.permanent:
+			look_item_deselected.emit(_items[index])

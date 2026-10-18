@@ -36,6 +36,8 @@ func _render_pending() -> void:
 
 
 func _render_next(item: LookItem) -> void:
+	Log.debug("rendering preview for %s", item.name)
+
 	# The thumbnail shows the item on the base look from the preview scene.
 	# The item is appended last, so it overrides the base item of its slot.
 	var look := _base_look.duplicate()

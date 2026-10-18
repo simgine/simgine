@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cfaaaq0t8oyog" path="res://family_editor/appearance/appearance_view.gd" id="1_appearance_view"]
 [ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://family_editor/appearance/body/body_tab.gd" id="2_body_tab"]
 [ext_resource type="Script" uid="uid://bqsh54hcofd35" path="res://family_editor/appearance/items/look_items_tab.gd" id="3_look_items_tab"]
+[ext_resource type="Script" uid="uid://b4wbb1vo82x7e" path="res://family_editor/appearance/items/look_item_preview.gd" id="4_v8yi7"]
 
 [node name="AppearanceView" type="TabContainer" unique_id=1586993996]
 size_flags_vertical = 3
@@ -50,3 +51,14 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Preview" type="SubViewport" parent="." unique_id=1562166991]
+own_world_3d = true
+transparent_bg = true
+msaa_3d = 1
+size = Vector2i(300, 400)
+render_target_update_mode = 0
+script = ExtResource("4_v8yi7")
+
+[node name="Light" type="DirectionalLight3D" parent="Preview" unique_id=1197551859]
+transform = Transform3D(0.8253356, 0.47513026, -0.3050776, 0, 0.5403023, 0.841471, 0.5646425, -0.694496, 0.44593075, 0, 0, 0)

@@ -5,4 +5,5 @@
 [resource]
 script = ExtResource("1_bottom")
 name = "Bottom"
+preview_camera = "Legs"
 metadata/_custom_type_script = "uid://v4rpudpmubdt"

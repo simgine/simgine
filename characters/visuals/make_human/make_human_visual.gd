@@ -89,6 +89,10 @@ func get_modifiers_dir() -> String:
 	return "res://characters/visuals/make_human/modifiers/"
 
 
+func get_preview_scene_path() -> String:
+	return "res://characters/visuals/make_human/make_human_preview.tscn"
+
+
 func resolve_modifier_params(
 	modifiers: Dictionary[StringName, BodyModifier]
 ) -> Array[BodyModifierParams]:

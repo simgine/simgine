@@ -4,6 +4,7 @@ extends Control
 
 signal item_selected(item: LookItem)
 signal item_deselected(item: LookItem)
+signal preview_requested(item: LookItem)
 
 ## Whether to show items with permanent slots, or items with the rest.
 @export var permanent: bool
@@ -37,8 +38,17 @@ func _create_look_item_list(tabs: TabContainer, slot: LookSlot) -> LookItemList:
 
 	list.look_item_selected.connect(item_selected.emit)
 	list.look_item_deselected.connect(item_deselected.emit)
+	list.preview_requested.connect(preview_requested.emit)
+
 	tabs.add_child(list)
 	return list
+
+
+func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
+	for list: LookItemList in _tabs.get_children():
+		if list.name == item.slot.name:
+			list.set_item_preview(item, texture)
+			return
 
 
 func load_state(visual: CharacterVisual) -> void:

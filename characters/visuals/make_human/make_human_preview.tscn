@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://csomw53fujp7j"]
+
+[ext_resource type="PackedScene" uid="uid://qgahouc3pgjn" path="res://characters/visuals/make_human/make_human_visual.tscn" id="1_visual"]
+
+[node name="MakeHumanPreview" unique_id=344067901 instance=ExtResource("1_visual")]
+
+[node name="Head" type="Camera3D" parent="." index="1" unique_id=1865214107]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.7)
+fov = 40.0
+
+[node name="Torso" type="Camera3D" parent="." index="2" unique_id=824378773]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14, 0.85)
+fov = 40.0
+
+[node name="Legs" type="Camera3D" parent="." index="3" unique_id=357244134]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 1.57)
+fov = 40.0
+
+[node name="Feet" type="Camera3D" parent="." index="4" unique_id=1593422379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.22, 1.05)
+fov = 40.0
+
+[node name="FullBody" type="Camera3D" parent="." index="5" unique_id=16932003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 2.1)
+fov = 40.0

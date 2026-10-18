@@ -54,6 +54,8 @@ func _create_view(visual: CharacterVisual) -> AppearanceView:
 	view.wardrobe_tab.item_deselected.connect(item_deselected.emit)
 	view.wardrobe_tab.populate(items)
 
+	view.preview.setup(visual.get_preview_scene_path())
+
 	return view
 
 

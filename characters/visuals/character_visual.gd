@@ -42,6 +42,11 @@ func set_look(new_look: Array[LookItem]) -> void:
 	look_changed.emit()
 
 
+## Returns a copy of the currently equipped items.
+func get_look() -> Array[LookItem]:
+	return _look.duplicate()
+
+
 static func _remove_conflicts(items: Array[LookItem]) -> void:
 	# Iterate backwards so conflicting items can be removed safely.
 	for index in range(items.size() - 1, -1, -1):
@@ -120,6 +125,13 @@ func get_item_dir() -> String
 ## Returns the directory where to recursively search for [BodyModifier] resources.
 @abstract
 func get_modifiers_dir() -> String
+
+
+## Returns the path to the scene of the model used to preview [LookItem]s.
+##
+## The scene's root must be a [CharacterVisual].
+@abstract
+func get_preview_scene_path() -> String
 
 
 ## Resolves the given [BodyModifier] resources into value parameters.

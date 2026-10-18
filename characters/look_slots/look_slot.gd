@@ -11,6 +11,9 @@ extends Resource
 ## Permanent slots are always filled with an item and are excluded from look sets.
 @export var permanent: bool
 
+## The name of the preview camera to use in the scene from [method CharacterVisual.get_preview_scene_path].
+@export var preview_camera: String
+
 @export var conflicts: Array[LookSlot] = _create_empty_conflicts()
 
 

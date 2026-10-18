@@ -6,18 +6,18 @@ signal preview_ready(item: LookItem, texture: ImageTexture)
 
 var _visual: CharacterVisual
 
-## Default look from the preview scene.
-##
-## Previewed items layered on top of it.
-var _base_look: Array[LookItem]
-
 var _queue: Array[LookItem]
 var _rendering := false
+
+## Item currently layered on the base look.
+var _layered_item: LookItem
+
+## Base look items displaced by [member _layered_item].
+var _displaced: Array[LookItem]
 
 
 func setup(scene_path: String) -> void:
 	_visual = _load_visual(scene_path)
-	_base_look = _visual.get_look()
 
 
 func request_preview(item: LookItem) -> void:
@@ -36,13 +36,16 @@ func _render_pending() -> void:
 
 
 func _render_next(item: LookItem) -> void:
-	Log.debug("rendering preview for %s", item.name)
+	_restore_base_look()
 
-	# The thumbnail shows the item on the base look from the preview scene.
-	# The item is appended last, so it overrides the base item of its slot.
-	var look := _base_look.duplicate()
-	look.append(item)
-	_visual.set_look(look)
+	# Record what add_look_item() will displace, so the base look can be
+	# restored for the next item.
+	for look_item: LookItem in _visual.look:
+		if item.conflicts_with(look_item):
+			_displaced.append(look_item)
+
+	_visual.add_look_item(item)
+	_layered_item = item
 
 	# Wait for the attachment rebuild, which is deferred.
 	await get_tree().process_frame
@@ -59,6 +62,15 @@ func _render_next(item: LookItem) -> void:
 		return
 
 	preview_ready.emit(item, ImageTexture.create_from_image(image))
+
+
+func _restore_base_look() -> void:
+	if _layered_item:
+		_visual.remove_look_item(_layered_item)
+	for displaced_item in _displaced:
+		_visual.add_look_item(displaced_item)
+	_displaced.clear()
+	_layered_item = null
 
 
 func _activate_camera(slot: LookSlot) -> bool:

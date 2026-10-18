@@ -12,6 +12,6 @@
 [node name="Human" unique_id=1028284929 instance=ExtResource("1_e211d")]
 
 [node name="MakeHumanVisual" parent="." index="0" unique_id=1038237501]
-_look = Array[ExtResource("2_c4skc")]([ExtResource("3_hw4yx"), ExtResource("4_5aagr"), ExtResource("6_5aagr"), ExtResource("7_ec50j"), ExtResource("7_5aagr"), ExtResource("8_272nq")])
+look = Array[ExtResource("2_c4skc")]([ExtResource("3_hw4yx"), ExtResource("4_5aagr"), ExtResource("6_5aagr"), ExtResource("7_ec50j"), ExtResource("7_5aagr"), ExtResource("8_272nq")])
 
 [editable path="MakeHumanVisual"]

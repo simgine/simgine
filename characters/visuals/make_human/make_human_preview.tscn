@@ -1,8 +1,14 @@
 [gd_scene format=3 uid="uid://csomw53fujp7j"]
 
 [ext_resource type="PackedScene" uid="uid://qgahouc3pgjn" path="res://characters/visuals/make_human/make_human_visual.tscn" id="1_visual"]
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="2_ien3r"]
+[ext_resource type="Resource" uid="uid://ca4iq0bt32pen" path="res://characters/visuals/make_human/items/eyes/high_poly_eye/high_poly_eyes.tres" id="3_f4d7u"]
+[ext_resource type="Resource" uid="uid://bs4s8kk2p8ry2" path="res://characters/visuals/make_human/items/hair/ponytail01/ponytail01.tres" id="4_fakd8"]
+[ext_resource type="Resource" uid="uid://dydsd3cotcikj" path="res://characters/visuals/make_human/items/eyelashes/eyelashes01/eyelashes01.tres" id="5_l3p8a"]
+[ext_resource type="Resource" uid="uid://rgx1ew4aa2ov" path="res://characters/visuals/make_human/items/eyebrows/eyebrow001/eyebrow001.tres" id="6_xeu00"]
 
 [node name="MakeHumanPreview" unique_id=344067901 instance=ExtResource("1_visual")]
+_look = Array[ExtResource("2_ien3r")]([ExtResource("3_f4d7u"), ExtResource("4_fakd8"), ExtResource("5_l3p8a"), ExtResource("6_xeu00")])
 
 [node name="Head" type="Camera3D" parent="." index="1" unique_id=1865214107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.7)

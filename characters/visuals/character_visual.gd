@@ -84,7 +84,7 @@ func remove_look_item(item: LookItem) -> void:
 	if not _look.has(item):
 		return
 
-	Log.debug("Removing '%s'", item)
+	Log.debug("Removing %s", item)
 	_look.erase(item)
 	_detach_item(item)
 	look_changed.emit()

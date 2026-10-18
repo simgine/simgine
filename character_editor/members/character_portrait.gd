@@ -22,7 +22,7 @@ func setup(visual: CharacterVisual) -> void:
 
 
 func _refresh(visual: CharacterVisual) -> void:
-	var focus := visual.get_bone_position("head")
+	var focus := visual.get_bone_position("Head")
 	_camera.position = focus + Vector3(0.0, 0.0, _distance)
 	_camera.look_at(focus, Vector3.UP)
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE

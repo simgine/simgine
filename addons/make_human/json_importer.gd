@@ -23,6 +23,64 @@ const MACRO_METADATA: Dictionary[StringName, Dictionary] = {
 	},
 }
 
+## Maps MakeHuman bone names to the names in [SkeletonProfileHumanoid].
+##
+## This way, animations retargeted through it play back on the skeleton as-is.
+## Bones without an entry fall back to PascalCase, which matches the profile for `Root` and `head`.
+const EXPORT_BONE_NAMES: Dictionary[StringName, StringName] = {
+	"pelvis": "Hips",
+	"spine_01": "Spine",
+	"spine_02": "Chest",
+	"spine_03": "UpperChest",
+	"neck_01": "Neck",
+	"clavicle_l": "LeftShoulder",
+	"clavicle_r": "RightShoulder",
+	"upperarm_l": "LeftUpperArm",
+	"upperarm_r": "RightUpperArm",
+	"lowerarm_l": "LeftLowerArm",
+	"lowerarm_r": "RightLowerArm",
+	"hand_l": "LeftHand",
+	"hand_r": "RightHand",
+	"thumb_01_l": "LeftThumbMetacarpal",
+	"thumb_02_l": "LeftThumbProximal",
+	"thumb_03_l": "LeftThumbDistal",
+	"thumb_01_r": "RightThumbMetacarpal",
+	"thumb_02_r": "RightThumbProximal",
+	"thumb_03_r": "RightThumbDistal",
+	"index_01_l": "LeftIndexProximal",
+	"index_02_l": "LeftIndexIntermediate",
+	"index_03_l": "LeftIndexDistal",
+	"index_01_r": "RightIndexProximal",
+	"index_02_r": "RightIndexIntermediate",
+	"index_03_r": "RightIndexDistal",
+	"middle_01_l": "LeftMiddleProximal",
+	"middle_02_l": "LeftMiddleIntermediate",
+	"middle_03_l": "LeftMiddleDistal",
+	"middle_01_r": "RightMiddleProximal",
+	"middle_02_r": "RightMiddleIntermediate",
+	"middle_03_r": "RightMiddleDistal",
+	"ring_01_l": "LeftRingProximal",
+	"ring_02_l": "LeftRingIntermediate",
+	"ring_03_l": "LeftRingDistal",
+	"ring_01_r": "RightRingProximal",
+	"ring_02_r": "RightRingIntermediate",
+	"ring_03_r": "RightRingDistal",
+	"pinky_01_l": "LeftLittleProximal",
+	"pinky_02_l": "LeftLittleIntermediate",
+	"pinky_03_l": "LeftLittleDistal",
+	"pinky_01_r": "RightLittleProximal",
+	"pinky_02_r": "RightLittleIntermediate",
+	"pinky_03_r": "RightLittleDistal",
+	"thigh_l": "LeftUpperLeg",
+	"thigh_r": "RightUpperLeg",
+	"calf_l": "LeftLowerLeg",
+	"calf_r": "RightLowerLeg",
+	"foot_l": "LeftFoot",
+	"foot_r": "RightFoot",
+	"ball_l": "LeftToes",
+	"ball_r": "RightToes",
+}
+
 
 func _get_importer_name() -> String:
 	return "make_human.json_importer"
@@ -321,6 +379,11 @@ static func _append_bone_with_parents(
 static func _parse_bone(bone_name: StringName, parent_index: int, dict: Dictionary) -> MHBone:
 	var bone := MHBone.new()
 	bone.name = bone_name
+	var export_name: Variant = EXPORT_BONE_NAMES.get(bone_name)
+	if not export_name:
+		# Rename bones missing in SkeletonProfileHumanoid for consistency.
+		export_name = bone_name.to_pascal_case()
+	bone.export_name = export_name
 	bone.parent_index = parent_index
 	bone.head = _parse_rig_position(dict.head)
 	bone.tail = _parse_rig_position(dict.tail)

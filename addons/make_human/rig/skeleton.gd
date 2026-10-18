@@ -64,7 +64,7 @@ func rebuild(rig: MHRig, vertex_groups: MHVertexGroups, body_vertices: PackedVec
 
 	for bone_index in rig.bones.size():
 		var bone := rig.bones[bone_index]
-		var added_index := add_bone(bone.name)
+		var added_index := add_bone(bone.export_name)
 		assert(added_index == bone_index)
 
 		var global_rest := bone.resolve_global_rest(body_vertices, vertex_groups)

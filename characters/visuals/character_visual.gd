@@ -32,13 +32,13 @@ func set_look(new_look: Array[LookItem]) -> void:
 	if is_node_ready():
 		for old_item in look:
 			if old_item and not new_look.has(old_item):
-				Log.debug("Removing old %s", old_item)
+				Log.trace("Removing old %s", old_item)
 				_detach_item(old_item)
 
 		for index in range(new_look.size() - 1, -1, -1):
 			var new_item := new_look[index]
 			if new_item and not look.has(new_item):
-				Log.debug("Adding new %s", new_item)
+				Log.trace("Adding new %s", new_item)
 				if not _attach_item(new_item):
 					new_look.remove_at(index)
 
@@ -74,7 +74,7 @@ func add_look_item(item: LookItem) -> void:
 			_detach_item(existing_item)
 			look.remove_at(index)
 
-	Log.debug("Adding %s", item)
+	Log.trace("Adding %s", item)
 	look.append(item)
 	look_changed.emit()
 
@@ -83,7 +83,7 @@ func remove_look_item(item: LookItem) -> void:
 	if not look.has(item):
 		return
 
-	Log.debug("Removing %s", item)
+	Log.trace("Removing %s", item)
 	look.erase(item)
 	_detach_item(item)
 	look_changed.emit()

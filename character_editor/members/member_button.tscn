@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://moyikf4q2rs5"]
 
-[ext_resource type="Script" uid="uid://b5funy2uetpsm" path="res://family_editor/members/member_button.gd" id="1"]
-[ext_resource type="Script" uid="uid://bsfwshqqcrg5k" path="res://family_editor/members/character_portrait.gd" id="2_portrait"]
+[ext_resource type="Script" uid="uid://b5funy2uetpsm" path="res://character_editor/members/member_button.gd" id="1"]
+[ext_resource type="Script" uid="uid://bsfwshqqcrg5k" path="res://character_editor/members/character_portrait.gd" id="2_portrait"]
 
 [node name="MemberButton" type="Button" unique_id=278841506]
 custom_minimum_size = Vector2(48, 48)

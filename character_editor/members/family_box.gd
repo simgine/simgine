@@ -7,7 +7,7 @@ var _group := ButtonGroup.new()
 
 
 func _create_button(character: Character) -> void:
-	const MEMBER_BUTTON := preload("res://family_editor/members/member_button.tscn")
+	const MEMBER_BUTTON := preload("res://character_editor/members/member_button.tscn")
 	var button: MemberButton = MEMBER_BUTTON.instantiate()
 	button.button_group = _group
 	button.pressed.connect(_emit_button_pressed.bind(button))

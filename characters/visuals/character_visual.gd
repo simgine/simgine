@@ -136,7 +136,7 @@ func get_preview_scene_path() -> String
 ## Resolves the given [BodyModifier] resources into value parameters.
 ##
 ## The returned parameters are grouped by category. I.e. all parameters of a
-## category are contiguous. The family editor relies on this ordering.
+## category are contiguous. The character editor relies on this ordering.
 ##
 ## All matched modifiers will be removed from [param modifiers].
 @abstract

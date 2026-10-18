@@ -1,5 +1,5 @@
 extends VBoxContainer
-## The appearance section of the family editor.
+## The appearance section of the character editor.
 ##
 ## Shows an [AppearanceView] per [CharacterVisual] type and keeps it in
 ## sync with the member's look.
@@ -34,7 +34,7 @@ func _show_character(character: Character) -> void:
 
 
 func _create_view(visual: CharacterVisual) -> AppearanceView:
-	const APPEARANCE_VIEW := preload("res://family_editor/appearance/appearance_view.tscn")
+	const APPEARANCE_VIEW := preload("res://character_editor/appearance/appearance_view.tscn")
 	var view: AppearanceView = APPEARANCE_VIEW.instantiate()
 
 	# The view must be in the tree before populating,

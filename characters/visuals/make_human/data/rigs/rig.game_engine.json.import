@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.json_importer"
+type="Resource"
+uid="uid://bqer4j288hant"
+path="res://.godot/imported/rig.game_engine.json-83bfdea69ecd10da1542ebf3d16420fd.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/data/rigs/rig.game_engine.json"
+dest_files=["res://.godot/imported/rig.game_engine.json-83bfdea69ecd10da1542ebf3d16420fd.res"]
+
+[params]
+

@@ -83,60 +83,6 @@
         "use_inherit_rotation": true,
         "use_local_location": true
     },
-    "breast_l": {
-        "head": {
-            "cube_name": "joint-spine-1",
-            "default_position": [
-                0.0,
-                0.018699999898672104,
-                0.4209800064563751
-            ],
-            "strategy": "CUBE"
-        },
-        "inherit_scale": "FULL",
-        "parent": "spine_02",
-        "rigify": {},
-        "roll": 0.5189173817634583,
-        "tail": {
-            "default_position": [
-                0.10209662467241287,
-                -0.14870992302894592,
-                0.39611339569091797
-            ],
-            "strategy": "VERTEX",
-            "vertex_index": 8451
-        },
-        "use_connect": false,
-        "use_inherit_rotation": true,
-        "use_local_location": true
-    },
-    "breast_r": {
-        "head": {
-            "cube_name": "joint-spine-1",
-            "default_position": [
-                0.0,
-                0.018699999898672104,
-                0.4209800064563751
-            ],
-            "strategy": "CUBE"
-        },
-        "inherit_scale": "FULL",
-        "parent": "spine_02",
-        "rigify": {},
-        "roll": -0.5189173817634583,
-        "tail": {
-            "default_position": [
-                -0.10209662467241287,
-                -0.14870992302894592,
-                0.39611339569091797
-            ],
-            "strategy": "VERTEX",
-            "vertex_index": 1779
-        },
-        "use_connect": false,
-        "use_inherit_rotation": true,
-        "use_local_location": true
-    },
     "calf_l": {
         "head": {
             "cube_name": "joint-l-knee",

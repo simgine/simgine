@@ -3,7 +3,7 @@
 [ext_resource type="Resource" uid="uid://cq4l65kp7fx6a" path="res://characters/visuals/make_human/data/3dobjs/base.obj" id="1_5g231"]
 [ext_resource type="Script" uid="uid://b3tm7pgue0gxn" path="res://addons/make_human/body.gd" id="1_h8hfm"]
 [ext_resource type="Resource" uid="uid://rwn1dv1lhdq" path="res://characters/visuals/make_human/data/targets/macrodetails/macro.json" id="2_drgmq"]
-[ext_resource type="Resource" uid="uid://dlub8a501shqe" path="res://characters/visuals/make_human/data/rigs/rig.game_engine_with_breast.json" id="3_oam52"]
+[ext_resource type="Resource" uid="uid://bqer4j288hant" path="res://characters/visuals/make_human/data/rigs/rig.game_engine.json" id="3_oam52"]
 [ext_resource type="Resource" uid="uid://gr3ts3ukdcvr" path="res://characters/visuals/make_human/data/rigs/weights.game_engine.json" id="4_tj5a2"]
 [ext_resource type="Resource" uid="uid://d26sarld4l3y" path="res://characters/visuals/make_human/data/targets/target.json" id="6_ei8ps"]
 [ext_resource type="Resource" uid="uid://bwy0k7jwowhx4" path="res://characters/visuals/make_human/data/mesh_metadata/basemesh_vertex_groups.json" id="7_3yy3w"]

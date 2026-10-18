@@ -36,6 +36,7 @@ func _render_pending() -> void:
 
 
 func _render_next(item: LookItem) -> void:
+	Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
 
 	# Record what add_look_item() will displace, so the base look can be

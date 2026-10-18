@@ -1,5 +1,5 @@
 class_name LookItemsTab
-extends Control
+extends TabContainer
 ## An appearance tab that groups [LookItem]s into subtabs by slot.
 
 signal item_selected(item: LookItem)
@@ -8,8 +8,6 @@ signal preview_requested(item: LookItem)
 
 ## Whether to show items with permanent slots, or items with the rest.
 @export var permanent: bool
-
-@onready var _tabs: TabContainer = $Tabs
 
 
 func populate(items: Array[LookItem]) -> void:
@@ -23,14 +21,14 @@ func populate(items: Array[LookItem]) -> void:
 		# so a new tab starts when the slot changes.
 		if item.slot != current_slot:
 			current_slot = item.slot
-			list = _create_look_item_list(_tabs, current_slot)
+			list = _create_look_item_list(current_slot)
 
 		list.add_look_item(item)
 
-	Log.debug("Created %d look slot tabs", _tabs.get_tab_count())
+	Log.debug("Created %d look slot tabs", get_tab_count())
 
 
-func _create_look_item_list(tabs: TabContainer, slot: LookSlot) -> LookItemList:
+func _create_look_item_list(slot: LookSlot) -> LookItemList:
 	const LOOK_ITEM_LIST := preload("res://family_editor/appearance/items/look_item_list.tscn")
 	var list: LookItemList = LOOK_ITEM_LIST.instantiate()
 	list.name = slot.name
@@ -40,17 +38,17 @@ func _create_look_item_list(tabs: TabContainer, slot: LookSlot) -> LookItemList:
 	list.look_item_deselected.connect(item_deselected.emit)
 	list.preview_requested.connect(preview_requested.emit)
 
-	tabs.add_child(list)
+	add_child(list)
 	return list
 
 
 func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
-	for list: LookItemList in _tabs.get_children():
+	for list: LookItemList in get_children():
 		if list.name == item.slot.name:
 			list.set_item_preview(item, texture)
 			return
 
 
 func load_state(visual: CharacterVisual) -> void:
-	for look_item_list: LookItemList in _tabs.get_children():
+	for look_item_list: LookItemList in get_children():
 		look_item_list.load_selected(visual)

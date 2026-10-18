@@ -1,9 +1,7 @@
 class_name BodyTab
-extends Control
+extends TabContainer
 
 signal modifier_changed(key: StringName, value: float)
-
-@onready var _tabs: TabContainer = $Tabs
 
 
 func populate(visual: CharacterVisual) -> void:
@@ -26,23 +24,23 @@ func populate(visual: CharacterVisual) -> void:
 		if param.modifier.category != current_category:
 			current_category = param.modifier.category
 
-			list = _create_modifier_list(_tabs, current_category)
+			list = _create_modifier_list(current_category)
 
 		list.add_modifier(param, left_suffix, right_suffix)
 
-	Log.debug("Created %d modifier category tabs", _tabs.get_tab_count())
+	Log.debug("Created %d modifier category tabs", get_tab_count())
 
 
-func _create_modifier_list(tabs: TabContainer, category: ModifierCategory) -> ModifierList:
+func _create_modifier_list(category: ModifierCategory) -> ModifierList:
 	const MODIFIER_LIST := preload("res://family_editor/appearance/body/modifier_list.tscn")
 	var list: ModifierList = MODIFIER_LIST.instantiate()
 	list.name = category.name
 
 	list.modifier_changed.connect(modifier_changed.emit)
-	tabs.add_child(list)
+	add_child(list)
 	return list
 
 
 func load_state(visual: CharacterVisual) -> void:
-	for list: ModifierList in _tabs.get_children():
+	for list: ModifierList in get_children():
 		list.load_values(visual)

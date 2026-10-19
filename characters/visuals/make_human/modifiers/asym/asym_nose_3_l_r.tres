@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="BodyModifier" format=3]
+
+[ext_resource type="Resource" path="res://characters/modifier_categories/asymmetry.tres" id="1_category"]
+[ext_resource type="Script" uid="uid://dycl2kaao42bx" path="res://characters/body_modifier.gd" id="2_modifier"]
+
+[resource]
+script = ExtResource("2_modifier")
+key = &"asym-nose-3-l-r"
+name = "Nose Asymmetry 3"
+min_label = "Left"
+max_label = "Right"
+category = ExtResource("1_category")
+metadata/_custom_type_script = "uid://dycl2kaao42bx"

@@ -8,7 +8,9 @@
 [ext_resource type="Script" uid="uid://vb6sg6ro8f0o" path="res://character_editor/profile.gd" id="6_profile"]
 [ext_resource type="Script" uid="uid://b8tvb5236maib" path="res://character_editor/appearance/appearance_panel.gd" id="7_appearance"]
 
-[sub_resource type="ButtonGroup" id="ButtonGroup_ubl36"]
+[sub_resource type="ButtonGroup" id="ButtonGroup_mgv58"]
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_inhhd"]
 
 [node name="CharacterEditor" type="Node" unique_id=165775639]
 script = ExtResource("1_c2sgl")
@@ -64,6 +66,8 @@ layout_mode = 0
 offset_right = 300.0
 offset_bottom = 115.0
 script = ExtResource("6_profile")
+_gender_group = SubResource("ButtonGroup_mgv58")
+_animation_group = SubResource("ButtonGroup_inhhd")
 
 [node name="Title" type="Label" parent="UI/Content/Profile" unique_id=1291411134]
 layout_mode = 2
@@ -77,7 +81,7 @@ layout_mode = 2
 
 [node name="Name" type="Label" parent="UI/Content/Profile/NameRow" unique_id=1822595618]
 layout_mode = 2
-text = "Name"
+text = "Name:"
 
 [node name="FirstName" type="LineEdit" parent="UI/Content/Profile/NameRow" unique_id=1228595706]
 unique_name_in_owner = true
@@ -96,25 +100,50 @@ layout_mode = 2
 
 [node name="Gender" type="Label" parent="UI/Content/Profile/GenderRow" unique_id=2058466369]
 layout_mode = 2
-text = "Gender"
+text = "Gender:"
 
 [node name="Male" type="Button" parent="UI/Content/Profile/GenderRow" unique_id=2098612213]
+unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("ButtonGroup_ubl36")
-text = "M"
+button_group = SubResource("ButtonGroup_mgv58")
+text = "Male"
 
 [node name="Female" type="Button" parent="UI/Content/Profile/GenderRow" unique_id=1020726079]
+unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("ButtonGroup_ubl36")
-text = "F"
+button_group = SubResource("ButtonGroup_mgv58")
+text = "Female"
 
-[node name="NonBinary" type="Button" parent="UI/Content/Profile/GenderRow" unique_id=2062507455]
+[node name="Customize" type="Button" parent="UI/Content/Profile/GenderRow" unique_id=2062507455]
+unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("ButtonGroup_ubl36")
-text = "NB"
+button_group = SubResource("ButtonGroup_mgv58")
+text = "Customize"
+
+[node name="AnimationsRow" type="HBoxContainer" parent="UI/Content/Profile" unique_id=812293696]
+visible = false
+layout_mode = 2
+
+[node name="Animations" type="Label" parent="UI/Content/Profile/AnimationsRow" unique_id=895871392]
+layout_mode = 2
+text = "Animations:"
+
+[node name="Feminine" type="Button" parent="UI/Content/Profile/AnimationsRow" unique_id=846629284]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_inhhd")
+text = "Feminine"
+
+[node name="Masculine" type="Button" parent="UI/Content/Profile/AnimationsRow" unique_id=756231323]
+unique_name_in_owner = true
+layout_mode = 2
+toggle_mode = true
+button_group = SubResource("ButtonGroup_inhhd")
+text = "Masculine"
 
 [node name="Appearance" type="VBoxContainer" parent="UI/Content" unique_id=1872450931]
 layout_mode = 1
@@ -141,6 +170,7 @@ layout_mode = 2
 [connection signal="button_pressed" from="UI/Content/FamilyBox" to="EditorFamily" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyBox" to="EditorFamily" method="_remove_member"]
 [connection signal="type_selected" from="UI/Content/FamilyBox/AddMember" to="EditorFamily" method="_create_member"]
+[connection signal="animation_style_changed" from="UI/Content/Profile" to="EditorFamily" method="_set_animation_style"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/FirstName" to="EditorFamily" method="_set_first_name"]
 [connection signal="text_changed" from="UI/Content/Profile/NameRow/LastName" to="EditorFamily" method="_set_last_name"]
 [connection signal="item_deselected" from="UI/Content/Appearance" to="EditorFamily" method="_remove_look_item"]

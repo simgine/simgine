@@ -11,93 +11,58 @@ signal look_changed
 signal body_changed
 
 ## Currently equipped items.
-@export var look: Array[LookItem]:
-	set = set_look
+@export var look: CharacterLook = CharacterLook.new():
+	set = _set_look
 
 
 func _ready() -> void:
-	for index in range(look.size() - 1, -1, -1):
-		var item := look[index]
-		if not item or not _attach_item(item):
-			look.remove_at(index)
+	_connect_look(look)
+	for item in look.items:
+		if item:
+			_attach_item(item)
 
 
 ## Replaces the old look with a new one.
-##
-## The passed array is stored as the look and may be modified:
-## conflicting and failed items are removed from it.
-func set_look(new_look: Array[LookItem]) -> void:
-	_remove_conflicts(new_look)
+func _set_look(new_look: CharacterLook) -> void:
+	if look == new_look:
+		return
 
+	# The look from the inspector may come with invalid or conflicting items.
+	new_look.remove_invalid()
+
+	var changed := false
 	if is_node_ready():
-		for old_item in look:
-			if old_item and not new_look.has(old_item):
-				Log.trace("Removing old %s", old_item)
-				_detach_item(old_item)
+		Log.trace("Removing old look")
+		_disconnect_look(look)
+		for item in look.items:
+			if item and not new_look.items.has(item):
+				_detach_item(item)
+				changed = true
 
-		for index in range(new_look.size() - 1, -1, -1):
-			var new_item := new_look[index]
-			if new_item and not look.has(new_item):
-				Log.trace("Adding new %s", new_item)
-				if not _attach_item(new_item):
-					new_look.remove_at(index)
+		Log.trace("Adding new look")
+		_connect_look(new_look)
+		for new_item in new_look.items:
+			if new_item and not look.items.has(new_item):
+				_attach_item(new_item)
+				changed = true
 
 	look = new_look
-	look_changed.emit()
+	if changed:
+		look_changed.emit()
 
 
-static func _remove_conflicts(items: Array[LookItem]) -> void:
-	# Iterate backwards so conflicting items can be removed safely.
-	for index in range(items.size() - 1, -1, -1):
-		var item := items[index]
-		if not item or not item.slot:
-			# Keep invalid items for editing from the inspector.
-			if not Engine.is_editor_hint():
-				items.remove_at(index)
-			continue
-
-		for later_index in range(index + 1, items.size()):
-			var other_item := items[later_index]
-			if item.conflicts_with(other_item):
-				items.remove_at(index)
-				break
+func _connect_look(new_look: CharacterLook) -> void:
+	new_look.item_added.connect(_attach_item)
+	new_look.item_removed.connect(_detach_item)
+	new_look.item_added.connect(look_changed.emit.unbind(1))
+	new_look.item_removed.connect(look_changed.emit.unbind(1))
 
 
-func add_look_item(item: LookItem) -> void:
-	# Try to attach first since it can fail.
-	if not _attach_item(item):
-		return
-
-	for index in range(look.size() - 1, -1, -1):
-		var existing_item := look[index]
-		if item.conflicts_with(existing_item):
-			_detach_item(existing_item)
-			look.remove_at(index)
-
-	Log.trace("Adding %s", item)
-	look.append(item)
-	look_changed.emit()
-
-
-func remove_look_item(item: LookItem) -> void:
-	if not look.has(item):
-		return
-
-	Log.trace("Removing %s", item)
-	look.erase(item)
-	_detach_item(item)
-	look_changed.emit()
-
-
-## Returns the currently equipped item of the given slot.
-##
-## Returns `null` if the slot is empty.
-func get_look_item(slot: LookSlot) -> LookItem:
-	for item in look:
-		if item and item.slot == slot:
-			return item
-
-	return null
+func _disconnect_look(old_look: CharacterLook) -> void:
+	old_look.item_added.disconnect(_attach_item)
+	old_look.item_removed.disconnect(_detach_item)
+	old_look.item_added.disconnect(look_changed.emit)
+	old_look.item_removed.disconnect(look_changed.emit)
 
 
 ## Displays item's visual.

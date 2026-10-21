@@ -63,10 +63,10 @@ func _set_modifier(key: StringName, value: float) -> void:
 
 func _add_look_item(item: LookItem) -> void:
 	Log.info("Adding look item '%s'", item.name)
-	_current_member.visual.add_look_item(item)
+	_current_member.visual.look.add(item)
 
 
 func _remove_look_item(item: LookItem) -> void:
 	assert(not item.slot.permanent, "Permanent look items cannot be removed")
 	Log.info("Removing look item '%s'", item.name)
-	_current_member.visual.remove_look_item(item)
+	_current_member.visual.look.remove(item)

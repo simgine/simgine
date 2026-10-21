@@ -41,7 +41,7 @@ func add_look_item(item: LookItem) -> void:
 
 
 func load_selected(visual: CharacterVisual) -> void:
-	var item := visual.get_look_item(_slot)
+	var item := visual.look.get_item(_slot)
 	if item and _item_indices.has(item):
 		select(_item_indices[item])
 	else:

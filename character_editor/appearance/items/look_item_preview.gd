@@ -39,13 +39,13 @@ func _render_next(item: LookItem) -> void:
 	Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
 
-	# Record what add_look_item() will displace, so the base look can be
+	# Record what look.add() will displace, so the base look can be
 	# restored for the next item.
-	for look_item: LookItem in _visual.look:
+	for look_item: LookItem in _visual.look.items:
 		if item.conflicts_with(look_item):
 			_displaced.append(look_item)
 
-	_visual.add_look_item(item)
+	_visual.look.add(item)
 	_layered_item = item
 
 	# Wait for the attachment rebuild, which is deferred.
@@ -67,9 +67,9 @@ func _render_next(item: LookItem) -> void:
 
 func _restore_base_look() -> void:
 	if _layered_item:
-		_visual.remove_look_item(_layered_item)
+		_visual.look.remove(_layered_item)
 	for displaced_item in _displaced:
-		_visual.add_look_item(displaced_item)
+		_visual.look.add(displaced_item)
 	_displaced.clear()
 	_layered_item = null
 

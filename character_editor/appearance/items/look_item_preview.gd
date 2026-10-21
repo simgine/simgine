@@ -39,8 +39,7 @@ func _render_next(item: LookItem) -> void:
 	Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
 
-	# Record what look.add() will displace, so the base look can be
-	# restored for the next item.
+	# Record conflicting items to restore before the next item.
 	for look_item: LookItem in _visual.look.items:
 		if item.conflicts_with(look_item):
 			_displaced.append(look_item)

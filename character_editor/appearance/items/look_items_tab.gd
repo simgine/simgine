@@ -43,12 +43,33 @@ func _create_look_item_list(slot: LookSlot) -> LookItemList:
 
 
 func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
-	for list: LookItemList in get_children():
-		if list.name == item.slot.name:
-			list.set_item_preview(item, texture)
-			return
+	var list := _find_list(item.slot)
+	if list:
+		list.set_item_preview(item, texture)
+
+
+## Selects the item's icon in the list of its slot.
+func select_item(item: LookItem) -> void:
+	var list := _find_list(item.slot)
+	if list:
+		list.select_item(item)
+
+
+## Deselects the item's icon in the list of its slot.
+func deselect_item(item: LookItem) -> void:
+	var list := _find_list(item.slot)
+	if list:
+		list.deselect_item(item)
 
 
 func load_state(visual: CharacterVisual) -> void:
 	for look_item_list: LookItemList in get_children():
 		look_item_list.load_selected(visual)
+
+
+func _find_list(slot: LookSlot) -> LookItemList:
+	for list: LookItemList in get_children():
+		if list.name == slot.name:
+			return list
+
+	return null

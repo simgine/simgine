@@ -59,5 +59,9 @@ func _create_view(visual: CharacterVisual) -> AppearanceView:
 	return view
 
 
-func _load_look_state(visual: CharacterVisual) -> void:
-	_current_view.load_look_state(visual)
+func _select_item(item: LookItem) -> void:
+	_current_view.select_item(item)
+
+
+func _deselect_item(item: LookItem) -> void:
+	_current_view.deselect_item(item)

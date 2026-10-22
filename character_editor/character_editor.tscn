@@ -163,7 +163,8 @@ text = "Appearance"
 [node name="Separator" type="HSeparator" parent="UI/Content/Appearance" unique_id=1728304965]
 layout_mode = 2
 
-[connection signal="current_look_updated" from="EditorFamily" to="UI/Content/Appearance" method="_load_look_state"]
+[connection signal="current_item_added" from="EditorFamily" to="UI/Content/Appearance" method="_select_item"]
+[connection signal="current_item_removed" from="EditorFamily" to="UI/Content/Appearance" method="_deselect_item"]
 [connection signal="current_member_changed" from="EditorFamily" to="UI/Content/Profile" method="_show_character"]
 [connection signal="current_member_changed" from="EditorFamily" to="UI/Content/Appearance" method="_show_character"]
 [connection signal="member_added" from="EditorFamily" to="UI/Content/FamilyBox" method="_create_button"]

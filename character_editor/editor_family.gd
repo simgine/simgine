@@ -2,7 +2,8 @@ extends Node3D
 
 signal member_added(character: Character)
 signal current_member_changed(character: Character)
-signal current_look_updated(visual: CharacterVisual)
+signal current_item_added(item: LookItem)
+signal current_item_removed(item: LookItem)
 
 ## The character currently shown on the scene.
 ##
@@ -34,13 +35,15 @@ func _set_current_member(index: int) -> void:
 		return
 
 	if _current_member:
-		_current_member.visual.look_changed.disconnect(current_look_updated.emit)
+		_current_member.visual.look.item_added.disconnect(current_item_added.emit)
+		_current_member.visual.look.item_removed.disconnect(current_item_removed.emit)
 		_current_member.visible = false
 
 	Log.info("Selecting '%s'", member.name)
 	_current_member = member
 	_current_member.visible = true
-	member.visual.look_changed.connect(current_look_updated.emit.bind(member.visual))
+	member.visual.look.item_added.connect(current_item_added.emit)
+	member.visual.look.item_removed.connect(current_item_removed.emit)
 	current_member_changed.emit(member)
 
 

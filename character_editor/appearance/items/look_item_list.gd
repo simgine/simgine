@@ -41,13 +41,19 @@ func add_look_item(item: LookItem) -> void:
 
 
 func load_selected(visual: CharacterVisual) -> void:
+	deselect_all()
+
 	var item := visual.look.get_item(_slot)
-	if item and _item_indices.has(item):
+	if item:
 		select(_item_indices[item])
-	else:
-		# Unlike `deselect_all()`, `deselect()` preserves the navigation cursor.
-		for index in get_selected_items():
-			deselect(index)
+
+
+func select_item(item: LookItem) -> void:
+	select(_item_indices[item])
+
+
+func deselect_item(item: LookItem) -> void:
+	deselect(_item_indices[item])
 
 
 ## Sets the rendered preview as the item's icon.
@@ -57,7 +63,7 @@ func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
 
 func _on_multi_selected(index: int, selected: bool) -> void:
 	# Undo the selection and only emit signals.
-	# The state later reloads from CharacterVisual because attachment can fail.
+	# The state will be updated via signals from CharacterVisual.
 	if selected:
 		deselect(index)
 		look_item_selected.emit(_items[index])

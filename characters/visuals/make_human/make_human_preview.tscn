@@ -8,12 +8,12 @@
 [ext_resource type="Resource" uid="uid://rgx1ew4aa2ov" path="res://characters/visuals/make_human/items/eyebrows/eyebrow001/eyebrow001.tres" id="6_xeu00"]
 [ext_resource type="Script" uid="uid://cw78o1pbhhjm7" path="res://characters/character_look.gd" id="7_look"]
 
-[sub_resource type="Resource" id="1_character_look"]
+[sub_resource type="Resource" id="Resource_k538c"]
 script = ExtResource("7_look")
 items = Array[ExtResource("2_ien3r")]([ExtResource("3_f4d7u"), ExtResource("4_fakd8"), ExtResource("5_l3p8a"), ExtResource("6_xeu00")])
 
 [node name="MakeHumanPreview" unique_id=344067901 instance=ExtResource("1_visual")]
-look = SubResource("1_character_look")
+look = SubResource("Resource_k538c")
 
 [node name="Head" type="Camera3D" parent="." index="1" unique_id=1865214107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.7)

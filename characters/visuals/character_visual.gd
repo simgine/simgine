@@ -4,6 +4,11 @@ class_name CharacterVisual
 extends Node3D
 ## Visual representation of a character.
 
+enum AnimationStyle {
+	FEMININE,
+	MASCULINE,
+}
+
 ## Emitted when the look items change.
 signal look_changed
 
@@ -13,6 +18,9 @@ signal body_changed
 ## Currently equipped items.
 @export var look: CharacterLook = CharacterLook.new():
 	set = _set_look
+
+## Animation style of the character.
+var anim_style: AnimationStyle
 
 
 func _ready() -> void:

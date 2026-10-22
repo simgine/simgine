@@ -1,6 +1,6 @@
 extends VBoxContainer
 
-signal animation_style_changed(style: Character.AnimationStyle)
+signal animation_style_changed(style: CharacterVisual.AnimationStyle)
 
 @onready var _first_name_edit: LineEdit = %FirstName
 @onready var _last_name_edit: LineEdit = %LastName
@@ -29,7 +29,7 @@ func _show_character(character: Character) -> void:
 
 	# TODO: once more options are available and they don't
 	# strictly match male or female, select the customize button.
-	if character.animation_style == Character.AnimationStyle.MASCULINE:
+	if character.visual.anim_style == CharacterVisual.AnimationStyle.MASCULINE:
 		_male_button.button_pressed = true
 	else:
 		_female_button.button_pressed = true
@@ -38,9 +38,9 @@ func _show_character(character: Character) -> void:
 func _select_gender(button: Button) -> void:
 	match button:
 		_male_button:
-			_set_animation_style(Character.AnimationStyle.MASCULINE)
+			_set_animation_style(CharacterVisual.AnimationStyle.MASCULINE)
 		_female_button:
-			_set_animation_style(Character.AnimationStyle.FEMININE)
+			_set_animation_style(CharacterVisual.AnimationStyle.FEMININE)
 
 	_animations_row.visible = button == _customize_button
 
@@ -48,12 +48,12 @@ func _select_gender(button: Button) -> void:
 func _select_animation(button: Button) -> void:
 	match button:
 		_feminine_button:
-			_set_animation_style(Character.AnimationStyle.FEMININE)
+			_set_animation_style(CharacterVisual.AnimationStyle.FEMININE)
 		_masculine_button:
-			_set_animation_style(Character.AnimationStyle.MASCULINE)
+			_set_animation_style(CharacterVisual.AnimationStyle.MASCULINE)
 
 
-func _set_animation_style(style: Character.AnimationStyle) -> void:
+func _set_animation_style(style: CharacterVisual.AnimationStyle) -> void:
 	var button := _get_animation_button(style)
 	if button.button_pressed:
 		return
@@ -62,11 +62,11 @@ func _set_animation_style(style: Character.AnimationStyle) -> void:
 	animation_style_changed.emit(style)
 
 
-func _get_animation_button(style: Character.AnimationStyle) -> Button:
+func _get_animation_button(style: CharacterVisual.AnimationStyle) -> Button:
 	match style:
-		Character.AnimationStyle.FEMININE:
+		CharacterVisual.AnimationStyle.FEMININE:
 			return _feminine_button
-		Character.AnimationStyle.MASCULINE:
+		CharacterVisual.AnimationStyle.MASCULINE:
 			return _masculine_button
 
 	return null

@@ -55,8 +55,8 @@ func _set_last_name(value: String) -> void:
 	_current_member.last_name = value
 
 
-func _set_animation_style(style: Character.AnimationStyle) -> void:
-	_current_member.animation_style = style
+func _set_animation_style(style: CharacterVisual.AnimationStyle) -> void:
+	_current_member.visual.anim_style = style
 
 
 func _set_modifier(key: StringName, value: float) -> void:

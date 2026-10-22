@@ -16,7 +16,7 @@ items = Array[ExtResource("2_ien3r")]([ExtResource("3_f4d7u"), ExtResource("4_fa
 look = SubResource("Resource_k538c")
 
 [node name="Head" type="Camera3D" parent="." index="1" unique_id=1865214107]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.585015)
 fov = 40.0
 
 [node name="Torso" type="Camera3D" parent="." index="2" unique_id=824378773]

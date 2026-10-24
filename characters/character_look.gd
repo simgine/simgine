@@ -1,3 +1,4 @@
+@tool
 class_name CharacterLook
 extends Resource
 ## The set of [LookItem]s equipped on a [CharacterVisual].

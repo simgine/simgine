@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Simgine"
+run/main_scene="res://main_menu/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 

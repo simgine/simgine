@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://dvahyufyx7s5g"]
+
+[ext_resource type="Script" uid="uid://ddbfewm25srjl" path="res://main_menu/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="MarginContainer" unique_id=1785110385]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+script = ExtResource("1_menu")
+
+[node name="Content" type="Control" parent="." unique_id=189603498]
+layout_mode = 2
+
+[node name="Menu" type="VBoxContainer" parent="Content" unique_id=1432849794]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+grow_vertical = 2
+
+[node name="CharacterEditor" type="Button" parent="Content/Menu" unique_id=1555154440]
+layout_mode = 2
+text = "Character editor"
+
+[node name="Exit" type="Button" parent="Content/Menu" unique_id=1022306123]
+layout_mode = 2
+text = "Exit"
+
+[connection signal="pressed" from="Content/Menu/CharacterEditor" to="." method="_open_character_editor"]
+[connection signal="pressed" from="Content/Menu/Exit" to="." method="_exit_game"]

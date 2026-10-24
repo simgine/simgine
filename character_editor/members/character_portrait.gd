@@ -15,9 +15,14 @@ func _ready() -> void:
 
 ## Shows the given visual.
 func setup(visual: CharacterVisual) -> void:
-	visual.look_changed.connect(_refresh.bind(visual))
-	visual.body_changed.connect(_refresh.bind(visual))
-	# The skeleton is built deferred, so the initial refresh waits for it.
+	# Wait for queued rebuilds before reading the head position.
+	visual.look_changed.connect(_refresh.bind(visual), CONNECT_DEFERRED)
+	visual.body_changed.connect(_refresh.bind(visual), CONNECT_DEFERRED)
+
+	# Rendering immediately after a scene change can capture an empty portrait.
+	await get_tree().process_frame
+	# process_frame fires before deferred calls are flushed, so the skeleton
+	# rebuild may still be queued. Wait for it before reading the head position.
 	_refresh.call_deferred(visual)
 
 

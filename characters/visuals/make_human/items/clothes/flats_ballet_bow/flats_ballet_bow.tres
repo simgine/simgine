@@ -5,7 +5,9 @@
 
 [resource]
 script = ExtResource("1_flats_ballet_bow")
-slot = ExtResource("2_shoes")
 name = "Flats Ballet Bow"
+license = "CC0"
+author = "MRT"
+slot = ExtResource("2_shoes")
 asset_path = "uid://cdxyglidhs06k"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

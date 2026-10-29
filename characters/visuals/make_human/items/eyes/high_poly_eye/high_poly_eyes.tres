@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1_byhqa")
 name = "High poly eyes"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
 slot = ExtResource("2_t3ih5")
 asset_path = "uid://djhd8x8rwt4q1"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

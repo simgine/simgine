@@ -10,6 +10,12 @@ extends Resource
 ## Display name.
 @export var name: String
 
+## License under which the asset is released.
+@export var license: String
+
+## Author of the asset.
+@export var author: String
+
 ## Occupied slot.
 ##
 ## Items without a slot are skipped at load time.

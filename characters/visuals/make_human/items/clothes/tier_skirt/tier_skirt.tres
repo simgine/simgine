@@ -5,7 +5,9 @@
 
 [resource]
 script = ExtResource("1_tier_skirt")
-slot = ExtResource("2_bottom")
 name = "Tier Skirt"
+license = "CC0"
+author = "MRT"
+slot = ExtResource("2_bottom")
 asset_path = "uid://8th63bsv226m"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1_5k68p")
 name = "Eyelashes 03"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
 slot = ExtResource("2_fdxwp")
 asset_path = "uid://dm82lhmkrps5d"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

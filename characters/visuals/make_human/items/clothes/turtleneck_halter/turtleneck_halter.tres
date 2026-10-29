@@ -5,7 +5,9 @@
 
 [resource]
 script = ExtResource("1_turtleneck_halter")
-slot = ExtResource("2_top")
 name = "Turtleneck Halter"
+license = "CC0"
+author = "MRT"
+slot = ExtResource("2_top")
 asset_path = "uid://w5hi35lua0u8"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

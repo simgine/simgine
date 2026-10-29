@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1_wctmn")
 name = "Braid 01"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
 slot = ExtResource("2_ibbl1")
 asset_path = "uid://bsfmu3oejombq"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

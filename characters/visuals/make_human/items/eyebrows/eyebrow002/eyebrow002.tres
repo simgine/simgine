@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1_0s2rj")
 name = "Eyebrows 002"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
 slot = ExtResource("2_ab3l1")
 asset_path = "uid://d10cyhk4dq65i"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

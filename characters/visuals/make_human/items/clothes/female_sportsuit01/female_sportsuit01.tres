@@ -5,7 +5,9 @@
 
 [resource]
 script = ExtResource("1_g4mwg")
-slot = ExtResource("2_675d6")
 name = "Female Sportsuit 01"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
+slot = ExtResource("2_675d6")
 asset_path = "uid://oex0vpiwtjf3"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

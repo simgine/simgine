@@ -6,6 +6,8 @@
 [resource]
 script = ExtResource("1_en88f")
 name = "Long 01"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
 slot = ExtResource("2_icf6d")
 asset_path = "uid://lshirshsg6vx"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

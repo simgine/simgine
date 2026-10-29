@@ -5,7 +5,9 @@
 
 [resource]
 script = ExtResource("1_ts1is")
-slot = ExtResource("2_7fv8e")
 name = "Ponytail"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
+slot = ExtResource("2_7fv8e")
 asset_path = "uid://dr8ghylhf60k6"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

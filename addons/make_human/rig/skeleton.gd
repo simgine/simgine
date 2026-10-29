@@ -9,7 +9,7 @@ extends Skeleton3D
 ## generated from JSON at runtime, they don't need to be serialized.
 ## To work around this they're temporarily removed before saving and
 ## restored immediately afterwards.
-var _bone_snapshots: Array[BoneSnapshot] = []
+var _bone_snapshots: Array[BoneSnapshot]
 
 
 func _notification(what: int) -> void:

@@ -35,9 +35,19 @@ func setup(slot: LookSlot) -> void:
 func add_look_item(item: LookItem) -> void:
 	_items.append(item)
 	var index := add_item("", _placeholder)
-	set_item_tooltip(index, item.name)
+	set_item_tooltip(index, _build_tooltip(item))
 	_item_indices[item] = index
 	_check_visible_previews()
+
+
+## Builds the item's tooltip, appending author and license credits when set.
+static func _build_tooltip(item: LookItem) -> String:
+	var tooltip := item.name
+	if not item.author.is_empty():
+		tooltip += "\nAuthor: %s" % item.author
+	if not item.license.is_empty():
+		tooltip += "\nLicense: %s" % item.license
+	return tooltip
 
 
 func load_selected(visual: CharacterVisual) -> void:

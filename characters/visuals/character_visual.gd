@@ -106,6 +106,13 @@ func get_modifiers_dir() -> String
 func get_preview_scene_path() -> String
 
 
+## Returns the visual's skeleton profile identifier, e.g. "SkeletonProfileHumanoid".
+##
+## Used to filter [AnimationClip]s by [member AnimationClip.skeleton_profile].
+@abstract
+func get_skeleton_profile() -> StringName
+
+
 ## Resolves the given [BodyModifier] resources into value parameters.
 ##
 ## The returned parameters are grouped by category. I.e. all parameters of a

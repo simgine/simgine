@@ -93,6 +93,10 @@ func get_preview_scene_path() -> String:
 	return "res://characters/visuals/make_human/make_human_preview.tscn"
 
 
+func get_skeleton_profile() -> StringName:
+	return "SkeletonProfileHumanoid"
+
+
 func resolve_modifier_params(
 	modifiers: Dictionary[StringName, BodyModifier]
 ) -> Array[BodyModifierParams]:

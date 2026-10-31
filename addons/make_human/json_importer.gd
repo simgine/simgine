@@ -11,6 +11,7 @@ extends EditorImportPlugin
 ## in `macro.json`, so it is represented explicitly here.
 const MACRO_METADATA: Dictionary[StringName, Dictionary] = {
 	"racegenderage": { "directory": "macrodetails" },
+	# MPFB2 names race-independent targets with the "universal" prefix.
 	"genderagemuscleweight": { "directory": "macrodetails", "prefix": "universal" },
 	"genderagemuscleweightproportions": { "directory": "macrodetails/proportions" },
 	"genderagemuscleweightheight": { "directory": "macrodetails/height" },
@@ -254,6 +255,7 @@ static func _parse_combination(
 	var component_sets: Array[PackedStringArray]
 	for name in combination.dimensions:
 		if name == "race":
+			# Race is a special case, see MHMacroRegistry.RACES.
 			component_sets.push_back(MHMacroRegistry.RACES)
 		else:
 			component_sets.push_back(macrotargets[name].get_components())
@@ -328,6 +330,8 @@ static func _load_target(target_name: String, dir: String, optional := false) ->
 func _import_vertex_groups(dict: Dictionary, save_path: String) -> Error:
 	var vertex_groups := MHVertexGroups.new()
 	for group_name: String in dict:
+		# Only the body group (ground collision) and joint cubes
+		# (bone positioning) are used at runtime.
 		if group_name != "body" and not group_name.begins_with("joint-"):
 			continue
 

@@ -23,6 +23,10 @@ signal body_changed(dirty: MHBodyInstance.Dirty)
 @export var rig_weights: MHRigWeights:
 	set = set_rig_weights
 
+## Pose adjustments applied when building the rig's rest pose.
+@export var rest_pose: MHPose:
+	set = set_rest_pose
+
 ## Lazy-initialized skinning shared across all instances with this resource.
 var skinning: MHSkinning:
 	get = get_skinning
@@ -84,6 +88,14 @@ func set_rig_weights(value: MHRigWeights) -> void:
 	body_changed.emit(MHBodyInstance.Dirty.WEIGHTS)
 
 
+func set_rest_pose(value: MHPose) -> void:
+	if rest_pose == value:
+		return
+
+	rest_pose = value
+	body_changed.emit(MHBodyInstance.Dirty.SKELETON)
+
+
 func get_skinning() -> MHSkinning:
 	if not skinning and rig and rig_weights and geometry:
 		skinning = MHSkinning.new()
@@ -94,7 +106,10 @@ func get_skinning() -> MHSkinning:
 
 ## Returns if all required resources are set.
 func is_complete() -> bool:
-	return geometry and vertex_groups and target_registry and macro_registry and rig and rig_weights
+	return (
+		geometry and vertex_groups and target_registry
+		and macro_registry and rig and rig_weights and rest_pose
+	)
 
 
 func get_modifier_info(modifier_name: StringName) -> ModifierInfo:

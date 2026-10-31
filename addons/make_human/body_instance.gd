@@ -326,8 +326,7 @@ func _rebuild_skeleton() -> void:
 	if not skeleton_node:
 		return
 
-	skeleton_node.rebuild(body.rig, body.vertex_groups, morphed_vertices)
-	skin = skeleton_node.create_skin_from_rest_transforms()
+	skin = skeleton_node.rebuild(body.rig, body.vertex_groups, morphed_vertices, body.rest_pose)
 
 
 func _rebuild_mask() -> void:

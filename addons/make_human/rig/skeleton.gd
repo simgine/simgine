@@ -59,8 +59,8 @@ func _restore_bones() -> void:
 func rebuild(rig: MHRig, vertex_groups: MHVertexGroups, body_vertices: PackedVector3Array) -> void:
 	clear_bones()
 
-	var global_rests: Array[Transform3D]
-	global_rests.resize(rig.bones.size())
+	var inv_global_rests: Array[Transform3D]
+	inv_global_rests.resize(rig.bones.size())
 
 	for bone_index in rig.bones.size():
 		var bone := rig.bones[bone_index]
@@ -71,10 +71,9 @@ func rebuild(rig: MHRig, vertex_groups: MHVertexGroups, body_vertices: PackedVec
 		var rest := global_rest
 		if bone.parent_index >= 0:
 			set_bone_parent(bone_index, bone.parent_index)
-			var parent_rest := global_rests[bone.parent_index]
-			rest = parent_rest.affine_inverse() * global_rest
+			rest = inv_global_rests[bone.parent_index] * global_rest
 
-		global_rests[bone_index] = global_rest
+		inv_global_rests[bone_index] = global_rest.affine_inverse()
 		set_bone_rest(bone_index, rest)
 
 	reset_bone_poses()

@@ -139,19 +139,25 @@ func _import(
 		)
 		return ERR_PARSE_ERROR
 
+	if json.data is not Dictionary:
+		push_error("The top-level value must be an object")
+		return ERR_PARSE_ERROR
+
+	var data: Dictionary = json.data
 	var filename := source_file.get_file()
 	if filename == "target.json":
 		var targets_dir := source_file.get_base_dir()
-		return _import_target_registry(json.data, targets_dir, save_path)
+		return _import_target_registry(data, targets_dir, save_path)
 	if filename == "macro.json":
+		# The targets directory is two levels up from macro.json.
 		var targets_dir := source_file.get_base_dir().get_base_dir()
-		return _import_macro_registry(json.data, targets_dir, save_path)
+		return _import_macro_registry(data, targets_dir, save_path)
 	if filename == "basemesh_vertex_groups.json":
-		return _import_vertex_groups(json.data, save_path)
-	if filename == "rig.game_engine.json" or filename == "rig.game_engine_with_breast.json":
-		return _import_rig(json.data, save_path)
-	if filename == "weights.game_engine.json":
-		return _import_rig_weights(json.data, save_path)
+		return _import_vertex_groups(data, save_path)
+	if data.has("head"):
+		return _import_rig(data, save_path)
+	if data.has("weights"):
+		return _import_rig_weights(data, save_path)
 	else:
 		push_error("Unknown MakeHuman JSON")
 		return ERR_PARSE_ERROR

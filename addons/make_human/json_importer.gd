@@ -359,7 +359,9 @@ func _import_rig(dict: Dictionary, save_path: String) -> Error:
 	var rig := MHRig.new()
 	var bone_indices: Dictionary[StringName, int]
 	for bone_name: String in dict:
-		_append_bone_with_parents(bone_name, dict, rig, bone_indices)
+		var error := _append_bone_with_parents(bone_name, dict, rig, bone_indices)
+		if error != OK:
+			return error
 
 	return ResourceSaver.save(rig, "%s.%s" % [save_path, _get_save_extension()])
 
@@ -370,23 +372,27 @@ static func _append_bone_with_parents(
 	dict: Dictionary,
 	rig: MHRig,
 	bone_indices: Dictionary[StringName, int],
-) -> int:
+) -> Error:
 	if bone_indices.has(bone_name):
-		return bone_indices[bone_name]
+		return OK
 
 	var bone_dict: Dictionary = dict[bone_name]
 	var parent_name: StringName = bone_dict.parent
 	var parent_index := -1
 
 	if parent_name:
-		parent_index = _append_bone_with_parents(parent_name, dict, rig, bone_indices)
+		var error := _append_bone_with_parents(parent_name, dict, rig, bone_indices)
+		if error != OK:
+			return error
+		parent_index = bone_indices[parent_name]
 
 	var bone := _parse_bone(bone_name, parent_index, bone_dict)
+	if not bone:
+		return ERR_PARSE_ERROR
 	rig.bones.push_back(bone)
 
-	var bone_index := rig.bones.size() - 1
-	bone_indices[bone_name] = bone_index
-	return bone_index
+	bone_indices[bone_name] = rig.bones.size() - 1
+	return OK
 
 
 static func _parse_bone(bone_name: StringName, parent_index: int, dict: Dictionary) -> MHBone:
@@ -399,13 +405,25 @@ static func _parse_bone(bone_name: StringName, parent_index: int, dict: Dictiona
 	bone.export_name = export_name
 	bone.parent_index = parent_index
 	bone.head = _parse_rig_position(dict.head)
+	if not bone.head:
+		return
 	bone.tail = _parse_rig_position(dict.tail)
+	if not bone.tail:
+		return
 	bone.roll = dict.roll
 
-	assert(not dict.use_connect, "'use_connect' should be 'false' in the game rig")
-	assert(dict.use_inherit_rotation, "'use_inherit_rotation' should be 'true' in the game rig")
-	assert(dict.use_local_location, "'use_local_location' should be 'true' in the game rig")
-	assert(dict.inherit_scale == "FULL", "'inherit_scale' should be 'FULL' in the game rig")
+	if dict.use_connect:
+		push_error("'use_connect' should be 'false' in the game rig")
+		return null
+	if not dict.use_inherit_rotation:
+		push_error("'use_inherit_rotation' should be 'true' in the game rig")
+		return null
+	if not dict.use_local_location:
+		push_error("'use_local_location' should be 'true' in the game rig")
+		return null
+	if dict.inherit_scale != "FULL":
+		push_error("'inherit_scale' should be 'FULL' in the game rig")
+		return null
 
 	return bone
 
@@ -420,7 +438,9 @@ static func _parse_rig_position(dict: Dictionary) -> MHRigPosition:
 	if position.strategy == MHRigPosition.Strategy.MEAN:
 		position.vertex_indices = dict.vertex_indices
 
-	assert(not dict.has("offset"), "'offset' shouldn't be used in the game engine rig")
+	if dict.has("offset"):
+		push_error("'offset' shouldn't be used in the game engine rig")
+		return null
 
 	return position
 

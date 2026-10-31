@@ -7,6 +7,13 @@ extends EditorImportPlugin
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/mesh_metadata.md]Vertex groups[/url][br]
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/rig.md]Rig[/url] (game engine only, which uses legacy format)[br]
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/weights.md]Weights[/url][br]
+## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/pose.md]Pose[/url][br]
+
+enum RotationMode {
+	INVALID = -1,
+	XYZ,
+	QUATERNION,
+}
 
 ## Additional metadata required to interpret `macro.json`.
 ##
@@ -29,7 +36,6 @@ const MACRO_METADATA: Dictionary[StringName, Dictionary] = {
 
 ## Maps MakeHuman bone names to the names in [SkeletonProfileHumanoid].
 ##
-## This way, animations retargeted through it play back on the skeleton as-is.
 ## Bones without an entry fall back to PascalCase, which matches the profile for `Root` and `head`.
 const EXPORT_BONE_NAMES: Dictionary[StringName, StringName] = {
 	"pelvis": "Hips",
@@ -158,6 +164,8 @@ func _import(
 		return _import_rig(data, save_path)
 	if data.has("weights"):
 		return _import_rig_weights(data, save_path)
+	if data.has("skeleton_type"):
+		return _import_pose(data, save_path)
 	else:
 		push_error("Unknown MakeHuman JSON")
 		return ERR_PARSE_ERROR
@@ -353,6 +361,87 @@ func _import_vertex_groups(dict: Dictionary, save_path: String) -> Error:
 		vertex_groups.ranges[group_name] = ranges
 
 	return ResourceSaver.save(vertex_groups, "%s.%s" % [save_path, _get_save_extension()])
+
+
+func _import_pose(dict: Dictionary, save_path: String) -> Error:
+	if dict.skeleton_type != "game_engine":
+		Log.error("Skeleton type '%s' is unsupported", dict.skeleton_type)
+		return ERR_PARSE_ERROR
+
+	if dict.has_ik_bones:
+		Log.error("Poses with IK bones are unsupported")
+		return ERR_PARSE_ERROR
+
+	if not dict.bone_translations.is_empty():
+		Log.error("Bone translations are unsupported")
+		return ERR_PARSE_ERROR
+
+	var pose := MHPose.new()
+	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
+	var bone_rotations: Dictionary = dict.bone_rotations
+	for bone_name: String in bone_rotations:
+		var components: Array = bone_rotations[bone_name]
+		var mode := _parse_rotation_mode(rotation_modes.get(bone_name, ""), components.size())
+
+		match mode:
+			RotationMode.XYZ:
+				var angles := Vector3(components[0], components[1], components[2])
+				# Blender XYZ composes Rz * Ry * Rx, which Godot calls ZYX.
+				var basis := Basis.from_euler(angles, EULER_ORDER_ZYX)
+				pose.rotations[bone_name] = basis.get_rotation_quaternion()
+			RotationMode.QUATERNION:
+				# Blender serializes quaternions as WXYZ; Godot's constructor uses XYZW.
+				var rotation := Quaternion(
+					components[1],
+					components[2],
+					components[3],
+					components[0],
+				)
+				if is_zero_approx(rotation.length_squared()):
+					Log.error("Bone '%s' has a zero-length quaternion", bone_name)
+					return ERR_INVALID_DATA
+
+				pose.rotations[bone_name] = rotation.normalized()
+			RotationMode.INVALID:
+				return ERR_INVALID_DATA
+
+	return ResourceSaver.save(pose, "%s.%s" % [save_path, _get_save_extension()])
+
+
+static func _parse_rotation_mode(mode_name: String, component_count: int) -> RotationMode:
+	match mode_name:
+		"":
+			# Deduce from component count.
+			match component_count:
+				3:
+					return RotationMode.XYZ
+				4:
+					return RotationMode.QUATERNION
+				_:
+					return RotationMode.INVALID
+		"XYZ":
+			var mode := RotationMode.XYZ
+			if component_count != 3:
+				Log.error(
+					"'%s' needs 3 components, got %d",
+					RotationMode.find_key(mode),
+					component_count,
+				)
+				return RotationMode.INVALID
+			return mode
+		"QUATERNION":
+			var mode := RotationMode.QUATERNION
+			if component_count != 4:
+				Log.error(
+					"'%s' needs 4 components, got %d",
+					RotationMode.find_key(mode),
+					component_count,
+				)
+				return RotationMode.INVALID
+			return mode
+		_:
+			Log.error("Rotation mode '%s' is unsupported", mode_name)
+			return RotationMode.INVALID
 
 
 func _import_rig(dict: Dictionary, save_path: String) -> Error:

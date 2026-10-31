@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.json_importer"
+type="Resource"
+uid="uid://crp8c3hdeiah0"
+path="res://.godot/imported/t-pose.json-97104a956ea4475cb071a9b689842b46.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/data/poses/game_engine_fk/t-pose.json"
+dest_files=["res://.godot/imported/t-pose.json-97104a956ea4475cb071a9b689842b46.res"]
+
+[params]
+

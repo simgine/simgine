@@ -2,11 +2,17 @@
 
 [ext_resource type="Script" uid="uid://n5fhexwjqcqb" path="res://characters/visuals/make_human/make_human_visual.gd" id="1_l4fvd"]
 [ext_resource type="Script" uid="uid://cx4qlf41yxuh3" path="res://addons/make_human/rig/skeleton.gd" id="2_74mn0"]
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="2_kaath"]
 [ext_resource type="Script" uid="uid://bnskcgj4ub0v5" path="res://characters/visuals/make_human/body_instance.gd" id="3_pubxi"]
+[ext_resource type="Script" uid="uid://cw78o1pbhhjm7" path="res://characters/character_look.gd" id="3_qsuha"]
 [ext_resource type="Resource" uid="uid://craf0e0x1m6ho" path="res://characters/visuals/make_human/body.tres" id="4_pubxi"]
+
+[sub_resource type="Resource" id="Resource_kaath"]
+script = ExtResource("3_qsuha")
 
 [node name="MakeHumanVisual" type="Node3D" unique_id=1038237501]
 script = ExtResource("1_l4fvd")
+look = SubResource("Resource_kaath")
 metadata/_custom_type_script = "uid://n5fhexwjqcqb"
 
 [node name="Skeleton" type="Skeleton3D" parent="." unique_id=338036088]

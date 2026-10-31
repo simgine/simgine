@@ -1,9 +1,12 @@
 class_name MHJSONImporter
 extends EditorImportPlugin
-## Importer for `target.json`, `macro.json` and `rig.game_engine.json`.
+## Importer for MakeHuman JSON files.
 ##
-## For details, see https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/target_metadata.md
-## and https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/rig.md
+## Formats:[br]
+## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/target_metadata.md]Target and macro registries[/url][br]
+## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/mesh_metadata.md]Vertex groups[/url][br]
+## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/rig.md]Rig[/url] (game engine only, which uses legacy format)[br]
+## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/weights.md]Weights[/url][br]
 
 ## Additional metadata required to interpret `macro.json`.
 ##

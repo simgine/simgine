@@ -11,6 +11,12 @@ extends Skeleton3D
 ## restored immediately afterwards.
 var _bone_snapshots: Array[BoneSnapshot]
 
+## Original MakeHuman rests expressed in the humanoid parent's rest space.
+var _mh_to_humanoid: Array[Transform3D]
+
+## Conversions from humanoid bone space to reference-pose bone space.
+var _humanoid_to_reference: Array[Transform3D]
+
 
 func _validate_property(property: Dictionary) -> void:
 	if property.name == "motion_scale":
@@ -74,6 +80,8 @@ func rebuild(
 ) -> Skin:
 	clear_bones()
 
+	_mh_to_humanoid.resize(rig.bones.size())
+
 	var inv_global_rests: Array[Transform3D]
 	inv_global_rests.resize(rig.bones.size())
 
@@ -88,6 +96,7 @@ func rebuild(
 			set_bone_parent(bone_index, bone.parent_index)
 			rest = inv_global_rests[bone.parent_index] * global_rest
 
+		_mh_to_humanoid[bone_index] = rest
 		inv_global_rests[bone_index] = global_rest.affine_inverse()
 		var pose_rotation: Quaternion = reference_pose.rotations.get(bone.name, Quaternion.IDENTITY)
 		rest.basis *= Basis(pose_rotation)
@@ -106,16 +115,18 @@ func _adapt_to_humanoid(profile: SkeletonProfile, inv_global_rests: Array[Transf
 	var profile_bases := _get_profile_bases(profile)
 
 	# Save before changing parents, which would also move their children.
-	var posed_rests: Array[Transform3D]
+	var reference_rests: Array[Transform3D]
 	for bone_index in get_bone_count():
-		posed_rests.append(get_bone_global_rest(bone_index))
+		reference_rests.append(get_bone_global_rest(bone_index))
+
+	_humanoid_to_reference.resize(get_bone_count())
 
 	# Avoid refreshing Godot's global-rest cache after each rest change.
 	var inv_humanoid_rests: Array[Transform3D]
 	inv_humanoid_rests.resize(get_bone_count())
 	var skin := Skin.new()
 	for bone_index in get_bone_count():
-		var corrected_rest := posed_rests[bone_index]
+		var corrected_rest := reference_rests[bone_index]
 		var bone_name := get_bone_name(bone_index)
 		if bone_name == profile.root_bone:
 			# The humanoid profile expects Root at the model origin.
@@ -135,6 +146,15 @@ func _adapt_to_humanoid(profile: SkeletonProfile, inv_global_rests: Array[Transf
 			rest = inv_humanoid_rests[parent_index] * humanoid_rest
 		set_bone_rest(bone_index, rest)
 
+		# Cache the parent correction so posing doesn't need global transforms.
+		if parent_index >= 0:
+			_mh_to_humanoid[bone_index] = (
+				inv_humanoid_rests[parent_index]
+				* reference_rests[parent_index] * _mh_to_humanoid[bone_index]
+			)
+		# Include Root's shift so posing doesn't undo its recentering.
+		_humanoid_to_reference[bone_index] = reference_rests[bone_index].affine_inverse() * humanoid_rest
+
 		# Build mesh-to-bone bindings that include the reference pose and compensate
 		# for the changed bone axes.
 		var bind_pose := inv_humanoid_rest * corrected_rest * inv_global_rests[bone_index]
@@ -152,6 +172,23 @@ func _update_motion_scale(profile: SkeletonProfile) -> void:
 		var hips_height := get_bone_global_rest(hips_index).origin.y
 		if not is_zero_approx(hips_height):
 			motion_scale = absf(hips_height)
+
+
+## Puts the skeleton into [param pose].
+##
+## Rotations are applied on top of the MakeHuman rest, the same way
+## [method rebuild] applies the reference pose. Bones missing from
+## [param pose] keep their MakeHuman original orientation.
+##
+## Playing an animation or skeleton rebuild resets the pose.
+func set_pose(pose: MHPose) -> void:
+	for bone_index in get_bone_count():
+		var bone_name := get_bone_name(bone_index)
+		var bone_rotation: Quaternion = pose.rotations.get(bone_name, Quaternion.IDENTITY)
+
+		var local_pose := _mh_to_humanoid[bone_index]
+		local_pose.basis *= Basis(bone_rotation)
+		set_bone_pose(bone_index, local_pose * _humanoid_to_reference[bone_index])
 
 
 static func _get_profile_bases(profile: SkeletonProfile) -> Dictionary[StringName, Basis]:

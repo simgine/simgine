@@ -17,5 +17,5 @@ target_registry = ExtResource("6_ei8ps")
 macro_registry = ExtResource("2_drgmq")
 rig = ExtResource("3_oam52")
 rig_weights = ExtResource("4_tj5a2")
-rest_pose = ExtResource("8_pose")
+reference_pose = ExtResource("8_pose")
 metadata/_custom_type_script = "uid://b3tm7pgue0gxn"

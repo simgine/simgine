@@ -24,8 +24,8 @@ signal body_changed(dirty: MHBodyInstance.Dirty)
 	set = set_rig_weights
 
 ## Pose adjustments applied when building the rig's rest pose.
-@export var rest_pose: MHPose:
-	set = set_rest_pose
+@export var reference_pose: MHPose:
+	set = set_reference_pose
 
 ## Lazy-initialized skinning shared across all instances with this resource.
 var skinning: MHSkinning:
@@ -88,11 +88,11 @@ func set_rig_weights(value: MHRigWeights) -> void:
 	body_changed.emit(MHBodyInstance.Dirty.WEIGHTS)
 
 
-func set_rest_pose(value: MHPose) -> void:
-	if rest_pose == value:
+func set_reference_pose(value: MHPose) -> void:
+	if reference_pose == value:
 		return
 
-	rest_pose = value
+	reference_pose = value
 	body_changed.emit(MHBodyInstance.Dirty.SKELETON)
 
 
@@ -108,7 +108,7 @@ func get_skinning() -> MHSkinning:
 func is_complete() -> bool:
 	return (
 		geometry and vertex_groups and target_registry
-		and macro_registry and rig and rig_weights and rest_pose
+		and macro_registry and rig and rig_weights and reference_pose
 	)
 
 

@@ -70,7 +70,7 @@ func rebuild(
 	rig: MHRig,
 	vertex_groups: MHVertexGroups,
 	body_vertices: PackedVector3Array,
-	rest_pose: MHPose,
+	reference_pose: MHPose,
 ) -> Skin:
 	clear_bones()
 
@@ -89,7 +89,7 @@ func rebuild(
 			rest = inv_global_rests[bone.parent_index] * global_rest
 
 		inv_global_rests[bone_index] = global_rest.affine_inverse()
-		var pose_rotation: Quaternion = rest_pose.rotations.get(bone.name, Quaternion.IDENTITY)
+		var pose_rotation: Quaternion = reference_pose.rotations.get(bone.name, Quaternion.IDENTITY)
 		rest.basis *= Basis(pose_rotation)
 		set_bone_rest(bone_index, rest)
 

@@ -2,16 +2,12 @@
 class_name MHBone
 extends Resource
 
-## MakeHuman bone name.
+## Bone name.
 ##
-## Rig weights and vertex groups are keyed by it.
+## During import, original MakeHuman bone names are mapped to the names
+## in [SkeletonProfileHumanoid] (missing names are just renamed to PascalCase
+## for consistency). Rig weights and poses are keyed by this mapped name.
 @export var name: StringName
-
-## Name the bone is used when added to a [Skeleton3D].
-##
-## Corresponds to a bone name of the built-in humanoid profile
-## [SkeletonProfileHumanoid].
-@export var export_name: StringName
 
 ## Parent index in [member MHRig.bones], or `-1` for a root bone.
 ##

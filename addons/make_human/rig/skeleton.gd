@@ -70,13 +70,14 @@ func _restore_bones() -> void:
 ## Bone rest transforms are first resolved in global skeleton space, then
 ## converted to parent-relative rests required by [Skeleton3D].
 ##
-## Applies [param reference_pose] and adapts bone axes to [SkeletonProfileHumanoid].
+## Applies [param reference_pose], if provided, and adapts bone axes to [SkeletonProfileHumanoid].
+## Without a reference pose, uses the native rest.
 ## The returned skin accounts for these changes.
 func rebuild(
 	rig: MHRig,
 	vertex_groups: MHVertexGroups,
 	body_vertices: PackedVector3Array,
-	reference_pose: MHPose,
+	reference_pose: MHPose = null,
 ) -> Skin:
 	clear_bones()
 
@@ -98,8 +99,12 @@ func rebuild(
 
 		_mh_to_humanoid[bone_index] = rest
 		inv_global_rests[bone_index] = global_rest.affine_inverse()
-		var pose_rotation: Quaternion = reference_pose.rotations.get(bone.name, Quaternion.IDENTITY)
-		rest.basis *= Basis(pose_rotation)
+		if reference_pose:
+			var pose_rotation: Quaternion = reference_pose.rotations.get(
+				bone.name,
+				Quaternion.IDENTITY,
+			)
+			rest.basis *= Basis(pose_rotation)
 		set_bone_rest(bone_index, rest)
 
 	var profile := SkeletonProfileHumanoid.new()

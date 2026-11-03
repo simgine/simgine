@@ -23,7 +23,8 @@ signal body_changed(dirty: MHBodyInstance.Dirty)
 @export var rig_weights: MHRigWeights:
 	set = set_rig_weights
 
-## Pose adjustments applied when building the rig's rest pose.
+## Optional pose adjustments applied when building the rig's rest pose.
+## If unset, preserves the native rest.
 @export var reference_pose: MHPose:
 	set = set_reference_pose
 
@@ -107,8 +108,7 @@ func get_skinning() -> MHSkinning:
 ## Returns if all required resources are set.
 func is_complete() -> bool:
 	return (
-		geometry and vertex_groups and target_registry
-		and macro_registry and rig and rig_weights and reference_pose
+		geometry and vertex_groups and target_registry and macro_registry and rig and rig_weights
 	)
 
 

@@ -17,16 +17,11 @@ signal body_changed(dirty: MHBodyInstance.Dirty)
 @export var macro_registry: MHMacroRegistry:
 	set = set_macro_registry
 
-@export var rig: MHRig:
-	set = set_rig
+@export var skeleton_config: MHSkeletonConfig:
+	set = set_skeleton_config
 
 @export var rig_weights: MHRigWeights:
 	set = set_rig_weights
-
-## Optional pose adjustments applied when building the rig's rest pose.
-## If unset, preserves the native rest.
-@export var reference_pose: MHPose:
-	set = set_reference_pose
 
 ## Lazy-initialized skinning shared across all instances with this resource.
 var skinning: MHSkinning:
@@ -69,11 +64,22 @@ func set_macro_registry(value: MHMacroRegistry) -> void:
 	body_changed.emit(MHBodyInstance.Dirty.MACROS)
 
 
-func set_rig(value: MHRig) -> void:
-	if rig == value:
+func set_skeleton_config(value: MHSkeletonConfig) -> void:
+	if skeleton_config == value:
 		return
 
-	rig = value
+	if skeleton_config:
+		skeleton_config.changed.disconnect(_invalidate_skeleton)
+
+	skeleton_config = value
+
+	if skeleton_config:
+		skeleton_config.changed.connect(_invalidate_skeleton)
+
+	_invalidate_skeleton()
+
+
+func _invalidate_skeleton() -> void:
 	skinning = null
 	_proxy_skinnings.clear()
 	body_changed.emit(MHBodyInstance.Dirty.RIG)
@@ -89,18 +95,10 @@ func set_rig_weights(value: MHRigWeights) -> void:
 	body_changed.emit(MHBodyInstance.Dirty.WEIGHTS)
 
 
-func set_reference_pose(value: MHPose) -> void:
-	if reference_pose == value:
-		return
-
-	reference_pose = value
-	body_changed.emit(MHBodyInstance.Dirty.SKELETON)
-
-
 func get_skinning() -> MHSkinning:
-	if not skinning and rig and rig_weights and geometry:
+	if not skinning and skeleton_config and skeleton_config.rig and rig_weights and geometry:
 		skinning = MHSkinning.new()
-		skinning.build_from_rig(geometry, rig, rig_weights)
+		skinning.build_from_rig(geometry, skeleton_config.rig, rig_weights)
 
 	return skinning
 
@@ -108,7 +106,8 @@ func get_skinning() -> MHSkinning:
 ## Returns if all required resources are set.
 func is_complete() -> bool:
 	return (
-		geometry and vertex_groups and target_registry and macro_registry and rig and rig_weights
+		geometry and vertex_groups and target_registry and macro_registry
+		and skeleton_config and skeleton_config.rig and rig_weights
 	)
 
 

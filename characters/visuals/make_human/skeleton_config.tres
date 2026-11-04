@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MHSkeletonConfig" format=3 uid="uid://dmg2by7vlgicg"]
+
+[ext_resource type="Script" uid="uid://cihgvqwc42o0v" path="res://addons/make_human/rig/skeleton_config.gd" id="1_config"]
+[ext_resource type="Resource" uid="uid://bqer4j288hant" path="res://characters/visuals/make_human/data/rigs/rig.game_engine.json" id="2_rig"]
+[ext_resource type="Resource" uid="uid://crp8c3hdeiah0" path="res://characters/visuals/make_human/data/poses/game_engine_fk/t-pose.json" id="3_pose"]
+
+[resource]
+script = ExtResource("1_config")
+rig = ExtResource("2_rig")
+reference_pose = ExtResource("3_pose")

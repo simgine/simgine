@@ -3,11 +3,10 @@
 [ext_resource type="Resource" uid="uid://cq4l65kp7fx6a" path="res://characters/visuals/make_human/data/3dobjs/base.obj" id="1_5g231"]
 [ext_resource type="Script" uid="uid://b3tm7pgue0gxn" path="res://addons/make_human/body.gd" id="1_h8hfm"]
 [ext_resource type="Resource" uid="uid://rwn1dv1lhdq" path="res://characters/visuals/make_human/data/targets/macrodetails/macro.json" id="2_drgmq"]
-[ext_resource type="Resource" uid="uid://bqer4j288hant" path="res://characters/visuals/make_human/data/rigs/rig.game_engine.json" id="3_oam52"]
+[ext_resource type="Resource" uid="uid://dmg2by7vlgicg" path="res://characters/visuals/make_human/skeleton_config.tres" id="3_config"]
 [ext_resource type="Resource" uid="uid://gr3ts3ukdcvr" path="res://characters/visuals/make_human/data/rigs/weights.game_engine.json" id="4_tj5a2"]
 [ext_resource type="Resource" uid="uid://d26sarld4l3y" path="res://characters/visuals/make_human/data/targets/target.json" id="6_ei8ps"]
 [ext_resource type="Resource" uid="uid://bwy0k7jwowhx4" path="res://characters/visuals/make_human/data/mesh_metadata/basemesh_vertex_groups.json" id="7_3yy3w"]
-[ext_resource type="Resource" uid="uid://crp8c3hdeiah0" path="res://characters/visuals/make_human/data/poses/game_engine_fk/t-pose.json" id="8_pose"]
 
 [resource]
 script = ExtResource("1_h8hfm")
@@ -15,7 +14,6 @@ geometry = ExtResource("1_5g231")
 vertex_groups = ExtResource("7_3yy3w")
 target_registry = ExtResource("6_ei8ps")
 macro_registry = ExtResource("2_drgmq")
-rig = ExtResource("3_oam52")
+skeleton_config = ExtResource("3_config")
 rig_weights = ExtResource("4_tj5a2")
-reference_pose = ExtResource("8_pose")
 metadata/_custom_type_script = "uid://b3tm7pgue0gxn"

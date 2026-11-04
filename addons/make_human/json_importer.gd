@@ -106,7 +106,7 @@ func _import(
 	if data.has("head"):
 		return _import_rig(data, save_path)
 	if data.has("weights"):
-		return _import_rig_weights(data, save_path)
+		return _import_rig_weights(data.weights, save_path)
 	if data.has("skeleton_type"):
 		return _import_pose(data, save_path)
 	else:
@@ -432,10 +432,10 @@ static func _parse_bone(bone_name: StringName, parent_index: int, dict: Dictiona
 	bone.parent_index = parent_index
 	bone.head = _parse_rig_position(dict.head)
 	if not bone.head:
-		return
+		return null
 	bone.tail = _parse_rig_position(dict.tail)
 	if not bone.tail:
-		return
+		return null
 	bone.roll = dict.roll
 
 	if dict.use_connect:
@@ -476,17 +476,21 @@ static func _parse_rig_position(dict: Dictionary) -> MHRigPosition:
 
 func _import_rig_weights(dict: Dictionary, save_path: String) -> Error:
 	var weights := MHRigWeights.new()
-	var weights_dict: Dictionary = dict.weights
-	for bone_name: String in weights_dict:
-		var bone := MHBoneWeights.new()
-		for bone_array: Array in weights_dict[bone_name]:
-			assert(bone_array.size() == 2)
-			bone.vertices.push_back(bone_array[0])
-			bone.weights.push_back(bone_array[1])
-
+	for bone_name: String in dict:
+		var bone := _parse_bone_weights(dict[bone_name])
 		weights.bones[_map_bone_name(bone_name)] = bone
 
 	return ResourceSaver.save(weights, "%s.%s" % [save_path, _get_save_extension()])
+
+
+static func _parse_bone_weights(array: Array) -> MHBoneWeights:
+	var bone := MHBoneWeights.new()
+	for pair: Array in array:
+		assert(pair.size() == 2)
+		bone.vertices.push_back(pair[0])
+		bone.weights.push_back(pair[1])
+
+	return bone
 
 
 ## Maps MakeHuman bone names to the names in [SkeletonProfileHumanoid].

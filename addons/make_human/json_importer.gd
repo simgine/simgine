@@ -84,7 +84,7 @@ func _import(
 	var json := JSON.new()
 	if json.parse(string) != OK:
 		push_error(
-			"Unable to parse: '%s' at line %d" % [json.get_error_message(), json.get_error_line()],
+			"Unable to parse: '%s' at line %d" % [json.get_error_message(), json.get_error_line()]
 		)
 		return ERR_PARSE_ERROR
 

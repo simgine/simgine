@@ -465,6 +465,9 @@ static func _parse_rig_position(dict: Dictionary) -> MHRigPosition:
 	if position.strategy == MHRigPosition.Strategy.MEAN:
 		position.vertex_indices = dict.vertex_indices
 
+	var components: Array = dict.default_position
+	position.default_position = Vector3(components[0], components[1], components[2])
+
 	if dict.has("offset"):
 		push_error("'offset' shouldn't be used in the game engine rig")
 		return null

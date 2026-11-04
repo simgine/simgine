@@ -17,6 +17,12 @@ enum Strategy {
 
 @export var strategy: Strategy
 
+## Rest position.
+##
+## Uses Blender armature coordinates.
+## Used with [member MHBone.roll] to reconstruct the rest transform.
+@export var default_position: Vector3
+
 ## Joint cube vertex group name, e.g. "joint-spine-1".
 ##
 ## Used by `CUBE`.
@@ -30,7 +36,9 @@ enum Strategy {
 
 ## Resolves this endpoint against the current (already morphed) body vertices.
 ##
-## This deliberately ignores the `default_position` stored in MPFB rig JSON.
+## Uses the [member strategy] rather than [member default_position]
+## so the skeleton follows the current body shape.
+##
 ## Joint helpers and explicit vertex references deform together with the body,
 ## so resolving them at runtime keeps the skeleton matched to the current shape.
 func resolve(body_vertices: PackedVector3Array, vertex_groups: MHVertexGroups) -> Vector3:

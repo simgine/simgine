@@ -308,15 +308,15 @@ func _import_vertex_groups(dict: Dictionary, save_path: String) -> Error:
 
 func _import_pose(dict: Dictionary, save_path: String) -> Error:
 	if dict.skeleton_type != "game_engine":
-		Log.error("Skeleton type '%s' is unsupported", dict.skeleton_type)
+		push_error("Skeleton type '%s' is unsupported" % dict.skeleton_type)
 		return ERR_PARSE_ERROR
 
 	if dict.has_ik_bones:
-		Log.error("Poses with IK bones are unsupported")
+		push_error("Poses with IK bones are unsupported")
 		return ERR_PARSE_ERROR
 
 	if not dict.bone_translations.is_empty():
-		Log.error("Bone translations are unsupported")
+		push_error("Bone translations are unsupported")
 		return ERR_PARSE_ERROR
 
 	var pose := MHPose.new()
@@ -341,7 +341,7 @@ func _import_pose(dict: Dictionary, save_path: String) -> Error:
 					components[0],
 				)
 				if is_zero_approx(rotation.length_squared()):
-					Log.error("Bone '%s' has a zero-length quaternion", bone_name)
+					push_error("Bone '%s' has a zero-length quaternion" % bone_name)
 					return ERR_INVALID_DATA
 
 				pose.rotations[_map_bone_name(bone_name)] = rotation.normalized()
@@ -361,29 +361,28 @@ static func _parse_rotation_mode(mode_name: String, component_count: int) -> Rot
 				4:
 					return RotationMode.QUATERNION
 				_:
+					push_error("Cannot deduce rotation mode from %d components" % component_count)
 					return RotationMode.INVALID
 		"XYZ":
 			var mode := RotationMode.XYZ
 			if component_count != 3:
-				Log.error(
-					"'%s' needs 3 components, got %d",
-					RotationMode.find_key(mode),
-					component_count,
+				push_error(
+					"'%s' needs 3 components, got %d"
+					% [RotationMode.find_key(mode), component_count]
 				)
 				return RotationMode.INVALID
 			return mode
 		"QUATERNION":
 			var mode := RotationMode.QUATERNION
 			if component_count != 4:
-				Log.error(
-					"'%s' needs 4 components, got %d",
-					RotationMode.find_key(mode),
-					component_count,
+				push_error(
+					"'%s' needs 4 components, got %d"
+					% [RotationMode.find_key(mode), component_count]
 				)
 				return RotationMode.INVALID
 			return mode
 		_:
-			Log.error("Rotation mode '%s' is unsupported", mode_name)
+			push_error("Rotation mode '%s' is unsupported" % mode_name)
 			return RotationMode.INVALID
 
 

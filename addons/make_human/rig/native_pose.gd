@@ -23,26 +23,27 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 		push_error("The reference pose must use the same source rig")
 		return null
 
-	var native_rests: Array[Basis]
-	var posed_bases: Array[Basis]
-	var reference_bases: Array[Basis]
-	for bone in rig.bones:
+	var native_rests: Dictionary[StringName, Basis]
+	var posed_bases: Dictionary[StringName, Basis]
+	var reference_bases: Dictionary[StringName, Basis]
+	for bone_name in rig.bones:
+		var bone := rig.bones[bone_name]
 		var native_rest := bone.get_rest_basis()
 
 		var local_rest := native_rest
-		if bone.parent_index >= 0:
-			local_rest = native_rests[bone.parent_index].inverse() * native_rest
-		native_rests.append(native_rest)
+		if bone.parent_name:
+			local_rest = native_rests[bone.parent_name].inverse() * native_rest
+		native_rests[bone_name] = native_rest
 
-		var posed_basis := local_rest * Basis(rotations.get(bone.name, Quaternion.IDENTITY))
+		var posed_basis := local_rest * Basis(rotations.get(bone_name, Quaternion.IDENTITY))
 		var reference_basis := local_rest
 		if reference_pose:
-			reference_basis *= Basis(reference_pose.rotations.get(bone.name, Quaternion.IDENTITY))
-		if bone.parent_index >= 0:
-			posed_basis = posed_bases[bone.parent_index] * posed_basis
-			reference_basis = reference_bases[bone.parent_index] * reference_basis
-		posed_bases.append(posed_basis)
-		reference_bases.append(reference_basis)
+			reference_basis *= Basis(reference_pose.rotations.get(bone_name, Quaternion.IDENTITY))
+		if bone.parent_name:
+			posed_basis = posed_bases[bone.parent_name] * posed_basis
+			reference_basis = reference_bases[bone.parent_name] * reference_basis
+		posed_bases[bone_name] = posed_basis
+		reference_bases[bone_name] = reference_basis
 
 	var pose := MHPose.new()
 	var profile := bone_map.profile
@@ -50,14 +51,13 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 	var profile_bases := get_profile_bases(profile)
 	var retargeted_bases: Dictionary[StringName, Basis]
 	var mapped_names: Dictionary[StringName, bool]
-	var bone_indices := rig.get_bone_indices()
 	for profile_index in profile.bone_size:
 		var profile_name := profile.get_bone_name(profile_index)
 		var parent_name := profile.get_bone_parent(profile_index)
 
 		var source_name := bone_map.get_skeleton_bone_name(profile_name)
 		if source_name:
-			if not bone_indices.has(source_name):
+			if not rig.bones.has(source_name):
 				push_error("BoneMap source bone '%s' is missing from the rig" % source_name)
 				return null
 			if mapped_names.has(source_name):
@@ -67,11 +67,10 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 
 			var ancestor_name := _find_mapped_ancestor(bone_map, profile, parent_name)
 			if ancestor_name:
-				var ancestor_index := bone_indices[ancestor_name]
-				var source_index := rig.bones[bone_indices[source_name]].parent_index
-				while source_index >= 0 and source_index != ancestor_index:
-					source_index = rig.bones[source_index].parent_index
-				if source_index < 0:
+				var source := source_name
+				while source and source != ancestor_name:
+					source = rig.bones[source].parent_name
+				if not source:
 					push_error("BoneMap hierarchy is incompatible at '%s'" % profile_name)
 					return null
 		elif profile.is_required(profile_index):
@@ -84,9 +83,8 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 
 		var retargeted_basis := parent_basis * profile.get_reference_pose(profile_index).basis
 		if source_name:
-			var source_index := bone_indices[source_name]
 			retargeted_basis = (
-				posed_bases[source_index] * reference_bases[source_index].inverse()
+				posed_bases[source_name] * reference_bases[source_name].inverse()
 				* profile_bases[profile_name]
 			)
 		retargeted_bases[profile_name] = retargeted_basis

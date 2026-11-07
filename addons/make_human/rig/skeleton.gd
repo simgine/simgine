@@ -86,29 +86,35 @@ func rebuild(
 	clear_bones()
 	_profile = bone_map.profile if bone_map else null
 
+	# Rigs are parent-first, so a parent is added before any of its children.
 	var inv_global_rests: Array[Transform3D]
 	inv_global_rests.resize(rig.bones.size())
 
-	for bone_index in rig.bones.size():
-		var bone := rig.bones[bone_index]
-		var bone_name := bone.name
+	for bone_name in rig.bones:
+		var bone := rig.bones[bone_name]
+		var skeleton_name := bone_name
 		if bone_map:
-			var mapped_name := bone_map.find_profile_bone_name(bone.name)
+			var mapped_name := bone_map.find_profile_bone_name(bone_name)
 			if mapped_name:
-				bone_name = mapped_name
-		var added_index := add_bone(bone_name)
-		assert(added_index == bone_index)
+				skeleton_name = mapped_name
+		var bone_index := add_bone(skeleton_name)
 
 		var global_rest := bone.resolve_global_rest(body_vertices, vertex_groups)
 		var rest := global_rest
-		if bone.parent_index >= 0:
-			set_bone_parent(bone_index, bone.parent_index)
-			rest = inv_global_rests[bone.parent_index] * global_rest
+		if bone.parent_name:
+			var parent_name := bone.parent_name
+			if bone_map:
+				var mapped_parent := bone_map.find_profile_bone_name(bone.parent_name)
+				if mapped_parent:
+					parent_name = mapped_parent
+			var parent_index := find_bone(parent_name)
+			set_bone_parent(bone_index, parent_index)
+			rest = inv_global_rests[parent_index] * global_rest
 
 		inv_global_rests[bone_index] = global_rest.affine_inverse()
 		if reference_pose:
 			var pose_rotation: Quaternion = reference_pose.rotations.get(
-				bone.name,
+				bone_name,
 				Quaternion.IDENTITY,
 			)
 			rest.basis *= Basis(pose_rotation)

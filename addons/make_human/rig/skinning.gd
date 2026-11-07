@@ -37,18 +37,17 @@ var render_weights: PackedFloat32Array
 func build_from_rig(geometry: MHGeometry, rig: MHRig, rig_weights: MHRigWeights) -> void:
 	_resize(geometry.vertices.size())
 
-	for bone_index in rig.bones.size():
-		var bone := rig.bones[bone_index]
-		var bone_weights: MHBoneWeights = rig_weights.bones.get(bone.name)
-		if not bone_weights:
-			continue
+	var bone_index := 0
+	for bone_name in rig.bones:
+		var bone_weights: MHBoneWeights = rig_weights.bones.get(bone_name)
+		if bone_weights:
+			assert(bone_weights.vertices.size() == bone_weights.weights.size())
+			for influence_index in bone_weights.vertices.size():
+				var vertex_index := bone_weights.vertices[influence_index]
+				var weight := bone_weights.weights[influence_index]
 
-		assert(bone_weights.vertices.size() == bone_weights.weights.size())
-		for influence_index in bone_weights.vertices.size():
-			var vertex_index := bone_weights.vertices[influence_index]
-			var weight := bone_weights.weights[influence_index]
-
-			_add_influence(vertex_index, bone_index, weight)
+				_add_influence(vertex_index, bone_index, weight)
+		bone_index += 1
 
 	assert(_weights_are_normalized())
 	_build_render_arrays(geometry)

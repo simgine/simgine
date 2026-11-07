@@ -5,15 +5,8 @@ extends Resource
 const BLENDER_TO_MH := Basis(Vector3.RIGHT, -PI * 0.5)
 const MH_TO_BLENDER := Basis(Vector3.RIGHT, PI * 0.5)
 
-## Original MakeHuman bone name.
-##
-## Rig weights and poses are keyed by this mapped name.
-@export var name: StringName
-
-## Parent index in [member MHRig.bones], or `-1` for a root bone.
-##
-## Resolved from the parent name in the rig JSON during import.
-@export var parent_index := -1
+## Parent bone name in [member MHRig.bones], or empty for a root bone.
+@export var parent_name: StringName
 
 ## Position strategy for the bone head.
 @export var head: MHRigPosition

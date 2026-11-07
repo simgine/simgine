@@ -6,15 +6,8 @@ extends Resource
 ##
 ## Imported from `rig.*.json`.
 
-## Bones in parent-first order.
-@export var bones: Array[MHBone]
-
-
-func get_bone_indices() -> Dictionary[StringName, int]:
-	var indices: Dictionary[StringName, int]
-	for bone_index in bones.size():
-		indices[bones[bone_index].name] = bone_index
-	return indices
+## Bones keyed by their MakeHuman bone name, in parent-first order.
+@export var bones: Dictionary[StringName, MHBone]
 
 
 ## Checks if [param bone_map] can be used with this rig.
@@ -25,15 +18,16 @@ func validate_bone_map(bone_map: BoneMap) -> bool:
 		return false
 
 	var target_names: Dictionary[StringName, bool]
-	for bone in bones:
-		var mapped_name := bone_map.find_profile_bone_name(bone.name)
+	for bone_name in bones:
+		var bone := bones[bone_name]
+		var mapped_name := bone_map.find_profile_bone_name(bone_name)
 		if not mapped_name:
-			if profile.find_bone(bone.name) >= 0:
-				push_error("Unmapped bone uses a profile bone name: %s" % bone.name)
+			if profile.find_bone(bone_name) >= 0:
+				push_error("Unmapped bone uses a profile bone name: %s" % bone_name)
 				return false
 			continue
 
-		var target_name := mapped_name if mapped_name else bone.name
+		var target_name := mapped_name if mapped_name else bone_name
 		if target_names.has(target_name):
 			push_error("Rig bones rename to the same target bone: %s" % target_name)
 			return false
@@ -41,19 +35,18 @@ func validate_bone_map(bone_map: BoneMap) -> bool:
 
 		var profile_index := profile.find_bone(mapped_name)
 		var parent_name: StringName
-		if bone.parent_index >= 0:
-			var parent_bone := bones[bone.parent_index]
-			parent_name = bone_map.find_profile_bone_name(parent_bone.name)
+		if bone.parent_name:
+			parent_name = bone_map.find_profile_bone_name(bone.parent_name)
 			if not parent_name:
 				push_error(
 					"Unsupported target hierarchy: mapped bone %s has unmapped parent %s"
-					% [bone.name, parent_bone.name],
+					% [bone_name, bone.parent_name],
 				)
 				return false
 
 		if parent_name != profile.get_bone_parent(profile_index):
 			push_error(
-				"Unsupported target hierarchy: parent of %s differs from profile" % bone.name
+				"Unsupported target hierarchy: parent of %s differs from profile" % bone_name
 			)
 			return false
 

@@ -357,11 +357,10 @@ func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> E
 
 	var native_pose := MHNativePose.new()
 	native_pose.rig = rig
-	var bone_indices := rig.get_bone_indices()
 	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
 	var bone_rotations: Dictionary = dict.bone_rotations
 	for bone_name: String in bone_rotations:
-		if not bone_indices.has(bone_name):
+		if not rig.bones.has(bone_name):
 			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
 			return ERR_INVALID_DATA
 		var components: Array = bone_rotations[bone_name]
@@ -455,9 +454,8 @@ static func _parse_rotation_mode(mode_name: String, component_count: int) -> Rot
 
 func _import_rig(dict: Dictionary, save_path: String) -> Error:
 	var rig := MHRig.new()
-	var bone_indices: Dictionary[StringName, int]
 	for bone_name: String in dict:
-		var error := _append_bone_with_parents(bone_name, dict, rig, bone_indices)
+		var error := _append_bone_with_parents(bone_name, dict, rig)
 		if error != OK:
 			return error
 
@@ -465,38 +463,29 @@ func _import_rig(dict: Dictionary, save_path: String) -> Error:
 
 
 ## Traverse bone ancestors to store them in parent-first order.
-static func _append_bone_with_parents(
-	bone_name: StringName,
-	dict: Dictionary,
-	rig: MHRig,
-	bone_indices: Dictionary[StringName, int],
-) -> Error:
-	if bone_indices.has(bone_name):
+static func _append_bone_with_parents(bone_name: StringName, dict: Dictionary, rig: MHRig) -> Error:
+	if rig.bones.has(bone_name):
 		return OK
 
 	var bone_dict: Dictionary = dict[bone_name]
 	var parent_name: StringName = bone_dict.parent
-	var parent_index := -1
 
 	if parent_name:
-		var error := _append_bone_with_parents(parent_name, dict, rig, bone_indices)
+		var error := _append_bone_with_parents(parent_name, dict, rig)
 		if error != OK:
 			return error
-		parent_index = bone_indices[parent_name]
 
-	var bone := _parse_bone(bone_name, parent_index, bone_dict)
+	var bone := _parse_bone(parent_name, bone_dict)
 	if not bone:
 		return ERR_PARSE_ERROR
-	rig.bones.push_back(bone)
+	rig.bones[bone_name] = bone
 
-	bone_indices[bone_name] = rig.bones.size() - 1
 	return OK
 
 
-static func _parse_bone(bone_name: StringName, parent_index: int, dict: Dictionary) -> MHBone:
+static func _parse_bone(parent_name: StringName, dict: Dictionary) -> MHBone:
 	var bone := MHBone.new()
-	bone.name = bone_name
-	bone.parent_index = parent_index
+	bone.parent_name = parent_name
 	bone.head = _parse_rig_position(dict.head)
 	if not bone.head:
 		return null

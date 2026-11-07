@@ -86,7 +86,7 @@ func set_rig(value: MHRig) -> void:
 			push_error("Body reference pose must have a matching rig")
 			return
 
-		if not value.validate_bone_map(bone_map):
+		if bone_map and not value.validate_bone_map(bone_map):
 			return
 
 	rig = value

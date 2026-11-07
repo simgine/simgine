@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LookItem" format=3]
+[gd_resource type="Resource" script_class="LookItem" format=3 uid="uid://dgy3p6dbmce0r"]
 
 [ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_turtleneck_halter"]
 [ext_resource type="Resource" path="res://characters/look_slots/top.tres" id="2_top"]

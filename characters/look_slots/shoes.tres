@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="LookSlot" format=3]
+[gd_resource type="Resource" script_class="LookSlot" format=3 uid="uid://du1yeyj0ncall"]
 
 [ext_resource type="Script" uid="uid://v4rpudpmubdt" path="res://characters/look_slots/look_slot.gd" id="1_shoes"]
 

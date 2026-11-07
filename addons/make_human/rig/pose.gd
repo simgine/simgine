@@ -1,11 +1,13 @@
 @tool
 class_name MHPose
 extends Resource
-## A pose file stores bone rotations and translations (not supported yet) for an armature,
-## allowing characters to be placed into predefined poses.
+## A predefined character pose retargeted to a [SkeletonProfile].
 ##
-## Imported from pose JSON. Bone names match [member MHBone.name].
-## Missing entries leave a bone in its native rest pose.
+## Imported from pose JSON.
+## See also [MHNativePose] for a pose with its original rig.
+
+## Profile used for retargeting.
+@export var profile: SkeletonProfile
 
 ## Maps bones to rotations.
 @export var rotations: Dictionary[StringName, Quaternion]

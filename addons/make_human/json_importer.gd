@@ -5,7 +5,7 @@ extends EditorImportPlugin
 ## Formats:[br]
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/target_metadata.md]Target and macro registries[/url][br]
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/mesh_metadata.md]Vertex groups[/url][br]
-## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/rig.md]Rig[/url] (game engine only, which uses legacy format)[br]
+## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/rig.md]Rig[/url] (legacy layout)[br]
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/weights.md]Weights[/url][br]
 ## - [url=https://github.com/makehumancommunity/mpfb2/blob/master/docs/fileformats/pose.md]Pose[/url][br]
 
@@ -64,13 +64,32 @@ func _get_import_order() -> int:
 
 
 func _get_import_options(_path: String, _preset_index: int) -> Array[Dictionary]:
-	return []
+	return [
+		{
+			"name": "rig",
+			"default_value": "",
+			"property_hint": PROPERTY_HINT_FILE,
+			"hint_string": "*.json",
+		},
+		{
+			"name": "bone_map",
+			"default_value": "",
+			"property_hint": PROPERTY_HINT_FILE,
+			"hint_string": "*.tres,*.res",
+		},
+		{
+			"name": "reference_pose",
+			"default_value": "",
+			"property_hint": PROPERTY_HINT_FILE,
+			"hint_string": "*.json,*.tres,*.res",
+		},
+	]
 
 
 func _import(
 	source_file: String,
 	save_path: String,
-	_options: Dictionary,
+	options: Dictionary,
 	_platform_variants: Array,
 	_gen_files: Array,
 ) -> Error:
@@ -108,7 +127,7 @@ func _import(
 	if data.has("weights"):
 		return _import_rig_weights(data.weights, save_path)
 	if data.has("skeleton_type"):
-		return _import_pose(data, save_path)
+		return _import_pose(data, save_path, options)
 	else:
 		push_error("Unknown MakeHuman JSON")
 		return ERR_PARSE_ERROR
@@ -306,10 +325,27 @@ func _import_vertex_groups(dict: Dictionary, save_path: String) -> Error:
 	return ResourceSaver.save(vertex_groups, "%s.%s" % [save_path, _get_save_extension()])
 
 
-func _import_pose(dict: Dictionary, save_path: String) -> Error:
-	if dict.skeleton_type != "game_engine":
-		push_error("Skeleton type '%s' is unsupported" % dict.skeleton_type)
-		return ERR_PARSE_ERROR
+func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> Error:
+	var rig_path: String = options.rig
+	if not rig_path:
+		push_error("Pose import requires a source rig")
+		return ERR_INVALID_PARAMETER
+
+	var skeleton_type: String = dict.skeleton_type
+	if not _rig_label_matches(rig_path, skeleton_type):
+		push_error("Source rig '%s' does not match skeleton_type '%s'" % [rig_path, skeleton_type])
+		return ERR_INVALID_DATA
+
+	var rig := ResourceLoader.load(rig_path) as MHRig
+	if not rig:
+		push_error("Unable to load source rig '%s'" % rig_path)
+		return ERR_CANT_OPEN
+
+	var map_path: String = options.bone_map
+	var reference_path: String = options.reference_pose
+	if reference_path and not map_path:
+		push_error("A reference pose is only used when a BoneMap is supplied")
+		return ERR_INVALID_PARAMETER
 
 	if dict.has_ik_bones:
 		push_error("Poses with IK bones are unsupported")
@@ -319,10 +355,15 @@ func _import_pose(dict: Dictionary, save_path: String) -> Error:
 		push_error("Bone translations are unsupported")
 		return ERR_PARSE_ERROR
 
-	var pose := MHPose.new()
+	var native_pose := MHNativePose.new()
+	native_pose.rig = rig
+	var bone_indices := rig.get_bone_indices()
 	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
 	var bone_rotations: Dictionary = dict.bone_rotations
 	for bone_name: String in bone_rotations:
+		if not bone_indices.has(bone_name):
+			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
+			return ERR_INVALID_DATA
 		var components: Array = bone_rotations[bone_name]
 		var mode := _parse_rotation_mode(rotation_modes.get(bone_name, ""), components.size())
 
@@ -331,7 +372,7 @@ func _import_pose(dict: Dictionary, save_path: String) -> Error:
 				var angles := Vector3(components[0], components[1], components[2])
 				# Blender XYZ composes Rz * Ry * Rx, which Godot calls ZYX.
 				var basis := Basis.from_euler(angles, EULER_ORDER_ZYX)
-				pose.rotations[_map_bone_name(bone_name)] = basis.get_rotation_quaternion()
+				native_pose.rotations[bone_name] = basis.get_rotation_quaternion()
 			RotationMode.QUATERNION:
 				# Blender serializes quaternions as WXYZ; Godot's constructor uses XYZW.
 				var rotation := Quaternion(
@@ -344,11 +385,37 @@ func _import_pose(dict: Dictionary, save_path: String) -> Error:
 					push_error("Bone '%s' has a zero-length quaternion" % bone_name)
 					return ERR_INVALID_DATA
 
-				pose.rotations[_map_bone_name(bone_name)] = rotation.normalized()
+				native_pose.rotations[bone_name] = rotation.normalized()
 			RotationMode.INVALID:
 				return ERR_INVALID_DATA
 
+	if not map_path:
+		# Import as a native pose without retargeting.
+		return ResourceSaver.save(native_pose, "%s.%s" % [save_path, _get_save_extension()])
+
+	var bone_map := ResourceLoader.load(map_path) as BoneMap
+	if not bone_map or not bone_map.profile:
+		push_error("Pose retargeting requires a BoneMap with a profile")
+		return ERR_INVALID_DATA
+
+	var reference_pose: MHNativePose = null
+	if reference_path:
+		reference_pose = ResourceLoader.load(reference_path) as MHNativePose
+		if not reference_pose:
+			push_error("Reference pose '%s' must be an MHNativePose" % reference_path)
+			return ERR_INVALID_DATA
+
+	var pose := native_pose.retarget(bone_map, reference_pose)
+	if not pose:
+		return ERR_INVALID_DATA
+
 	return ResourceSaver.save(pose, "%s.%s" % [save_path, _get_save_extension()])
+
+
+static func _rig_label_matches(rig_path: String, skeleton_type: String) -> bool:
+	const RIG_PREFIX := "rig."
+	var rig_label := rig_path.get_file().get_basename().trim_prefix(RIG_PREFIX)
+	return skeleton_type == rig_label or skeleton_type.begins_with(rig_label + "_")
 
 
 static func _parse_rotation_mode(mode_name: String, component_count: int) -> RotationMode:
@@ -428,7 +495,7 @@ static func _append_bone_with_parents(
 
 static func _parse_bone(bone_name: StringName, parent_index: int, dict: Dictionary) -> MHBone:
 	var bone := MHBone.new()
-	bone.name = _map_bone_name(bone_name)
+	bone.name = bone_name
 	bone.parent_index = parent_index
 	bone.head = _parse_rig_position(dict.head)
 	if not bone.head:
@@ -478,7 +545,7 @@ func _import_rig_weights(dict: Dictionary, save_path: String) -> Error:
 	var weights := MHRigWeights.new()
 	for bone_name: String in dict:
 		var bone := _parse_bone_weights(dict[bone_name])
-		weights.bones[_map_bone_name(bone_name)] = bone
+		weights.bones[bone_name] = bone
 
 	return ResourceSaver.save(weights, "%s.%s" % [save_path, _get_save_extension()])
 
@@ -491,68 +558,3 @@ static func _parse_bone_weights(array: Array) -> MHBoneWeights:
 		bone.weights.push_back(pair[1])
 
 	return bone
-
-
-## Maps MakeHuman bone names to the names in [SkeletonProfileHumanoid].
-##
-## Bones without an entry fall back to PascalCase, which matches the profile for `Root` and `head`.
-static func _map_bone_name(mh_name: StringName) -> StringName:
-	const BONE_NAMES: Dictionary[StringName, StringName] = {
-		"pelvis": "Hips",
-		"spine_01": "Spine",
-		"spine_02": "Chest",
-		"spine_03": "UpperChest",
-		"neck_01": "Neck",
-		"clavicle_l": "LeftShoulder",
-		"clavicle_r": "RightShoulder",
-		"upperarm_l": "LeftUpperArm",
-		"upperarm_r": "RightUpperArm",
-		"lowerarm_l": "LeftLowerArm",
-		"lowerarm_r": "RightLowerArm",
-		"hand_l": "LeftHand",
-		"hand_r": "RightHand",
-		"thumb_01_l": "LeftThumbMetacarpal",
-		"thumb_02_l": "LeftThumbProximal",
-		"thumb_03_l": "LeftThumbDistal",
-		"thumb_01_r": "RightThumbMetacarpal",
-		"thumb_02_r": "RightThumbProximal",
-		"thumb_03_r": "RightThumbDistal",
-		"index_01_l": "LeftIndexProximal",
-		"index_02_l": "LeftIndexIntermediate",
-		"index_03_l": "LeftIndexDistal",
-		"index_01_r": "RightIndexProximal",
-		"index_02_r": "RightIndexIntermediate",
-		"index_03_r": "RightIndexDistal",
-		"middle_01_l": "LeftMiddleProximal",
-		"middle_02_l": "LeftMiddleIntermediate",
-		"middle_03_l": "LeftMiddleDistal",
-		"middle_01_r": "RightMiddleProximal",
-		"middle_02_r": "RightMiddleIntermediate",
-		"middle_03_r": "RightMiddleDistal",
-		"ring_01_l": "LeftRingProximal",
-		"ring_02_l": "LeftRingIntermediate",
-		"ring_03_l": "LeftRingDistal",
-		"ring_01_r": "RightRingProximal",
-		"ring_02_r": "RightRingIntermediate",
-		"ring_03_r": "RightRingDistal",
-		"pinky_01_l": "LeftLittleProximal",
-		"pinky_02_l": "LeftLittleIntermediate",
-		"pinky_03_l": "LeftLittleDistal",
-		"pinky_01_r": "RightLittleProximal",
-		"pinky_02_r": "RightLittleIntermediate",
-		"pinky_03_r": "RightLittleDistal",
-		"thigh_l": "LeftUpperLeg",
-		"thigh_r": "RightUpperLeg",
-		"calf_l": "LeftLowerLeg",
-		"calf_r": "RightLowerLeg",
-		"foot_l": "LeftFoot",
-		"foot_r": "RightFoot",
-		"ball_l": "LeftToes",
-		"ball_r": "RightToes",
-	}
-
-	var name: Variant = BONE_NAMES.get(mh_name)
-	if not name:
-		return mh_name.to_pascal_case()
-
-	return name

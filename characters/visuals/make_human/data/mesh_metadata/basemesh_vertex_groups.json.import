@@ -12,3 +12,6 @@ dest_files=["res://.godot/imported/basemesh_vertex_groups.json-cdab3a40bdcf98b78
 
 [params]
 
+rig=""
+bone_map=""
+reference_pose=""

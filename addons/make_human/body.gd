@@ -23,9 +23,17 @@ signal body_changed(dirty: MHBodyInstance.Dirty)
 @export var rig_weights: MHRigWeights:
 	set = set_rig_weights
 
+## Optional bone mapping and profile axes for the runtime skeleton.
+##
+## If unset, builds a native skeleton without retargeting. Maps incompatible
+## with the assigned rig are rejected.
+@export var bone_map: BoneMap:
+	set = set_bone_map
+
 ## Optional pose adjustments applied when building the rig's rest pose.
+##
 ## If unset, preserves the native rest.
-@export var reference_pose: MHPose:
+@export var reference_pose: MHNativePose:
 	set = set_reference_pose
 
 ## Lazy-initialized skinning shared across all instances with this resource.
@@ -73,6 +81,14 @@ func set_rig(value: MHRig) -> void:
 	if rig == value:
 		return
 
+	if value:
+		if reference_pose and reference_pose.rig != value:
+			push_error("Body reference pose must have a matching rig")
+			return
+
+		if not value.validate_bone_map(bone_map):
+			return
+
 	rig = value
 	skinning = null
 	_proxy_skinnings.clear()
@@ -89,8 +105,32 @@ func set_rig_weights(value: MHRigWeights) -> void:
 	body_changed.emit(MHBodyInstance.Dirty.WEIGHTS)
 
 
-func set_reference_pose(value: MHPose) -> void:
+func set_bone_map(value: BoneMap) -> void:
+	if bone_map == value:
+		return
+
+	if rig and value and not rig.validate_bone_map(value):
+		return
+
+	if bone_map:
+		bone_map.bone_map_updated.disconnect(body_changed.emit)
+		bone_map.profile_updated.disconnect(body_changed.emit)
+
+	bone_map = value
+
+	if bone_map:
+		bone_map.bone_map_updated.connect(body_changed.emit.bind(MHBodyInstance.Dirty.SKELETON))
+		bone_map.profile_updated.connect(body_changed.emit.bind(MHBodyInstance.Dirty.SKELETON))
+
+	body_changed.emit(MHBodyInstance.Dirty.SKELETON)
+
+
+func set_reference_pose(value: MHNativePose) -> void:
 	if reference_pose == value:
+		return
+
+	if value and rig and value.rig != rig:
+		push_error("Body reference pose must be native to the assigned rig")
 		return
 
 	reference_pose = value

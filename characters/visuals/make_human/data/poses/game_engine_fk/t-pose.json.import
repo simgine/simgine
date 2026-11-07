@@ -12,3 +12,6 @@ dest_files=["res://.godot/imported/t-pose.json-97104a956ea4475cb071a9b689842b46.
 
 [params]
 
+rig="res://characters/visuals/make_human/data/rigs/rig.game_engine.json"
+bone_map=""
+reference_pose=""

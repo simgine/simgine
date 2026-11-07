@@ -12,3 +12,6 @@ dest_files=["res://.godot/imported/rig.game_engine.json-83bfdea69ecd10da1542ebf3
 
 [params]
 
+rig=""
+bone_map=""
+reference_pose=""

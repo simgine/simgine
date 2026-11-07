@@ -1,0 +1,17 @@
+[remap]
+
+importer="make_human.json_importer"
+type="Resource"
+uid="uid://dnl32x77jgkpa"
+path="res://.godot/imported/rig.default.json-572b123d2729cea2f2f4f9d95a7c7a91.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/data/rigs/rig.default.json"
+dest_files=["res://.godot/imported/rig.default.json-572b123d2729cea2f2f4f9d95a7c7a91.res"]
+
+[params]
+
+rig=""
+bone_map=""
+reference_pose=""

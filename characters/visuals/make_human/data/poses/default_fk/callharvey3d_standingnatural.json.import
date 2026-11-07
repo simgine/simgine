@@ -1,0 +1,17 @@
+[remap]
+
+importer="make_human.json_importer"
+type="Resource"
+uid="uid://b4c2lnu65dm3s"
+path="res://.godot/imported/callharvey3d_standingnatural.json-9b98827ef079e74b310390eab1b365e7.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json"
+dest_files=["res://.godot/imported/callharvey3d_standingnatural.json-9b98827ef079e74b310390eab1b365e7.res"]
+
+[params]
+
+rig="res://characters/visuals/make_human/data/rigs/rig.default.json"
+bone_map="res://characters/visuals/make_human/data/rigs/default_bone_map.tres"
+reference_pose="res://characters/visuals/make_human/data/poses/default_fk/t-pose.json"

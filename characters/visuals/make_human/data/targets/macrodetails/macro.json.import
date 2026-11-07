@@ -12,3 +12,6 @@ dest_files=["res://.godot/imported/macro.json-95dd10aa60a8cd84626e028bb961cdfb.r
 
 [params]
 
+rig=""
+bone_map=""
+reference_pose=""

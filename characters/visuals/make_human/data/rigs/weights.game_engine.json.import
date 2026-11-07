@@ -12,3 +12,6 @@ dest_files=["res://.godot/imported/weights.game_engine.json-a2278d062eaffc8ab3f3
 
 [params]
 
+rig=""
+bone_map=""
+reference_pose=""

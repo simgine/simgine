@@ -1,0 +1,17 @@
+[remap]
+
+importer="make_human.json_importer"
+type="Resource"
+uid="uid://cr2c5m8r03nt3"
+path="res://.godot/imported/t-pose.json-a4f564e8659627fa12b473458bc91ad8.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/data/poses/default_fk/t-pose.json"
+dest_files=["res://.godot/imported/t-pose.json-a4f564e8659627fa12b473458bc91ad8.res"]
+
+[params]
+
+rig="res://characters/visuals/make_human/data/rigs/rig.default.json"
+bone_map=""
+reference_pose=""

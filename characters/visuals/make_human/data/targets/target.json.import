@@ -12,3 +12,6 @@ dest_files=["res://.godot/imported/target.json-4ee8964be4493bf2d2c87fc22695f049.
 
 [params]
 
+rig=""
+bone_map=""
+reference_pose=""

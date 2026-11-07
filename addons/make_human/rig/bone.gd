@@ -2,11 +2,12 @@
 class_name MHBone
 extends Resource
 
-## Bone name.
+const BLENDER_TO_MH := Basis(Vector3.RIGHT, -PI * 0.5)
+const MH_TO_BLENDER := Basis(Vector3.RIGHT, PI * 0.5)
+
+## Original MakeHuman bone name.
 ##
-## During import, original MakeHuman bone names are mapped to the names
-## in [SkeletonProfileHumanoid] (missing names are just renamed to PascalCase
-## for consistency). Rig weights and poses are keyed by this mapped name.
+## Rig weights and poses are keyed by this mapped name.
 @export var name: StringName
 
 ## Parent index in [member MHRig.bones], or `-1` for a root bone.
@@ -22,6 +23,13 @@ extends Resource
 
 ## Bone roll in radians.
 @export var roll: float
+
+
+## Reconstructs the saved native orientation in MakeHuman/global skeleton space.
+func get_rest_basis() -> Basis:
+	var blender_axis := tail.default_position - head.default_position
+	assert(not blender_axis.is_zero_approx())
+	return BLENDER_TO_MH * _basis_from_axis_roll(blender_axis.normalized())
 
 
 ## Resolves this bone's global rest transform from the current morphed body.
@@ -45,9 +53,6 @@ func resolve_global_rest(
 ## Bone head/tail positions are resolved from that raw geometry, so the bone
 ## axis must be converted to Blender space before applying roll.
 func _make_basis(head_pos: Vector3, tail_pos: Vector3) -> Basis:
-	const MH_TO_BLENDER := Basis(Vector3.RIGHT, PI * 0.5)
-	const BLENDER_TO_MH := Basis(Vector3.RIGHT, -PI * 0.5)
-
 	var makehuman_axis := tail_pos - head_pos
 	assert(not makehuman_axis.is_zero_approx())
 

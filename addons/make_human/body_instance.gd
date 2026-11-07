@@ -331,6 +331,7 @@ func _rebuild_skeleton() -> void:
 		body.vertex_groups,
 		morphed_vertices,
 		body.reference_pose,
+		body.bone_map,
 	)
 
 

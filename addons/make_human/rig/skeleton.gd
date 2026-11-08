@@ -187,7 +187,8 @@ func _update_motion_scale() -> void:
 
 
 ## Applies a baked profile-space pose directly, without runtime retargeting.
-## Missing optional target bones are skipped; invalid poses leave the current pose unchanged.
+##
+## Missing optional target bones are skipped. Invalid poses leave the current pose unchanged.
 ## Playing an animation or rebuilding the skeleton resets the pose.
 func set_pose(pose: MHPose) -> void:
 	if _profile != pose.profile:

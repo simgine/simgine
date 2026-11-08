@@ -117,7 +117,8 @@ func rebuild(
 				bone_name,
 				Quaternion.IDENTITY,
 			)
-			rest.basis *= Basis(pose_rotation)
+			var pose_translation: Vector3 = reference_pose.translations.get(bone_name, Vector3.ZERO)
+			rest *= Transform3D(Basis(pose_rotation), pose_translation)
 		set_bone_rest(bone_index, rest)
 
 	var skin := _build_skin(inv_global_rests)
@@ -198,6 +199,26 @@ func set_pose(pose: MHPose) -> void:
 		var bone_index := find_bone(bone_name)
 		if bone_index >= 0:
 			set_bone_pose_rotation(bone_index, pose.rotations[bone_name])
+
+	# Rigs are parent-first, so a translated parent was positioned first and its
+	# contribution to this bone's displacement is already in place.
+	for bone_name in pose.translations:
+		var bone_index := find_bone(bone_name)
+		if bone_index < 0:
+			continue
+		var displacement := pose.translations[bone_name]
+		var parent_index := get_bone_parent(bone_index)
+		if parent_index >= 0:
+			displacement -= pose.translations.get(get_bone_name(parent_index), Vector3.ZERO)
+			if displacement.is_zero_approx():
+				continue
+			var parent_pose := get_bone_global_pose(parent_index)
+			set_bone_pose_position(
+				bone_index,
+				get_bone_pose_position(bone_index) + parent_pose.basis.inverse() * displacement,
+			)
+		elif not displacement.is_zero_approx():
+			set_bone_pose_position(bone_index, get_bone_pose_position(bone_index) + displacement)
 
 
 class BoneSnapshot:

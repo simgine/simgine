@@ -351,10 +351,6 @@ func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> E
 		push_error("Poses with IK bones are unsupported")
 		return ERR_PARSE_ERROR
 
-	if not dict.bone_translations.is_empty():
-		push_error("Bone translations are unsupported")
-		return ERR_PARSE_ERROR
-
 	var native_pose := MHNativePose.new()
 	native_pose.rig = rig
 	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
@@ -387,6 +383,22 @@ func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> E
 				native_pose.rotations[bone_name] = rotation.normalized()
 			RotationMode.INVALID:
 				return ERR_INVALID_DATA
+
+	var bone_translations: Dictionary = dict.bone_translations
+	for bone_name: String in bone_translations:
+		if not rig.bones.has(bone_name):
+			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
+			return ERR_INVALID_DATA
+
+		var components: Array = bone_translations[bone_name]
+		if components.size() != 3:
+			push_error(
+				"Pose bone '%s' translation has %d components, expected 3"
+				% [bone_name, components.size()]
+			)
+			return ERR_INVALID_DATA
+
+		native_pose.translations[bone_name] = Vector3(components[0], components[1], components[2])
 
 	if not map_path:
 		# Import as a native pose without retargeting.

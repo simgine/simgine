@@ -147,9 +147,15 @@
             0.08857634663581848
         ]
     },
-    "bone_translations": {},
+    "bone_translations": {
+        "root": [
+            -6.984919309616089e-10,
+            -0.021529631689190865,
+            0.3873862028121948
+        ]
+    },
     "has_ik_bones": false,
-    "original_shoulder_width": 0.32196231571438716,
-    "original_spine_length": 0.5398076053927573,
+    "original_shoulder_width": 0.34003272228695264,
+    "original_spine_length": 0.5398059673572444,
     "skeleton_type": "default"
 }

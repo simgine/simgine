@@ -11,3 +11,12 @@ extends Resource
 
 ## Maps bones to rotations.
 @export var rotations: Dictionary[StringName, Quaternion]
+
+## Maps bones to position offsets relative to the reference pose.
+##
+## When applied, the bone and its subtree are displaced by the offset
+## relative to their positions without the translations.
+##
+## Missing entries leave a bone where the rotations place it.
+## Typically only present for the bone mapped from the source rig's root.
+@export var translations: Dictionary[StringName, Vector3]

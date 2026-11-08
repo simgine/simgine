@@ -353,6 +353,8 @@ func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> E
 
 	var native_pose := MHNativePose.new()
 	native_pose.rig = rig
+	native_pose.original_spine_length = dict.original_spine_length
+	native_pose.original_shoulder_width = dict.original_shoulder_width
 	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
 	var bone_rotations: Dictionary = dict.bone_rotations
 	for bone_name: String in bone_rotations:

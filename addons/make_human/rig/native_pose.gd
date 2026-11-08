@@ -23,6 +23,17 @@ extends Resource
 ## Typically only present for root bones and IK control bones.
 @export var translations: Dictionary[StringName, Vector3]
 
+## Distance from the head of spine05 to the tail of spine01 when the pose was captured.
+##
+## Used to scale translations when applying the pose to differently proportioned characters.
+## Set to 0 for non-default rigs (no scaling).
+@export var original_spine_length: float
+
+## Distance between the tails of shoulder01.L and shoulder01.R when captured.
+##
+## Used to scale X/Z translations. Set to 0 for non-default rigs.
+@export var original_shoulder_width: float
+
 
 ## Bakes native rotations and translations into [param bone_map]'s profile space.
 ##
@@ -77,6 +88,8 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 	var pose := MHPose.new()
 	var profile := bone_map.profile
 	pose.profile = profile
+	pose.original_spine_length = original_spine_length
+	pose.original_shoulder_width = original_shoulder_width
 	var profile_bases := get_profile_bases(profile)
 	var retargeted_bases: Dictionary[StringName, Basis]
 	var mapped_names: Dictionary[StringName, bool]

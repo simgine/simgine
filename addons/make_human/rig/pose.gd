@@ -20,3 +20,14 @@ extends Resource
 ## Missing entries leave a bone where the rotations place it.
 ## Typically only present for the bone mapped from the source rig's root.
 @export var translations: Dictionary[StringName, Vector3]
+
+## Distance from the head of spine05 to the tail of spine01 when the pose was captured.
+##
+## Used to scale translations when applying the pose to differently proportioned characters.
+## Set to 0 for non-default rigs (no scaling).
+@export var original_spine_length: float
+
+## Distance between the tails of shoulder01.L and shoulder01.R when captured.
+##
+## Used to scale X/Y translations. Set to 0 for non-default rigs.
+@export var original_shoulder_width: float

@@ -14,6 +14,16 @@ var _bone_snapshots: Array[BoneSnapshot]
 ## Profile used to build the current skeleton.
 var _profile: SkeletonProfile
 
+## Distance from the head of spine05 to the tail of spine01 on the current body.
+##
+## Set to 0 when the rig has no such bones (no translation scaling).
+var _spine_length: float
+
+## Distance between the tails of shoulder01.L and shoulder01.R on the current body.
+##
+## Set to 0 when the rig has no such bones (no translation scaling).
+var _shoulder_width: float
+
 
 func _validate_property(property: Dictionary) -> void:
 	if property.name == "motion_scale":
@@ -85,6 +95,19 @@ func rebuild(
 
 	clear_bones()
 	_profile = bone_map.profile if bone_map else null
+	_update_proportions(rig, body_vertices, vertex_groups)
+
+	var reference_shoulder_scale := 1.0
+	var reference_spine_scale := 1.0
+	if reference_pose:
+		reference_shoulder_scale = _proportion_scale(
+			_shoulder_width,
+			reference_pose.original_shoulder_width,
+		)
+		reference_spine_scale = _proportion_scale(
+			_spine_length,
+			reference_pose.original_spine_length,
+		)
 
 	# Rigs are parent-first, so a parent is added before any of its children.
 	var inv_global_rests: Array[Transform3D]
@@ -118,6 +141,13 @@ func rebuild(
 				Quaternion.IDENTITY,
 			)
 			var pose_translation: Vector3 = reference_pose.translations.get(bone_name, Vector3.ZERO)
+			if not pose_translation.is_zero_approx():
+				# Native armature space is Z-up, so its horizontal axes are X/Y.
+				pose_translation = Vector3(
+					pose_translation.x * reference_shoulder_scale,
+					pose_translation.y * reference_shoulder_scale,
+					pose_translation.z * reference_spine_scale,
+				)
 			rest *= Transform3D(Basis(pose_rotation), pose_translation)
 		set_bone_rest(bone_index, rest)
 
@@ -127,6 +157,31 @@ func rebuild(
 	notify_property_list_changed()
 
 	return skin
+
+
+## Measures this body's spine and shoulder proportions for scaling pose
+## translations.
+func _update_proportions(
+	rig: MHRig,
+	body_vertices: PackedVector3Array,
+	vertex_groups: MHVertexGroups,
+) -> void:
+	_spine_length = 0.0
+	_shoulder_width = 0.0
+
+	var left_shoulder: MHBone = rig.bones.get("shoulder01.L")
+	var right_shoulder: MHBone = rig.bones.get("shoulder01.R")
+	var upper_spine: MHBone = rig.bones.get("spine01")
+	var lower_spine: MHBone = rig.bones.get("spine05")
+
+	if left_shoulder and right_shoulder and upper_spine and lower_spine:
+		var spine_top := upper_spine.tail.resolve(body_vertices, vertex_groups)
+		var spine_bottom := lower_spine.head.resolve(body_vertices, vertex_groups)
+		_spine_length = (spine_top - spine_bottom).length()
+
+		var left_tail := left_shoulder.tail.resolve(body_vertices, vertex_groups)
+		var right_tail := right_shoulder.tail.resolve(body_vertices, vertex_groups)
+		_shoulder_width = (left_tail - right_tail).length()
 
 
 func _build_skin(inv_global_rests: Array[Transform3D]) -> Skin:
@@ -201,6 +256,9 @@ func set_pose(pose: MHPose) -> void:
 		if bone_index >= 0:
 			set_bone_pose_rotation(bone_index, pose.rotations[bone_name])
 
+	var shoulder_scale := _proportion_scale(_shoulder_width, pose.original_shoulder_width)
+	var spine_scale := _proportion_scale(_spine_length, pose.original_spine_length)
+
 	# Rigs are parent-first, so a translated parent was positioned first and its
 	# contribution to this bone's displacement is already in place.
 	for bone_name in pose.translations:
@@ -213,13 +271,40 @@ func set_pose(pose: MHPose) -> void:
 			displacement -= pose.translations.get(get_bone_name(parent_index), Vector3.ZERO)
 			if displacement.is_zero_approx():
 				continue
+			displacement = _scale_displacement(displacement, shoulder_scale, spine_scale)
 			var parent_pose := get_bone_global_pose(parent_index)
 			set_bone_pose_position(
 				bone_index,
 				get_bone_pose_position(bone_index) + parent_pose.basis.inverse() * displacement,
 			)
 		elif not displacement.is_zero_approx():
+			displacement = _scale_displacement(displacement, shoulder_scale, spine_scale)
 			set_bone_pose_position(bone_index, get_bone_pose_position(bone_index) + displacement)
+
+
+## Scales [param original] capture proportion to this skeleton's.
+##
+## Returns 1 (no scaling) when either proportion is 0: the rig has no bones
+## to measure from, or the pose was recorded without capture proportions.
+static func _proportion_scale(measured: float, original: float) -> float:
+	if measured > 0.0 and original > 0.0001:
+		return measured / original
+
+	return 1.0
+
+
+## Scales a skeleton-space (Y-up) displacement, whose vertical axis is Y, by the
+## proportion scales.
+static func _scale_displacement(
+	displacement: Vector3,
+	shoulder_scale: float,
+	spine_scale: float,
+) -> Vector3:
+	return Vector3(
+		displacement.x * shoulder_scale,
+		displacement.y * spine_scale,
+		displacement.z * shoulder_scale,
+	)
 
 
 class BoneSnapshot:

@@ -355,52 +355,10 @@ func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> E
 	native_pose.rig = rig
 	native_pose.original_spine_length = dict.original_spine_length
 	native_pose.original_shoulder_width = dict.original_shoulder_width
-	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
-	var bone_rotations: Dictionary = dict.bone_rotations
-	for bone_name: String in bone_rotations:
-		if not rig.bones.has(bone_name):
-			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
-			return ERR_INVALID_DATA
-		var components: Array = bone_rotations[bone_name]
-		var mode := _parse_rotation_mode(rotation_modes.get(bone_name, ""), components.size())
-
-		match mode:
-			RotationMode.XYZ:
-				var angles := Vector3(components[0], components[1], components[2])
-				# Blender XYZ composes Rz * Ry * Rx, which Godot calls ZYX.
-				var basis := Basis.from_euler(angles, EULER_ORDER_ZYX)
-				native_pose.rotations[bone_name] = basis.get_rotation_quaternion()
-			RotationMode.QUATERNION:
-				# Blender serializes quaternions as WXYZ; Godot's constructor uses XYZW.
-				var rotation := Quaternion(
-					components[1],
-					components[2],
-					components[3],
-					components[0],
-				)
-				if is_zero_approx(rotation.length_squared()):
-					push_error("Bone '%s' has a zero-length quaternion" % bone_name)
-					return ERR_INVALID_DATA
-
-				native_pose.rotations[bone_name] = rotation.normalized()
-			RotationMode.INVALID:
-				return ERR_INVALID_DATA
-
-	var bone_translations: Dictionary = dict.bone_translations
-	for bone_name: String in bone_translations:
-		if not rig.bones.has(bone_name):
-			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
-			return ERR_INVALID_DATA
-
-		var components: Array = bone_translations[bone_name]
-		if components.size() != 3:
-			push_error(
-				"Pose bone '%s' translation has %d components, expected 3"
-				% [bone_name, components.size()]
-			)
-			return ERR_INVALID_DATA
-
-		native_pose.translations[bone_name] = Vector3(components[0], components[1], components[2])
+	if not _parse_pose_rotations(native_pose, rig, dict):
+		return ERR_INVALID_DATA
+	if not _parse_pose_translations(native_pose, rig, dict):
+		return ERR_INVALID_DATA
 
 	if not map_path:
 		# Import as a native pose without retargeting.
@@ -423,6 +381,65 @@ func _import_pose(dict: Dictionary, save_path: String, options: Dictionary) -> E
 		return ERR_INVALID_DATA
 
 	return ResourceSaver.save(pose, "%s.%s" % [save_path, _get_save_extension()])
+
+
+static func _parse_pose_rotations(native_pose: MHNativePose, rig: MHRig, dict: Dictionary) -> bool:
+	var rotation_modes: Dictionary = dict.get("bone_rotation_modes", { })
+	var bone_rotations: Dictionary = dict.bone_rotations
+	for bone_name: String in bone_rotations:
+		if not rig.bones.has(bone_name):
+			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
+			return false
+		var components: Array = bone_rotations[bone_name]
+		var mode := _parse_rotation_mode(rotation_modes.get(bone_name, ""), components.size())
+
+		match mode:
+			RotationMode.XYZ:
+				var angles := Vector3(components[0], components[1], components[2])
+				# Blender XYZ composes Rz * Ry * Rx, which Godot calls ZYX.
+				var basis := Basis.from_euler(angles, EULER_ORDER_ZYX)
+				native_pose.rotations[bone_name] = basis.get_rotation_quaternion()
+			RotationMode.QUATERNION:
+				# Blender serializes quaternions as WXYZ; Godot's constructor uses XYZW.
+				var rotation := Quaternion(
+					components[1],
+					components[2],
+					components[3],
+					components[0],
+				)
+				if is_zero_approx(rotation.length_squared()):
+					push_error("Bone '%s' has a zero-length quaternion" % bone_name)
+					return false
+
+				native_pose.rotations[bone_name] = rotation.normalized()
+			RotationMode.INVALID:
+				return false
+
+	return true
+
+
+static func _parse_pose_translations(
+	native_pose: MHNativePose,
+	rig: MHRig,
+	dict: Dictionary,
+) -> bool:
+	var bone_translations: Dictionary = dict.bone_translations
+	for bone_name: String in bone_translations:
+		if not rig.bones.has(bone_name):
+			push_error("Pose bone '%s' does not exist in the source rig" % bone_name)
+			return false
+
+		var components: Array = bone_translations[bone_name]
+		if components.size() != 3:
+			push_error(
+				"Pose bone '%s' translation has %d components, expected 3"
+				% [bone_name, components.size()]
+			)
+			return false
+
+		native_pose.translations[bone_name] = Vector3(components[0], components[1], components[2])
+
+	return true
 
 
 static func _rig_label_matches(rig_path: String, skeleton_type: String) -> bool:

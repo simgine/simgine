@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://dydsd3cotcikj" path="res://characters/visuals/make_human/items/eyelashes/eyelashes01/eyelashes01.tres" id="5_l3p8a"]
 [ext_resource type="Resource" uid="uid://rgx1ew4aa2ov" path="res://characters/visuals/make_human/items/eyebrows/eyebrow001/eyebrow001.tres" id="6_xeu00"]
 [ext_resource type="Script" uid="uid://cw78o1pbhhjm7" path="res://characters/character_look.gd" id="7_look"]
+[ext_resource type="Resource" uid="uid://b4c2lnu65dm3s" path="res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json" id="8_fakd8"]
 
 [sub_resource type="Resource" id="Resource_k538c"]
 script = ExtResource("7_look")
@@ -14,6 +15,9 @@ items = Array[ExtResource("2_ien3r")]([ExtResource("3_f4d7u"), ExtResource("4_fa
 
 [node name="MakeHumanPreview" unique_id=344067901 instance=ExtResource("1_visual")]
 look = SubResource("Resource_k538c")
+
+[node name="Skeleton" parent="." index="0" unique_id=338036088]
+pose = ExtResource("8_fakd8")
 
 [node name="Head" type="Camera3D" parent="." index="1" unique_id=1865214107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.575, 0.585015)

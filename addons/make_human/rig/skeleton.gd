@@ -14,6 +14,13 @@ var _bone_snapshots: Array[BoneSnapshot]
 ## Profile used to build the current skeleton.
 var _profile: SkeletonProfile
 
+## Applied pose.
+##
+## Missing optional target bones are skipped.
+## Playing an animation or rebuilding the skeleton resets the pose.
+@export var pose: MHPose:
+	set = set_pose
+
 ## Distance from the head of spine05 to the tail of spine01 on the current body.
 ##
 ## Set to 0 when the rig has no such bones (no translation scaling).
@@ -153,7 +160,7 @@ func rebuild(
 
 	var skin := _build_skin(inv_global_rests)
 	_update_motion_scale()
-	reset_bone_poses()
+	set_pose(pose)
 	notify_property_list_changed()
 
 	return skin
@@ -241,16 +248,17 @@ func _update_motion_scale() -> void:
 			motion_scale = absf(hips_height)
 
 
-## Applies a baked profile-space pose directly, without runtime retargeting.
-##
-## Missing optional target bones are skipped. Invalid poses leave the current pose unchanged.
-## Playing an animation or rebuilding the skeleton resets the pose.
-func set_pose(pose: MHPose) -> void:
+func set_pose(value: MHPose) -> void:
+	pose = value
+	reset_bone_poses()
+
+	if not pose or not _profile:
+		return
+
 	if _profile != pose.profile:
 		push_error("Pose profile does not match the active skeleton profile")
 		return
 
-	reset_bone_poses()
 	for bone_name in pose.rotations:
 		var bone_index := find_bone(bone_name)
 		if bone_index >= 0:

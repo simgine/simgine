@@ -43,53 +43,12 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 		push_error("The reference pose must use the same source rig")
 		return null
 
-	var native_rests: Dictionary[StringName, Basis]
-	var posed_bases: Dictionary[StringName, Basis]
-	var reference_bases: Dictionary[StringName, Basis]
-	var posed_deltas: Dictionary[StringName, Vector3]
-	var reference_deltas: Dictionary[StringName, Vector3]
-	for bone_name in rig.bones:
-		var bone := rig.bones[bone_name]
-		var native_rest := bone.get_rest_basis()
-
-		var local_rest := native_rest
-		if bone.parent_name:
-			local_rest = native_rests[bone.parent_name].inverse() * native_rest
-		native_rests[bone_name] = native_rest
-
-		var posed_basis := local_rest * Basis(rotations.get(bone_name, Quaternion.IDENTITY))
-		var reference_basis := local_rest
-		var reference_translation := Vector3.ZERO
-		if reference_pose:
-			reference_basis *= Basis(reference_pose.rotations.get(bone_name, Quaternion.IDENTITY))
-			reference_translation = reference_pose.translations.get(bone_name, Vector3.ZERO)
-		if bone.parent_name:
-			posed_basis = posed_bases[bone.parent_name] * posed_basis
-			reference_basis = reference_bases[bone.parent_name] * reference_basis
-		posed_bases[bone_name] = posed_basis
-		reference_bases[bone_name] = reference_basis
-
-		# Translations accumulate through the posed bases, so the joint
-		# displacement of a translated bone carries over to its subtree.
-		var posed_translation: Vector3 = translations.get(bone_name, Vector3.ZERO)
-		var posed_delta := local_rest * posed_translation
-		var reference_delta := local_rest * reference_translation
-		if bone.parent_name:
-			posed_delta = (
-				posed_bases[bone.parent_name] * posed_delta + posed_deltas[bone.parent_name]
-			)
-			reference_delta = (
-				reference_bases[bone.parent_name] * reference_delta
-				+ reference_deltas[bone.parent_name]
-			)
-		posed_deltas[bone_name] = posed_delta
-		reference_deltas[bone_name] = reference_delta
-
 	var pose := MHPose.new()
 	var profile := bone_map.profile
 	pose.profile = profile
 	pose.original_spine_length = original_spine_length
 	pose.original_shoulder_width = original_shoulder_width
+	var bone_bases := _build_bone_bases(reference_pose)
 	var profile_bases := get_profile_bases(profile)
 	var retargeted_bases: Dictionary[StringName, Basis]
 	var mapped_names: Dictionary[StringName, bool]
@@ -126,15 +85,16 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 		var delta := Vector3.ZERO
 		var retargeted_basis := parent_basis * profile.get_reference_pose(profile_index).basis
 		if source_name:
+			var bone_basis := bone_bases[source_name]
 			retargeted_basis = (
-				posed_bases[source_name] * reference_bases[source_name].inverse()
+				bone_basis.posed_basis * bone_basis.reference_basis.inverse()
 				* profile_bases[profile_name]
 			)
 			var has_translation := translations.has(source_name)
 			if not has_translation and reference_pose:
 				has_translation = reference_pose.translations.has(source_name)
 			if has_translation:
-				delta = posed_deltas[source_name] - reference_deltas[source_name]
+				delta = bone_basis.posed_delta - bone_basis.reference_delta
 
 		retargeted_bases[profile_name] = retargeted_basis
 		pose.rotations[profile_name] = (
@@ -148,6 +108,47 @@ func retarget(bone_map: BoneMap, reference_pose: MHNativePose = null) -> MHPose:
 		return null
 
 	return pose
+
+
+func _build_bone_bases(reference_pose: MHNativePose) -> Dictionary[StringName, BoneBasis]:
+	var native_rests: Dictionary[StringName, Basis]
+	var bases: Dictionary[StringName, BoneBasis]
+	for bone_name in rig.bones:
+		var bone := rig.bones[bone_name]
+		var native_rest := bone.get_rest_basis()
+
+		var local_rest := native_rest
+		if bone.parent_name:
+			local_rest = native_rests[bone.parent_name].inverse() * native_rest
+		native_rests[bone_name] = native_rest
+
+		var posed_basis := local_rest * Basis(rotations.get(bone_name, Quaternion.IDENTITY))
+		var reference_basis := local_rest
+		var reference_translation := Vector3.ZERO
+		if reference_pose:
+			reference_basis *= Basis(reference_pose.rotations.get(bone_name, Quaternion.IDENTITY))
+			reference_translation = reference_pose.translations.get(bone_name, Vector3.ZERO)
+
+		var posed_translation: Vector3 = translations.get(bone_name, Vector3.ZERO)
+		var posed_delta := local_rest * posed_translation
+		var reference_delta := local_rest * reference_translation
+		if bone.parent_name:
+			var parent := bases[bone.parent_name]
+			posed_basis = parent.posed_basis * posed_basis
+			reference_basis = parent.reference_basis * reference_basis
+			# Translations accumulate through the posed bases, so the joint
+			# displacement of a translated bone carries over to its subtree.
+			posed_delta = parent.posed_basis * posed_delta + parent.posed_delta
+			reference_delta = parent.reference_basis * reference_delta + parent.reference_delta
+
+		var bone_basis := BoneBasis.new()
+		bone_basis.posed_basis = posed_basis
+		bone_basis.reference_basis = reference_basis
+		bone_basis.posed_delta = posed_delta
+		bone_basis.reference_delta = reference_delta
+		bases[bone_name] = bone_basis
+
+	return bases
 
 
 static func get_profile_bases(profile: SkeletonProfile) -> Dictionary[StringName, Basis]:
@@ -181,3 +182,10 @@ static func _find_mapped_ancestor(
 		profile_name = profile.get_bone_parent(profile.find_bone(profile_name))
 
 	return ""
+
+
+class BoneBasis:
+	var posed_basis: Basis
+	var reference_basis: Basis
+	var posed_delta: Vector3
+	var reference_delta: Vector3

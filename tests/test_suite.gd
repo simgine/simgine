@@ -57,3 +57,21 @@ func test_assert_approx_nested_arrays() -> void:
 	assert_approx_eq([[1.0000001], [Vector3.ONE]], [[1.0], [Vector3.ONE]])
 	assert_approx_eq([[1.0000001], [Vector3.ONE]], [[1.0], PackedVector3Array([Vector3.ONE])])
 	assert_approx_ne([[1.0], [2.0]], [[1.0], [2.00001]])
+
+
+func test_expect() -> void:
+	expect_error("expected error")
+	push_error("An expected error occurred.")
+
+	expect_warning("expected warning")
+	push_warning("An expected warning occurred.")
+
+	expect_error("expected error")
+	expect_error("expected error")
+	push_error("An expected error 1 occurred.")
+	push_error("An expected error 2 occurred.")
+
+	expect_error("First error")
+	expect_warning("First warning")
+	push_error("First error")
+	push_warning("First warning")

@@ -6,6 +6,7 @@ extends SceneTree
 
 var jobs: int = OS.get_processor_count()
 var nocapture: bool
+var no_import: bool
 var list: bool
 var exact: bool
 var filter: String
@@ -26,6 +27,10 @@ func _initialize() -> void:
 	if list:
 		list_suites()
 		quit()
+		return
+
+	if not no_import and not await import_assets():
+		quit(1)
 		return
 
 	if not await run_suites():
@@ -49,6 +54,8 @@ func parse_args() -> bool:
 				list = true
 			"--nocapture":
 				nocapture = true
+			"--no-import":
+				no_import = true
 			"--exact":
 				exact = true
 			"--jobs":
@@ -85,6 +92,37 @@ func parse_args() -> bool:
 				filter = arg
 
 	return true
+
+
+func import_assets() -> bool:
+	print("     %s project assets" % Ansi.paint("Importing", Ansi.BOLD_BRIGHT_GREEN))
+	var process := OS.execute_with_pipe(
+		OS.get_executable_path(),
+		["--headless", "--no-header", "--import"],
+		false,
+	)
+	if not process:
+		printerr("Failed to start asset import")
+		return false
+
+	var pid: int = process.pid
+	while true:
+		var process_running := OS.is_process_running(pid)
+		_print_pipe(process.stdio)
+		_print_pipe(process.stderr)
+
+		if not process_running:
+			break
+
+		await process_frame
+
+	return OS.get_process_exit_code(pid) == 0
+
+
+func _print_pipe(pipe: FileAccess) -> void:
+	var available := pipe.get_length()
+	if available > 0:
+		printraw(pipe.get_buffer(available).get_string_from_utf8())
 
 
 func run_suites() -> bool:
@@ -132,9 +170,8 @@ func run_suite(suite: TestSuite) -> bool:
 	)
 	print("running %d %s" % [tests.size(), "test" if tests.size() == 1 else "tests"])
 	var started_ms := Time.get_ticks_msec()
-	var max_jobs := 1 if runner.editor_mode else jobs
 	for test_name in tests:
-		while runner.running >= max_jobs:
+		while runner.running >= jobs:
 			await runner.test_completed
 
 		runner.start(test_name)
@@ -195,13 +232,18 @@ static func print_usage() -> void:
 
 Usage: godot --headless --script addons/test/cli.gd -- [OPTIONS] [FILTER]
 
+Assets are imported once before tests run unless --no-import is set. Editor
+workers share project files and caches; avoid changing project files or
+triggering imports during a run.
+
 Options:
   --list                 List all test suites and their tests
   --nocapture            Don't capture stdout/stderr of each task, allow
                          printing directly
+  --no-import            Skip the initial import pass; assets must already
+                         be up to date
   --exact                Exactly match the filter rather than by substring
-  --jobs <COUNT>         Number of parallel runtime jobs, defaults to # of CPUs;
-                         editor-mode tests run sequentially
+  --jobs <COUNT>         Number of parallel jobs, defaults to # of CPUs
   --test <SUITE>         Test only the specified script file; can be
                          located outside of the tests directory
   --help                 Print help

@@ -8,10 +8,9 @@ extends Node
 ##
 ## All functions that begin with [constant TEST_PREFIX] will be treated as
 ## tests that can run via the CLI script: [code]res://addons/test/cli.gd[/code].
-## Each test runs in its own Godot process, so no data is shared between them.
-##
-## Runtime tests run in parallel, but editor tests run sequentially to avoid
-## concurrent writes to the import cache.
+## Tests run in parallel, but each test runs in its own Godot process, so no
+## data is shared between them. Assets are pre-imported once. Avoid changing
+## project files or triggering imports while tests run.
 ##
 ## Only files located in [code]res://tests[/code] will be automatically discovered.
 ##

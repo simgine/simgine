@@ -47,7 +47,6 @@ func run(test_name: String) -> bool:
 	var pid: int = process.pid
 	while true:
 		var process_running := OS.is_process_running(pid)
-
 		_read_pipe(process.stdio, test_name)
 		_read_pipe(process.stderr, test_name)
 

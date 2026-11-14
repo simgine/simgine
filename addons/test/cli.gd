@@ -96,33 +96,15 @@ func parse_args() -> bool:
 
 func import_assets() -> bool:
 	print("     %s project assets" % Ansi.paint("Importing", Ansi.BOLD_BRIGHT_GREEN))
-	var process := OS.execute_with_pipe(
-		OS.get_executable_path(),
-		["--headless", "--no-header", "--import"],
-		false,
-	)
-	if not process:
-		printerr("Failed to start asset import")
-		return false
+	var process := GodotProcess.new()
+	if nocapture:
+		process.output_received.connect(printraw)
 
-	var pid: int = process.pid
-	while true:
-		var process_running := OS.is_process_running(pid)
-		_print_pipe(process.stdio)
-		_print_pipe(process.stderr)
+	var exit_code := await process.run(["--headless", "--no-header", "--import"])
+	if exit_code != 0 and not nocapture:
+		printraw(process.output)
 
-		if not process_running:
-			break
-
-		await process_frame
-
-	return OS.get_process_exit_code(pid) == 0
-
-
-func _print_pipe(pipe: FileAccess) -> void:
-	var available := pipe.get_length()
-	if available > 0:
-		printraw(pipe.get_buffer(available).get_string_from_utf8())
+	return exit_code == 0
 
 
 func run_suites() -> bool:

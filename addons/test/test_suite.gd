@@ -145,7 +145,7 @@ static func _is_array(value: Variant) -> bool:
 ## Returns the relative distance between [param a] and [param b]: their
 ## distance divided by the larger of the two magnitudes.
 static func _relative_epsilon(a: Variant, b: Variant) -> float:
-	var distance := _distance(a, b)
+	var distance := _magnitude(a - b)
 	if distance == 0.0:
 		return 0.0
 
@@ -161,13 +161,6 @@ static func _magnitude(value: Variant) -> float:
 		return absf(value)
 
 	return value.length()
-
-
-static func _distance(a: Variant, b: Variant) -> float:
-	if a is float or a is int:
-		return absf(a - b)
-
-	return (a - b).length()
 
 
 ## Prints a message and ends execution of the current process.

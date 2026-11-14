@@ -44,12 +44,7 @@ static func assert_eq(left: Variant, right: Variant, msg: String = "") -> void:
 		panic(panic_msg)
 
 
-## Asserts that [param left] and [param right] are not equal to each other.
-##
-## See [method assert_eq] for array comparison rules.
-##
-## On failure, calls [method panic] and prints the values of the arguments
-## and the optional [param msg].
+## Like [method assert_eq], but asserts that the values are not equal.
 static func assert_ne(left: Variant, right: Variant, msg: String = "") -> void:
 	if _is_equal(left, right):
 		var details := ": " + msg if msg else ""
@@ -96,13 +91,8 @@ static func assert_approx_eq(
 		panic(panic_msg)
 
 
-## Asserts that [param left] and [param right] are not approximately equal,
-## within a relative [param epsilon].
-##
-## See [method assert_approx_eq] for details on approximate equality.
-##
-## On failure, calls [method panic] and prints the values of the arguments,
-## [param epsilon] and the optional [param msg].
+## Like [method assert_approx_eq], but asserts that the values are not
+## approximately equal.
 static func assert_approx_ne(
 	left: Variant,
 	right: Variant,
@@ -216,10 +206,7 @@ func expect_error(msg: String) -> void:
 	error_expected.emit(Logger.ERROR_TYPE_ERROR, msg)
 
 
-## Expects a warning from [method @GDScript.push_warning] whose message
-## contains [param msg].
-##
-## See [method expect_error] for the matching and failure rules.
+## Like [method expect_error], but for warnings from [method @GDScript.push_warning].
 func expect_warning(msg: String) -> void:
 	error_expected.emit(Logger.ERROR_TYPE_WARNING, msg)
 

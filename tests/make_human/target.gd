@@ -15,7 +15,7 @@ func test_simple() -> void:
 	var vertices: PackedVector3Array = [Vector3.ONE, Vector3.ONE, Vector3.ZERO]
 	registry.apply(vertices, { "horizontal": 0.5, "vertical": 0.25 })
 
-	assert_eq(vertices, PackedVector3Array([Vector3(2, 2, 1), Vector3.ONE, Vector3.BACK]))
+	assert_eq(vertices, [Vector3(2, 2, 1), Vector3.ONE, Vector3.BACK])
 
 
 func test_opposites() -> void:
@@ -64,15 +64,15 @@ func test_sided() -> void:
 	const BASE_VERTICES: PackedVector3Array = [Vector3.ZERO, Vector3.ZERO]
 	var vertices := BASE_VERTICES.duplicate()
 	registry.apply(vertices, { "width/left": -0.5, "width/right": 0.25 })
-	assert_eq(vertices, PackedVector3Array([Vector3.LEFT, Vector3.UP]))
+	assert_eq(vertices, [Vector3.LEFT, Vector3.UP])
 
 	vertices = BASE_VERTICES.duplicate()
 	registry.apply(vertices, { "width/left": 0.25, "width/right": -0.5 })
-	assert_eq(vertices, PackedVector3Array([Vector3.RIGHT, Vector3.DOWN]))
+	assert_eq(vertices, [Vector3.RIGHT, Vector3.DOWN])
 
 	vertices = BASE_VERTICES.duplicate()
 	registry.apply(vertices, { "width/left": -0.5 })
-	assert_eq(vertices, PackedVector3Array([Vector3.LEFT, Vector3.ZERO]))
+	assert_eq(vertices, [Vector3.LEFT, Vector3.ZERO])
 
 
 static func _target(indices: PackedInt32Array, offsets: PackedVector3Array) -> MHTarget:

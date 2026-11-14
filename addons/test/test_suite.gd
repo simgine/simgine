@@ -25,10 +25,13 @@ const TEST_PREFIX: String = "test_"
 
 ## Asserts that [param left] and [param right] are equal.
 ##
+## Regular and packed arrays are compared recursively element-wise,
+## ignoring their storage types, and must have equal sizes.
+##
 ## Calls [method panic] if the arguments are not equal, printing their
 ## values and the optional [param msg].
 static func assert_eq(left: Variant, right: Variant, msg: String = "") -> void:
-	if left != right:
+	if not _is_equal(left, right):
 		var details := ": " + msg if msg else ""
 		var panic_msg := "\n".join(
 			[
@@ -43,10 +46,12 @@ static func assert_eq(left: Variant, right: Variant, msg: String = "") -> void:
 
 ## Asserts that [param left] and [param right] are not equal to each other.
 ##
+## See [method assert_eq] for array comparison rules.
+##
 ## On failure, calls [method panic] and prints the values of the arguments
 ## and the optional [param msg].
 static func assert_ne(left: Variant, right: Variant, msg: String = "") -> void:
-	if left == right:
+	if _is_equal(left, right):
 		var details := ": " + msg if msg else ""
 		var panic_msg := "\n".join(
 			[
@@ -118,9 +123,25 @@ static func assert_approx_ne(
 		panic(panic_msg)
 
 
-static func _is_equal_approx(left: Variant, right: Variant, epsilon: float) -> bool:
+static func _is_equal(left: Variant, right: Variant) -> bool:
 	var left_is_array := _is_array(left)
 	var right_is_array := _is_array(right)
+	if left_is_array or right_is_array:
+		if not left_is_array or not right_is_array or left.size() != right.size():
+			return false
+
+		for index: int in left.size():
+			if not _is_equal(left[index], right[index]):
+				return false
+
+		return true
+
+	return left == right
+
+
+static func _is_equal_approx(left: Variant, right: Variant, epsilon: float) -> bool:
+	var left_is_array := _is_approx_array(left)
+	var right_is_array := _is_approx_array(right)
 	if left_is_array or right_is_array:
 		if not left_is_array or not right_is_array or left.size() != right.size():
 			return false
@@ -136,6 +157,13 @@ static func _is_equal_approx(left: Variant, right: Variant, epsilon: float) -> b
 
 
 static func _is_array(value: Variant) -> bool:
+	return (
+		_is_approx_array(value) or value is PackedByteArray or value is PackedInt32Array
+		or value is PackedInt64Array or value is PackedStringArray or value is PackedColorArray
+	)
+
+
+static func _is_approx_array(value: Variant) -> bool:
 	return (
 		value is Array or value is PackedFloat32Array or value is PackedFloat64Array
 		or value is PackedVector2Array or value is PackedVector3Array or value is PackedVector4Array

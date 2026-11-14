@@ -66,6 +66,8 @@ static func assert_ne(left: Variant, right: Variant, msg: String = "") -> void:
 ## [param epsilon] times the larger of the two magnitudes.
 ## [param left] and [param right] must be floats, ints or one
 ## of the vector types: Vector2, Vector3, Vector4 or Quaternion.
+## Arrays of supported values are compared recursively element-wise
+## and must have equal sizes.
 ##
 ## Calls [method panic] if the values are not approximately equal, printing
 ## their values, [param epsilon] and the optional [param msg].
@@ -75,8 +77,7 @@ static func assert_approx_eq(
 	epsilon: float = 1e-6,
 	msg: String = "",
 ) -> void:
-	# `not ... <=` keeps NaN from comparing equal to anything.
-	if not _relative_epsilon(left, right) <= epsilon:
+	if not _is_equal_approx(left, right, epsilon):
 		var details := ": " + msg if msg else ""
 		var panic_msg := "\n".join(
 			[
@@ -103,7 +104,7 @@ static func assert_approx_ne(
 	epsilon: float = 1e-6,
 	msg: String = "",
 ) -> void:
-	if _relative_epsilon(left, right) <= epsilon:
+	if _is_equal_approx(left, right, epsilon):
 		var details := ": " + msg if msg else ""
 		var panic_msg := "\n".join(
 			[
@@ -115,6 +116,30 @@ static func assert_approx_ne(
 		)
 
 		panic(panic_msg)
+
+
+static func _is_equal_approx(left: Variant, right: Variant, epsilon: float) -> bool:
+	var left_is_array := _is_array(left)
+	var right_is_array := _is_array(right)
+	if left_is_array or right_is_array:
+		if not left_is_array or not right_is_array or left.size() != right.size():
+			return false
+
+		for index: int in left.size():
+			if not _is_equal_approx(left[index], right[index], epsilon):
+				return false
+
+		return true
+
+	# NaN remains unequal, including inside arrays.
+	return _relative_epsilon(left, right) <= epsilon
+
+
+static func _is_array(value: Variant) -> bool:
+	return (
+		value is Array or value is PackedFloat32Array or value is PackedFloat64Array
+		or value is PackedVector2Array or value is PackedVector3Array or value is PackedVector4Array
+	)
 
 
 ## Returns the relative distance between [param a] and [param b]: their

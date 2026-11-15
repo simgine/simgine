@@ -49,7 +49,11 @@ func test_single_index() -> void:
 	assert(proxy.material)
 	assert_eq(proxy.ref_a.size(), 250)
 	assert_eq(proxy.weights.size(), 250)
-	assert_eq(proxy.weights[0], Vector3(1.0, 0.0, 0.0))
+	assert_eq(
+		proxy.weights[0],
+		Vector3(1.0, 0.0, 0.0),
+		"single-index mappings give the referenced body vertex full weight",
+	)
 	assert_eq(proxy.offsets[0], Vector3.ZERO)
 
 

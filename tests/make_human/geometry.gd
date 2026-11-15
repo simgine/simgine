@@ -16,6 +16,7 @@ func test_uv_seams() -> void:
 			Vector3(1, 0, 2),
 			Vector3(1, 1, 2),
 		],
+		"UV seams split render vertices and unused helpers are omitted",
 	)
 	assert_eq(surface[Mesh.ARRAY_TEX_UV], geometry.uvs)
 	assert_eq(surface[Mesh.ARRAY_INDEX], [0, 2, 1, 0, 3, 2, 4, 6, 5, 4, 2, 6])

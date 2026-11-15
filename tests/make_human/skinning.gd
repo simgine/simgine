@@ -17,15 +17,23 @@ func test_body_weights() -> void:
 	skinning.build_from_rig(geometry, rig, rig_weights)
 
 	assert_eq(skinning.get_vertex_count(), 3)
+	# fmt: off
 	assert_eq(
 		skinning.bones,
-		[1, 2, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0],
+		[
+			1, 2, 0, 0, 0, 0, 0, 0,
+			1, 0, 0, 0, 0, 0, 0, 0,
+			1, 2, 0, 0, 0, 0, 0, 0,
+		],
 	)
 	assert_approx_eq(
 		skinning.weights,
-		[0.75, 0.25, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0.4, 0.6, 0, 0, 0, 0, 0, 0],
+		[
+			0.75, 0.25, 0, 0, 0, 0, 0, 0,
+			1.0, 0, 0, 0, 0, 0, 0, 0,
+			0.4, 0.6, 0, 0, 0, 0, 0, 0,
+		],
 	)
-	# fmt: off
 	assert_eq(
 		skinning.render_bones,
 		[

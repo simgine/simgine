@@ -88,7 +88,9 @@ func test_clothing() -> void:
 	var instance := MHBodyInstance.new()
 	instance.body = _body()
 	add_child(instance)
+
 	await get_tree().process_frame
+
 	_assert_faces(instance, [0, 1, 2, 3], "all faces are visible without clothing")
 
 	# Delete-only proxies isolate equipment masking from fitting and skeleton updates.
@@ -96,20 +98,26 @@ func test_clothing() -> void:
 	first.proxy = MHProxy.new()
 	first.proxy.delete_verts = [0, 7]
 	instance.add_child(first)
+
 	await get_tree().process_frame
+
 	_assert_faces(instance, [2, 3], "the inclusive range hides faces 0 and 1")
 
 	var second := MHProxyInstance.new()
 	second.proxy = MHProxy.new()
 	second.proxy.delete_verts = [4, 10, 11, 11]
 	instance.add_child(second)
+
 	await get_tree().process_frame
+
 	_assert_faces(instance, [3], "overlapping ranges and the singleton hide faces 0, 1, and 2")
 
 	var replacement := MHProxy.new()
 	replacement.delete_verts = [8, 11]
 	first.proxy = replacement
+
 	await get_tree().process_frame
+
 	_assert_faces(
 		instance,
 		[0, 3],
@@ -118,7 +126,9 @@ func test_clothing() -> void:
 
 	instance.remove_child(second)
 	second.free()
+
 	await get_tree().process_frame
+
 	_assert_faces(
 		instance,
 		[0, 1, 3],
@@ -127,7 +137,9 @@ func test_clothing() -> void:
 
 	instance.remove_child(first)
 	first.free()
+
 	await get_tree().process_frame
+
 	_assert_faces(instance, [0, 1, 2, 3], "removing the last item restores every face")
 	instance.free()
 

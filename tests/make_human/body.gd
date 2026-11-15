@@ -12,6 +12,7 @@ const INITIAL_VERTICES: PackedVector3Array = [
 
 func test_modifier_updates() -> void:
 	var instance := _instance(_body(), _proxy())
+
 	await get_tree().process_frame
 
 	# The source quad spans Y=10..20 dm and its helper is at Y=0 dm.
@@ -21,7 +22,9 @@ func test_modifier_updates() -> void:
 	var expected := INITIAL_VERTICES.duplicate()
 
 	instance.set_modifier("height", 0.75)
+
 	await get_tree().process_frame
+
 	expected[2] += Vector3.UP
 	_assert_positions(
 		instance,
@@ -30,18 +33,24 @@ func test_modifier_updates() -> void:
 	)
 
 	instance.set_modifier("width", 1.0)
+
 	await get_tree().process_frame
+
 	expected[2] += Vector3.RIGHT
 	_assert_positions(instance, expected, "local update preserves macro")
 
 	instance.set_modifier("width", 0.5)
+
 	await get_tree().process_frame
+
 	expected[2] -= Vector3.RIGHT * 0.5
 	_assert_positions(instance, expected, "local-only rebuild starts from the cached macro shape")
 
 	instance.set_modifier("height", MHMacroRegistry.DEFAULT_VALUE)
 	instance.set_modifier("width", MHTargetRegistry.DEFAULT_VALUE)
+
 	await get_tree().process_frame
+
 	_assert_positions(instance, INITIAL_VERTICES, "restoring defaults removes all deformation")
 
 
@@ -53,13 +62,17 @@ func test_instance_isolation() -> void:
 
 	var first := _instance(body, proxy)
 	var second := _instance(body, proxy)
+
 	await get_tree().process_frame
+
 	_assert_positions(first, INITIAL_VERTICES)
 	_assert_positions(second, INITIAL_VERTICES)
 
 	first.set_modifier("height", 0.75)
 	first.set_modifier("width", 1.0)
+
 	await get_tree().process_frame
+
 	var expected := INITIAL_VERTICES.duplicate()
 	expected[2] += Vector3.UP + Vector3.RIGHT
 	_assert_positions(first, expected)
@@ -67,7 +80,9 @@ func test_instance_isolation() -> void:
 
 	# Rebuild the second instance too, to detect a corrupted shared base or macro cache.
 	second.set_modifier("width", MHTargetRegistry.DEFAULT_VALUE)
+
 	await get_tree().process_frame
+
 	_assert_positions(first, expected, "rebuilding second instance leaves first unchanged")
 	_assert_positions(second, INITIAL_VERTICES)
 	assert_eq(body.geometry.vertices, source_body_vertices)

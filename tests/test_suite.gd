@@ -60,6 +60,27 @@ func test_assert_approx_bases() -> void:
 	assert_approx_ne(Vector3.ONE, basis)
 
 
+func test_assert_approx_transforms() -> void:
+	var transform := Transform3D(Basis.IDENTITY, Vector3(100, 200, 300))
+	var nearby := transform
+	nearby.origin.x += 0.0000001
+	nearby.basis.x.x += 0.0000001
+	assert_approx_eq(transform, nearby)
+	assert_approx_eq([transform], [nearby])
+
+	var translated := transform
+	translated.origin.x += 1.0
+	assert_approx_ne(transform, translated)
+	assert_approx_eq(transform, translated, 0.01)
+
+	var scaled := transform
+	scaled.basis.x *= 1.00001
+	assert_approx_ne(transform, scaled, 1e-6, "a large origin must not hide a basis difference")
+	assert_approx_eq(transform, scaled, 0.001)
+	assert_approx_ne(transform, transform.basis)
+	assert_approx_ne(transform.basis, transform)
+
+
 func test_assert_approx_arrays() -> void:
 	assert_approx_eq([1.0000001, 2.0000001], [1.0, 2.0])
 	assert_approx_ne([1.0, 2.0], [1.0, 2.00001])

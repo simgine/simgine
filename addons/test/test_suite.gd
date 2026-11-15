@@ -65,7 +65,9 @@ static func assert_ne(left: Variant, right: Variant, msg: String = "") -> void:
 ## Two values are approximately equal when their distance does not exceed
 ## [param epsilon] times the larger of the two magnitudes.
 ## [param left] and [param right] must be floats, ints, Vector2, Vector3,
-## Vector4, Quaternion or Basis. Bases are compared axis by axis.
+## Vector4, Quaternion, Basis or Transform3D.
+## Bases are compared axis by axis.
+## Transforms compare their basis and origin independently.
 ## Arrays of supported values are compared recursively element-wise
 ## and must have equal sizes.
 ##
@@ -141,6 +143,15 @@ static func _is_equal_approx(left: Variant, right: Variant, epsilon: float) -> b
 				return false
 
 		return true
+
+	if left is Transform3D or right is Transform3D:
+		if not left is Transform3D or not right is Transform3D:
+			return false
+
+		return (
+			_is_equal_approx(left.basis, right.basis, epsilon)
+			and _is_equal_approx(left.origin, right.origin, epsilon)
+		)
 
 	if left is Basis or right is Basis:
 		if not left is Basis or not right is Basis:

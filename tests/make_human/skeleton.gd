@@ -78,14 +78,14 @@ func test_rests() -> void:
 	var skin := skeleton.rebuild(rig, MHVertexGroups.new(), BODY_VERTICES)
 
 	_assert_layout(skeleton, skin, ["root", "child"])
-	_assert_transform(skeleton.get_bone_global_rest(0), ROOT_REST)
-	_assert_transform(skeleton.get_bone_global_rest(1), CHILD_REST)
-	_assert_transform(skeleton.get_bone_rest(0), ROOT_REST)
-	_assert_transform(skeleton.get_bone_rest(1), CHILD_LOCAL_REST)
+	assert_approx_eq(skeleton.get_bone_global_rest(0), ROOT_REST)
+	assert_approx_eq(skeleton.get_bone_global_rest(1), CHILD_REST)
+	assert_approx_eq(skeleton.get_bone_rest(0), ROOT_REST)
+	assert_approx_eq(skeleton.get_bone_rest(1), CHILD_LOCAL_REST)
 
 	# Without a reference pose, skinning at rest must leave the mesh unchanged.
-	_assert_transform(skin.get_bind_pose(0), ROOT_REST.affine_inverse())
-	_assert_transform(skin.get_bind_pose(1), CHILD_REST.affine_inverse())
+	assert_approx_eq(skin.get_bind_pose(0), ROOT_REST.affine_inverse())
+	assert_approx_eq(skin.get_bind_pose(1), CHILD_REST.affine_inverse())
 	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT, SKIN_POINT)
 
 
@@ -112,11 +112,11 @@ func test_rebuild() -> void:
 	var skin := skeleton.rebuild(rig, groups, morphed_vertices)
 
 	_assert_layout(skeleton, skin, ["root", "child"])
-	_assert_transform(skeleton.get_bone_global_rest(0), morphed_root)
-	_assert_transform(skeleton.get_bone_global_rest(1), morphed_child)
-	_assert_transform(skeleton.get_bone_rest(1), morphed_root.affine_inverse() * morphed_child)
-	_assert_transform(skin.get_bind_pose(0), morphed_root.affine_inverse())
-	_assert_transform(skin.get_bind_pose(1), morphed_child.affine_inverse())
+	assert_approx_eq(skeleton.get_bone_global_rest(0), morphed_root)
+	assert_approx_eq(skeleton.get_bone_global_rest(1), morphed_child)
+	assert_approx_eq(skeleton.get_bone_rest(1), morphed_root.affine_inverse() * morphed_child)
+	assert_approx_eq(skin.get_bind_pose(0), morphed_root.affine_inverse())
+	assert_approx_eq(skin.get_bind_pose(1), morphed_child.affine_inverse())
 	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT, SKIN_POINT)
 
 
@@ -126,20 +126,22 @@ func test_reference_pose() -> void:
 	var skin := skeleton.rebuild(rig, MHVertexGroups.new(), BODY_VERTICES, _reference_pose(rig))
 
 	_assert_layout(skeleton, skin, ["root", "child"])
-	_assert_transform(skeleton.get_bone_global_rest(0), REFERENCE_ROOT)
-	_assert_transform(skeleton.get_bone_global_rest(1), REFERENCE_CHILD)
-	_assert_transform(
+	assert_approx_eq(skeleton.get_bone_global_rest(0), REFERENCE_ROOT)
+	assert_approx_eq(skeleton.get_bone_global_rest(1), REFERENCE_CHILD)
+	assert_approx_eq(
 		skeleton.get_bone_rest(1),
 		Transform3D(REFERENCE_CHILD.basis, Vector3(-1, 2, 0)),
 	)
-	_assert_transform(
+	assert_approx_eq(
 		skin.get_bind_pose(0),
 		ROOT_REST.affine_inverse(),
+		1e-6,
 		"root bind undoes the native rest",
 	)
-	_assert_transform(
+	assert_approx_eq(
 		skin.get_bind_pose(1),
 		CHILD_REST.affine_inverse(),
+		1e-6,
 		"child bind undoes the native rest",
 	)
 
@@ -163,9 +165,9 @@ func test_profile_mapping() -> void:
 	_assert_layout(skeleton, skin, ["MappedRoot", "MappedChild"])
 	# Use profile axes, but keep body joint positions rather than profile positions.
 	# The child's global basis includes both profile bones' local rotations.
-	_assert_transform(skeleton.get_bone_global_rest(0), mapped_root)
-	_assert_transform(skeleton.get_bone_global_rest(1), mapped_child)
-	_assert_transform(skeleton.get_bone_rest(1), mapped_root.affine_inverse() * mapped_child)
+	assert_approx_eq(skeleton.get_bone_global_rest(0), mapped_root)
+	assert_approx_eq(skeleton.get_bone_global_rest(1), mapped_child)
+	assert_approx_eq(skeleton.get_bone_rest(1), mapped_root.affine_inverse() * mapped_child)
 	_assert_deformation(
 		skeleton,
 		skin,
@@ -178,8 +180,8 @@ func test_profile_mapping() -> void:
 	skin = skeleton.rebuild(rig, groups, BODY_VERTICES, _reference_pose(rig), bone_map)
 	mapped_root.origin = REFERENCE_ROOT.origin
 	mapped_child.origin = REFERENCE_CHILD.origin
-	_assert_transform(skeleton.get_bone_global_rest(0), mapped_root)
-	_assert_transform(skeleton.get_bone_global_rest(1), mapped_child)
+	assert_approx_eq(skeleton.get_bone_global_rest(0), mapped_root)
+	assert_approx_eq(skeleton.get_bone_global_rest(1), mapped_child)
 	_assert_deformation(
 		skeleton,
 		skin,
@@ -202,13 +204,6 @@ static func _assert_layout(
 		assert_eq(skeleton.get_bone_name(bone_index), names[bone_index], msg)
 		assert_eq(skeleton.get_bone_parent(bone_index), bone_index - 1, msg)
 		assert_eq(skin.get_bind_bone(bone_index), bone_index, msg)
-
-
-static func _assert_transform(actual: Transform3D, expected: Transform3D, msg: String = "") -> void:
-	assert_approx_eq(actual.origin, expected.origin, 1e-6, msg)
-	assert_approx_eq(actual.basis.x, expected.basis.x, 1e-6, msg)
-	assert_approx_eq(actual.basis.y, expected.basis.y, 1e-6, msg)
-	assert_approx_eq(actual.basis.z, expected.basis.z, 1e-6, msg)
 
 
 static func _assert_deformation(

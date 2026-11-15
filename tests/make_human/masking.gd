@@ -136,7 +136,60 @@ func test_clothing_masks() -> void:
 	await get_tree().process_frame
 
 	_assert_faces(instance, [0, 1, 2, 3], "removing the last item restores every face")
-	instance.free()
+
+
+func test_replacement_body_masks() -> void:
+	var instance := MHBodyInstance.new()
+	instance.body = _body()
+	add_child(instance)
+
+	var clothing := MHProxyInstance.new()
+	clothing.proxy = MHProxy.new()
+	clothing.proxy.delete_verts = [0, 3]
+	instance.add_child(clothing)
+
+	await get_tree().process_frame
+
+	_assert_faces(instance, [1, 2, 3], "clothing hides the first source body face")
+
+	# The body quads are disconnected, but the replacement shares boundary vertices.
+	var geometry := MHGeometry.new()
+	geometry.vertices = [
+		Vector3.ZERO,
+		Vector3.RIGHT,
+		Vector3(1, 1, 0),
+		Vector3.UP,
+		Vector3(2, 0, 0),
+		Vector3(2, 1, 0),
+	]
+	geometry.uvs = [Vector2.ZERO, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN]
+	geometry.quads = [_quad([0, 1, 2, 3]), _quad([1, 4, 5, 2])]
+
+	var replacement := _proxy(geometry, Vector3i.ZERO, Vector3.RIGHT)
+	replacement.ref_a = [0, 1, 2, 3, 4, 7]
+	var scale := MHScale.new()
+	scale.min_vertex = 0
+	scale.max_vertex = 2
+	scale.factor = 1.0
+	replacement.x_scale = scale
+	replacement.y_scale = scale
+	replacement.z_scale = scale
+	instance.proxy = replacement
+
+	await get_tree().process_frame
+
+	_assert_faces(
+		instance,
+		[1],
+		"existing clothing masks transfer to the replacement without hiding its neighbor",
+	)
+
+	instance.remove_child(clothing)
+	clothing.free()
+
+	await get_tree().process_frame
+
+	_assert_faces(instance, [0, 1], "removing clothing restores both replacement faces")
 
 
 static func _assert_faces(instance: MHBodyInstance, faces: PackedInt32Array, msg: String) -> void:

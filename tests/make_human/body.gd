@@ -18,6 +18,7 @@ func test_modifier_updates() -> void:
 	# The source quad spans Y=10..20 dm and its helper is at Y=0 dm.
 	# After conversion and grounding, the quad spans Y=0..1 m and the helper is at -1 m.
 	_assert_positions(instance, INITIAL_VERTICES)
+	_assert_skinning(instance)
 
 	var expected := INITIAL_VERTICES.duplicate()
 
@@ -47,6 +48,13 @@ func test_modifier_updates() -> void:
 	)
 
 	instance.set_modifier("height", MHMacroRegistry.DEFAULT_VALUE)
+
+	await get_tree().process_frame
+
+	expected[2] -= Vector3.UP
+	_assert_positions(instance, expected, "resetting the macro preserves local deformation")
+	_assert_skinning(instance)
+
 	instance.set_modifier("width", MHTargetRegistry.DEFAULT_VALUE)
 
 	await get_tree().process_frame
@@ -101,6 +109,18 @@ static func _assert_positions(
 
 	var attachment: MHProxyInstance = instance.get_node("Attachment")
 	assert_approx_eq(attachment.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX], rendered, 1e-6, msg)
+
+
+static func _assert_skinning(instance: MHBodyInstance) -> void:
+	var body_surface := instance.mesh.surface_get_arrays(0)
+	assert_eq(body_surface[Mesh.ARRAY_BONES], instance.body.skinning.render_bones)
+	assert_approx_eq(body_surface[Mesh.ARRAY_WEIGHTS], instance.body.skinning.render_weights)
+
+	var attachment: MHProxyInstance = instance.get_node("Attachment")
+	var proxy_surface := attachment.mesh.surface_get_arrays(0)
+	var proxy_skinning := instance.body.get_proxy_skinning(attachment.proxy)
+	assert_eq(proxy_surface[Mesh.ARRAY_BONES], proxy_skinning.render_bones)
+	assert_approx_eq(proxy_surface[Mesh.ARRAY_WEIGHTS], proxy_skinning.render_weights)
 
 
 func _instance(body: MHBody, proxy: MHProxy) -> MHBodyInstance:

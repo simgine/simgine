@@ -47,6 +47,32 @@ func test_unmapped_ancestors() -> void:
 	)
 
 
+func test_reference_relative_rotations() -> void:
+	var rig := _rig()
+	# The sideways child's native rest axes are (+Z, +X, +Y).
+	# The root's are identity.
+	rig.bones["spine01"] = _bone(2, 5, "spine05")
+	var native := MHNativePose.new()
+	native.rig = rig
+	native.rotations = {
+		"spine05": Quaternion(Vector3.UP, PI * 0.5),
+		"spine01": Quaternion(Vector3.BACK, PI * 0.5),
+	}
+	var reference := MHNativePose.new()
+	reference.rig = rig
+	reference.rotations = {
+		"spine05": Quaternion(Vector3.RIGHT, PI * 0.5),
+		"spine01": Quaternion(Vector3.UP, PI * 0.5),
+	}
+
+	var pose := native.retarget(_bone_map(), reference)
+	var root := Basis(pose.rotations["Root"])
+	var child := root * Basis(pose.rotations["Child"])
+	assert_approx_eq(root, Basis(Vector3.DOWN, Vector3.LEFT, Vector3.FORWARD))
+	# Child posed axes are (-Z, -X, +Y), reference/profile axes are (-Z, +X, -Y).
+	assert_approx_eq(child, Basis(Vector3.FORWARD, Vector3.LEFT, Vector3.UP))
+
+
 func test_reference_cancellation() -> void:
 	var native := MHNativePose.new()
 	native.rig = _rig_with_intermediate()
@@ -120,6 +146,24 @@ func test_translations() -> void:
 		Vector3(6, 3, 4),
 		Vector3(4, -6, -2),
 		"translations scale in skeleton space without counting parent displacement twice",
+	)
+
+
+func test_pose_rotations() -> void:
+	var rig := _rig()
+	var bone_map := _bone_map()
+	var skeleton := _skeleton(rig, bone_map)
+	skeleton.pose = _native_pose(rig).retarget(bone_map)
+
+	# Two Y quarter-turns.
+	assert_approx_eq(
+		skeleton.get_bone_global_pose(skeleton.find_bone("Root")).basis,
+		Basis(Vector3.LEFT, Vector3.UP, Vector3.FORWARD),
+	)
+	# (Y quarter-turn * X quarter-turn) squared.
+	assert_approx_eq(
+		skeleton.get_bone_global_pose(skeleton.find_bone("Child")).basis,
+		Basis(Vector3.UP, Vector3.FORWARD, Vector3.LEFT),
 	)
 
 

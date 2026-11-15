@@ -5,7 +5,7 @@ extends SceneTree
 ## See [code]--help[/code] for usage details.
 
 var jobs: int = OS.get_processor_count()
-var nocapture: bool
+var no_capture: bool
 var no_import: bool
 var list: bool
 var exact: bool
@@ -52,8 +52,8 @@ func parse_args() -> bool:
 				help = true
 			"--list":
 				list = true
-			"--nocapture":
-				nocapture = true
+			"--no-capture":
+				no_capture = true
 			"--no-import":
 				no_import = true
 			"--exact":
@@ -97,11 +97,11 @@ func parse_args() -> bool:
 func import_assets() -> bool:
 	print("     %s project assets" % Ansi.paint("Importing", Ansi.BOLD_BRIGHT_GREEN))
 	var process := GodotProcess.new()
-	if nocapture:
+	if no_capture:
 		process.output_received.connect(printraw)
 
 	var exit_code := await process.run(["--headless", "--no-header", "--import"])
-	if exit_code != 0 and not nocapture:
+	if exit_code != 0 and not no_capture:
 		printraw(process.output)
 
 	return exit_code == 0
@@ -133,7 +133,7 @@ func run_suite(suite: TestSuite) -> bool:
 				]
 			),
 	)
-	if nocapture:
+	if no_capture:
 		runner.output_received.connect(printraw)
 
 	var tests: PackedStringArray
@@ -220,7 +220,7 @@ triggering imports during a run.
 
 Options:
   --list                 List all test suites and their tests
-  --nocapture            Don't capture stdout/stderr of each task, allow
+  --no-capture           Don't capture stdout/stderr of each task, allow
                          printing directly
   --no-import            Skip the initial import pass; assets must already
                          be up to date

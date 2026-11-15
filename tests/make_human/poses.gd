@@ -47,7 +47,7 @@ func test_unmapped_ancestors() -> void:
 	)
 
 
-func test_reference_pose() -> void:
+func test_reference_cancellation() -> void:
 	var native := MHNativePose.new()
 	native.rig = _rig_with_intermediate()
 	native.rotations = {
@@ -123,7 +123,7 @@ func test_translations() -> void:
 	)
 
 
-func test_replacement() -> void:
+func test_pose_replacement() -> void:
 	var rig := _rig()
 	var bone_map := _bone_map()
 	var skeleton := _skeleton(rig, bone_map)

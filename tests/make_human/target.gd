@@ -1,7 +1,7 @@
 extends TestSuite
 
 
-func test_simple() -> void:
+func test_additive_targets() -> void:
 	var first := MHTargetCategory.new()
 	first.targets = {
 		"horizontal": _target([0, 2], [Vector3.RIGHT * 2, Vector3.BACK * 2]),

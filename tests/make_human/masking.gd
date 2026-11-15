@@ -79,7 +79,7 @@ func test_weighted_mapping() -> void:
 		)
 
 
-func test_clothing() -> void:
+func test_clothing_masks() -> void:
 	var instance := MHBodyInstance.new()
 	instance.body = _body()
 	add_child(instance)

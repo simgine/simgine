@@ -38,6 +38,28 @@ func test_assert_approx() -> void:
 	assert_approx_ne(Vector3.ONE, Vector3(1.00001, 1, 1))
 
 
+func test_assert_approx_bases() -> void:
+	var basis := Basis(Vector3(2, 0, 0), Vector3(0, 3, 0), Vector3(0, 0, 4))
+	var nearby := basis
+	nearby.x.x += 0.0000001
+	nearby.y.y += 0.0000001
+	nearby.z.z += 0.0000001
+	assert_approx_eq(basis, nearby)
+	assert_approx_eq([basis], [nearby])
+
+	for axis in 3:
+		var changed := basis
+		changed[axis] *= 1.001
+		assert_approx_ne(basis, changed, 1e-6)
+		assert_approx_eq(basis, changed, 0.01)
+
+	var invalid := basis
+	invalid.x.x = NAN
+	assert_approx_ne(invalid, invalid)
+	assert_approx_ne(basis, Vector3.ONE)
+	assert_approx_ne(Vector3.ONE, basis)
+
+
 func test_assert_approx_arrays() -> void:
 	assert_approx_eq([1.0000001, 2.0000001], [1.0, 2.0])
 	assert_approx_ne([1.0, 2.0], [1.0, 2.00001])

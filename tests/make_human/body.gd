@@ -26,11 +26,7 @@ func test_modifier_updates() -> void:
 	await get_tree().process_frame
 
 	expected[2] += Vector3.UP
-	_assert_positions(
-		instance,
-		expected,
-		"local update replaces rather than accumulates deformation",
-	)
+	_assert_positions(instance, expected, "height updates the body and attachment")
 
 	instance.set_modifier("width", 1.0)
 
@@ -44,7 +40,11 @@ func test_modifier_updates() -> void:
 	await get_tree().process_frame
 
 	expected[2] -= Vector3.RIGHT * 0.5
-	_assert_positions(instance, expected, "local-only rebuild starts from the cached macro shape")
+	_assert_positions(
+		instance,
+		expected,
+		"changing width replaces its previous contribution while preserving macro deformation",
+	)
 
 	instance.set_modifier("height", MHMacroRegistry.DEFAULT_VALUE)
 	instance.set_modifier("width", MHTargetRegistry.DEFAULT_VALUE)

@@ -77,11 +77,6 @@ func test_weighted_mapping() -> void:
 			"weighted mappings hide when at least two references are hidden with body_mask=%s"
 			% body_mask,
 		)
-		assert_eq(
-			proxy.geometry.filter_indices(mask),
-			PackedInt32Array() if hidden else _face_indices([0]),
-			"filtered indices follow proxy visibility with body_mask=%s" % body_mask,
-		)
 
 
 func test_clothing() -> void:

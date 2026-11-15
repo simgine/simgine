@@ -86,7 +86,7 @@ func test_rests() -> void:
 	# Without a reference pose, skinning at rest must leave the mesh unchanged.
 	assert_approx_eq(skin.get_bind_pose(0), ROOT_REST.affine_inverse())
 	assert_approx_eq(skin.get_bind_pose(1), CHILD_REST.affine_inverse())
-	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT, SKIN_POINT)
+	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT)
 
 
 func test_rebuild() -> void:
@@ -117,7 +117,7 @@ func test_rebuild() -> void:
 	assert_approx_eq(skeleton.get_bone_rest(1), morphed_root.affine_inverse() * morphed_child)
 	assert_approx_eq(skin.get_bind_pose(0), morphed_root.affine_inverse())
 	assert_approx_eq(skin.get_bind_pose(1), morphed_child.affine_inverse())
-	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT, SKIN_POINT)
+	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT)
 
 
 func test_reference_pose() -> void:
@@ -146,8 +146,8 @@ func test_reference_pose() -> void:
 	)
 
 	# (4, 3, 5) has native bone-local coordinates (-1, 3, 2) and (2, 1, -1).
-	# The reference rests move those to (2, 4, 5) and (1, 2, 5); blend at 25%/75%.
-	_assert_deformation(skeleton, skin, Vector3(2, 4, 5), Vector3(1, 2, 5), Vector3(1.25, 2.5, 5))
+	# The reference rests move those to (2, 4, 5) and (1, 2, 5).
+	_assert_deformation(skeleton, skin, Vector3(2, 4, 5), Vector3(1, 2, 5))
 
 
 func test_profile_mapping() -> void:
@@ -173,7 +173,6 @@ func test_profile_mapping() -> void:
 		skin,
 		SKIN_POINT,
 		SKIN_POINT,
-		SKIN_POINT,
 		"changing axes alone must not deform the mesh",
 	)
 
@@ -187,7 +186,6 @@ func test_profile_mapping() -> void:
 		skin,
 		Vector3(2, 4, 5),
 		Vector3(1, 2, 5),
-		Vector3(1.25, 2.5, 5),
 		"mapping must preserve reference deformation",
 	)
 
@@ -211,14 +209,12 @@ static func _assert_deformation(
 	skin: Skin,
 	expected_root_point: Vector3,
 	expected_child_point: Vector3,
-	expected_blended_point: Vector3,
 	msg: String = "",
 ) -> void:
 	var root_point := skeleton.get_bone_global_pose(0) * skin.get_bind_pose(0) * SKIN_POINT
 	var child_point := skeleton.get_bone_global_pose(1) * skin.get_bind_pose(1) * SKIN_POINT
 	assert_approx_eq(root_point, expected_root_point, 1e-6, msg)
 	assert_approx_eq(child_point, expected_child_point, 1e-6, msg)
-	assert_approx_eq(root_point * 0.25 + child_point * 0.75, expected_blended_point, 1e-6, msg)
 
 
 static func _rig() -> MHRig:

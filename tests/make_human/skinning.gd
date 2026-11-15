@@ -59,29 +59,62 @@ func test_proxy_weights() -> void:
 	var body := _body_skinning([[0.75, 0.25, 0.5], [0.25, 0, 0], [0, 0.75, 0], [0, 0, 0.5]])
 
 	var proxy := _proxy(Vector3(0.5, 0.2, 0.3))
-	proxy.ref_a = [2]
-	proxy.ref_b = [0]
-	proxy.ref_c = [1]
+	proxy.geometry = _geometry(2, [1, 0, 1])
+	proxy.ref_a = [2, 0]
+	proxy.ref_b = [0, 1]
+	proxy.ref_c = [1, 2]
+	proxy.weights.append(Vector3(1, 0, 0))
+	proxy.offsets.append(Vector3.ZERO)
 
 	var skinning := MHSkinning.new()
 	skinning.build_from_proxy(body, proxy)
 
+	assert_eq(skinning.get_vertex_count(), 2)
 	# Bone 0 receives 0.5 * 0.5 + 0.75 * 0.2 + 0.25 * 0.3 = 0.475.
-	assert_eq(skinning.bones, [0, 3, 2, 1, 0, 0, 0, 0])
-	assert_approx_eq(skinning.weights, [0.475, 0.25, 0.225, 0.05, 0, 0, 0, 0])
-	assert_eq(skinning.render_bones, skinning.bones)
-	assert_eq(skinning.render_weights, skinning.weights)
+	# The second vertex maps directly to body vertex 0, with no accumulated influences.
+	# fmt: off
+	assert_eq(
+		skinning.bones,
+		[
+			0, 3, 2, 1, 0, 0, 0, 0,
+			0, 1, 0, 0, 0, 0, 0, 0,
+		],
+	)
+	assert_approx_eq(
+		skinning.weights,
+		[
+			0.475, 0.25, 0.225, 0.05, 0, 0, 0, 0,
+			0.75, 0.25, 0, 0, 0, 0, 0, 0,
+		],
+	)
+	assert_eq(
+		skinning.render_bones,
+		[
+			0, 1, 0, 0, 0, 0, 0, 0,
+			0, 3, 2, 1, 0, 0, 0, 0,
+			0, 1, 0, 0, 0, 0, 0, 0,
+		],
+	)
+	assert_approx_eq(
+		skinning.render_weights,
+		[
+			0.75, 0.25, 0, 0, 0, 0, 0, 0,
+			0.475, 0.25, 0.225, 0.05, 0, 0, 0, 0,
+			0.75, 0.25, 0, 0, 0, 0, 0, 0,
+		],
+	)
+	# fmt: on
 
 
 func test_influence_pruning() -> void:
 	# Each reference has four normalized influences.
-	# Together they contribute twelve bones.
+	# References 0 and 2 share bone 3.
 	var body := _body_skinning(
 		[
 			[0.4, 0, 0],
 			[0.3, 0, 0],
 			[0.2, 0, 0],
-			[0.1, 0, 0],
+			[0.1, 0, 0.1],
 			[0, 0.4, 0],
 			[0, 0.3, 0],
 			[0, 0.2, 0],
@@ -89,28 +122,21 @@ func test_influence_pruning() -> void:
 			[0, 0, 0.4],
 			[0, 0, 0.3],
 			[0, 0, 0.2],
-			[0, 0, 0.1],
 		],
 	)
 
 	var skinning := MHSkinning.new()
 	skinning.build_from_proxy(body, _proxy(Vector3(0.5, 0.35, 0.15)))
 
-	assert_eq(skinning.bones, [0, 1, 4, 5, 2, 6, 8, 3])
-	# The retained contributions sum to 0.875, not the original total of 1.
+	# Merge bone 3's 0.05 + 0.015 before pruning, ranking it above bone 8's 0.06.
+	# The retained contributions sum to 0.89, not the original total of 1.
+	# fmt: off
+	assert_eq(skinning.bones, [0, 1, 4, 5, 2, 6, 3, 8])
 	assert_approx_eq(
 		skinning.weights,
-		[
-			0.2 / 0.875,
-			0.15 / 0.875,
-			0.14 / 0.875,
-			0.105 / 0.875,
-			0.1 / 0.875,
-			0.07 / 0.875,
-			0.06 / 0.875,
-			0.05 / 0.875,
-		],
+		[0.2 / 0.89, 0.15 / 0.89, 0.14 / 0.89, 0.105 / 0.89, 0.1 / 0.89, 0.07 / 0.89, 0.065 / 0.89, 0.06 / 0.89],
 	)
+	# fmt: on
 
 
 func test_influence_filtering() -> void:

@@ -50,6 +50,7 @@ func test_instance_isolation() -> void:
 	var proxy := _proxy()
 	var source_body_vertices := body.geometry.vertices.duplicate()
 	var source_proxy_vertices := proxy.geometry.vertices.duplicate()
+
 	var first := _instance(body, proxy)
 	var second := _instance(body, proxy)
 	await get_tree().process_frame
@@ -93,11 +94,13 @@ func _instance(body: MHBody, proxy: MHProxy) -> MHBodyInstance:
 	instance.add_child(skeleton)
 	instance.skeleton_node = skeleton
 	instance.body = body
+
 	var attachment := MHProxyInstance.new()
 	attachment.name = "Attachment"
 	attachment.proxy = proxy
 	instance.add_child(attachment)
 	add_child(instance)
+
 	return instance
 
 
@@ -121,19 +124,24 @@ static func _body() -> MHBody:
 	part.lowest = 0.5
 	part.highest = 1.0
 	part.high = "tall"
+
 	var macro := MHMacro.new()
 	macro.parts = [part]
+
 	var combination := MHMacroCombination.new()
 	combination.dimensions = ["height"]
 	combination.targets = { "tall": _target(Vector3.UP * 20) }
+
 	body.macro_registry = MHMacroRegistry.new()
 	body.macro_registry.macrotargets = { "height": macro }
 	body.macro_registry.combinations = [combination]
 
 	var category := MHTargetCategory.new()
 	category.targets = { "width": _target(Vector3.RIGHT * 10) }
+
 	var section := MHTargetSection.new()
 	section.categories = [category]
+
 	body.target_registry = MHTargetRegistry.new()
 	body.target_registry.sections = [section]
 
@@ -147,11 +155,14 @@ static func _body() -> MHBody:
 	bone.tail.vertex_indices = [3]
 	body.rig = MHRig.new()
 	body.rig.bones = { "root": bone }
+
 	var bone_weights := MHBoneWeights.new()
 	bone_weights.vertices = [0, 1, 2, 3, 4]
 	bone_weights.weights = [1, 1, 1, 1, 1]
+
 	body.rig_weights = MHRigWeights.new()
 	body.rig_weights.bones = { "root": bone_weights }
+
 	return body
 
 
@@ -172,6 +183,7 @@ static func _proxy() -> MHProxy:
 	proxy.ref_c = QUAD_INDICES
 	proxy.weights = [Vector3.RIGHT, Vector3.RIGHT, Vector3.RIGHT, Vector3.RIGHT]
 	proxy.offsets = [Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO]
+
 	var scale := MHScale.new()
 	scale.min_vertex = 0
 	scale.max_vertex = 2
@@ -179,6 +191,7 @@ static func _proxy() -> MHProxy:
 	proxy.x_scale = scale
 	proxy.y_scale = scale
 	proxy.z_scale = scale
+
 	return proxy
 
 

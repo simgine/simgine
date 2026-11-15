@@ -12,6 +12,7 @@ func test_conservative_mask() -> void:
 		Vector3(2, 1, 0),
 	]
 	geometry.uvs = [Vector2.ZERO, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN]
+
 	var hidden := _quad([0, 1, 2, 3])
 	var neighbor := _quad([1, 4, 5, 2])
 
@@ -19,6 +20,7 @@ func test_conservative_mask() -> void:
 		geometry.quads = [hidden, neighbor]
 		if reverse_order:
 			geometry.quads.reverse()
+
 		var mask: PackedByteArray = [1, 1, 1, 1, 0, 0]
 		geometry.make_mask_conservative(mask)
 
@@ -27,10 +29,12 @@ func test_conservative_mask() -> void:
 			[1, 0, 0, 1, 0, 0],
 			"only shared boundary vertices are unmasked with reverse_order=%s" % reverse_order,
 		)
+
 		var indices := geometry.filter_indices(mask)
 		var source_indices: PackedInt32Array
 		for render_index in indices:
 			source_indices.append(geometry.topology.geometry_indices[render_index])
+
 		assert_eq(
 			source_indices,
 			[1, 5, 4, 1, 2, 5],
@@ -138,11 +142,13 @@ static func _face_indices(faces: PackedInt32Array) -> PackedInt32Array:
 	for face in faces:
 		var first := face * 4
 		indices.append_array([first, first + 2, first + 1, first, first + 3, first + 2])
+
 	return indices
 
 
 static func _body() -> MHBody:
 	var source := _geometry(4)
+
 	var body := MHBody.new()
 	body.geometry = MHBodyGeometry.new()
 	body.geometry.vertices = source.vertices
@@ -154,12 +160,15 @@ static func _body() -> MHBody:
 	body.target_registry = MHTargetRegistry.new()
 	body.rig = MHRig.new()
 	body.rig.bones = { "root": MHBone.new() }
+
 	var bone_weights := MHBoneWeights.new()
 	for vertex_index in body.geometry.vertices.size():
 		bone_weights.vertices.append(vertex_index)
 		bone_weights.weights.append(1.0)
+
 	body.rig_weights = MHRigWeights.new()
 	body.rig_weights.bones = { "root": bone_weights }
+
 	return body
 
 
@@ -172,6 +181,7 @@ static func _proxy(geometry: MHGeometry, references: Vector3i, fit_weights: Vect
 		proxy.ref_c.append(references.z)
 		proxy.weights.append(fit_weights)
 		proxy.offsets.append(Vector3.ZERO)
+
 	return proxy
 
 
@@ -186,6 +196,7 @@ static func _geometry(quad_count: int) -> MHGeometry:
 			[origin, origin + Vector3.RIGHT, origin + Vector3(1, 1, 0), origin + Vector3.UP],
 		)
 		geometry.quads.append(_quad([first, first + 1, first + 2, first + 3]))
+
 	return geometry
 
 
@@ -193,4 +204,5 @@ static func _quad(vertex_indices: PackedInt32Array) -> MHQuad:
 	var quad := MHQuad.new()
 	quad.vertex_indices = vertex_indices
 	quad.uv_indices = [0, 1, 2, 3]
+
 	return quad

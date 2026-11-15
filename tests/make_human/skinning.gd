@@ -4,12 +4,14 @@ extends TestSuite
 func test_body_weights() -> void:
 	var rig := MHRig.new()
 	rig.bones = { "unweighted": MHBone.new(), "first": MHBone.new(), "second": MHBone.new() }
+
 	var rig_weights := MHRigWeights.new()
 	# Deliberately reverse the rig order and omit the unweighted bone.
 	rig_weights.bones = {
 		"second": _bone_weights([2, 0], [0.6, 0.25]),
 		"first": _bone_weights([1, 2, 0], [1.0, 0.4, 0.75]),
 	}
+
 	var geometry := _geometry(3, [2, 0, 1, 0])
 	var skinning := MHSkinning.new()
 	skinning.build_from_rig(geometry, rig, rig_weights)
@@ -47,10 +49,12 @@ func test_body_weights() -> void:
 
 func test_proxy_weights() -> void:
 	var body := _body_skinning([[0.75, 0.25, 0.5], [0.25, 0, 0], [0, 0.75, 0], [0, 0, 0.5]])
+
 	var proxy := _proxy(Vector3(0.5, 0.2, 0.3))
 	proxy.ref_a = [2]
 	proxy.ref_b = [0]
 	proxy.ref_c = [1]
+
 	var skinning := MHSkinning.new()
 	skinning.build_from_proxy(body, proxy)
 
@@ -80,6 +84,7 @@ func test_influence_pruning() -> void:
 			[0, 0, 0.1],
 		],
 	)
+
 	var skinning := MHSkinning.new()
 	skinning.build_from_proxy(body, _proxy(Vector3(0.5, 0.35, 0.15)))
 
@@ -111,6 +116,7 @@ func test_influence_filtering() -> void:
 			[0, 0, 0.25],
 		],
 	)
+
 	var skinning := MHSkinning.new()
 	# Negative fitting factors occur in real proxies such as afro01.mhclo.
 	skinning.build_from_proxy(body, _proxy(Vector3(1, 0.5, -0.5)))
@@ -139,16 +145,19 @@ static func _body_skinning(weights_by_bone: Array[PackedFloat32Array]) -> MHSkin
 	for bone_index in weights_by_bone.size():
 		var bone_name: StringName = "bone_%d" % bone_index
 		rig.bones[bone_name] = MHBone.new()
+
 		var bone_weights := MHBoneWeights.new()
 		var vertex_weights := weights_by_bone[bone_index]
 		for vertex_index in vertex_weights.size():
 			if vertex_weights[vertex_index] > 0.0:
 				bone_weights.vertices.append(vertex_index)
 				bone_weights.weights.append(vertex_weights[vertex_index])
+
 		rig_weights.bones[bone_name] = bone_weights
 
 	var skinning := MHSkinning.new()
 	skinning.build_from_rig(_geometry(weights_by_bone[0].size()), rig, rig_weights)
+
 	return skinning
 
 

@@ -60,6 +60,7 @@ func test_fitting() -> void:
 	]
 	var surface := proxy.build_fitted_surface(body_vertices)
 	assert_eq(surface[Mesh.ARRAY_VERTEX], FITTED_VERTICES)
+
 	# Fitting must not change either source array.
 	assert_eq(body_vertices, original_body_vertices)
 	assert_eq(proxy.geometry.vertices, original_proxy_vertices)

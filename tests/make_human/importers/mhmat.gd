@@ -40,6 +40,7 @@ func test_subsurface_scattering() -> void:
 		[],
 	)
 	assert_eq(error, OK)
+
 	var material := saver.resource as StandardMaterial3D
 	assert(material.subsurf_scatter_enabled)
 
@@ -58,5 +59,6 @@ func test_transparency() -> void:
 		[],
 	)
 	assert_eq(error, OK)
+
 	var material := saver.resource as StandardMaterial3D
 	assert_eq(material.transparency, BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR)

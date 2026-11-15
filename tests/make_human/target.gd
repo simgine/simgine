@@ -88,4 +88,5 @@ static func _registry(categories: Array[MHTargetCategory]) -> MHTargetRegistry:
 
 	var registry := MHTargetRegistry.new()
 	registry.sections = [section]
+
 	return registry

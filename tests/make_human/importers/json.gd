@@ -70,7 +70,18 @@ func test_rig() -> void:
 		[],
 	)
 	assert_eq(error, OK)
-	assert(saver.resource as MHRig)
+
+	# The bundled JSON lists some children before their parents.
+	var rig := saver.resource as MHRig
+	var visited: Dictionary[StringName, bool]
+	for bone_name in rig.bones:
+		var parent_name := rig.bones[bone_name].parent_name
+		if parent_name:
+			assert(
+				parent_name in visited,
+				"parent %s must precede child %s" % [parent_name, bone_name],
+			)
+		visited[bone_name] = true
 
 
 func test_weights() -> void:

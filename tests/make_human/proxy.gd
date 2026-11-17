@@ -2,6 +2,7 @@ extends TestSuite
 ## Proxy instance integration.
 
 const ELEGANT_SUIT: String = "res://characters/visuals/make_human/items/clothes/female_elegantsuit01/female_elegantsuit01.mhclo"
+const SPORTS_SUIT: String = "res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
 
 
 func test_clothing_lifecycle() -> void:
@@ -95,9 +96,7 @@ func test_proxy_replacement() -> void:
 
 	assert_eq(instance.mesh.surface_get_array_index_len(0), 21746 * 3)
 
-	var sportsuit := load(
-		"res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
-	) as MHProxy
+	var sportsuit := load(SPORTS_SUIT) as MHProxy
 	clothing.proxy = sportsuit
 
 	await get_tree().process_frame
@@ -122,6 +121,40 @@ func test_proxy_replacement() -> void:
 			44: Vector3(0.110115773976, 1.387498974800, 0.028883960098),
 			1633: Vector3(0.163661763072, 0.076937094331, -0.017548732460),
 		},
+	)
+
+
+func test_combined_masks() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	# The suits overlap, but each also hides body regions the other leaves visible.
+	var elegant_suit := MHProxyInstance.new()
+	elegant_suit.proxy = load(ELEGANT_SUIT) as MHProxy
+	instance.add_child(elegant_suit)
+
+	var sportsuit := MHProxyInstance.new()
+	sportsuit.proxy = load(SPORTS_SUIT) as MHProxy
+	instance.add_child(sportsuit)
+
+	await get_tree().process_frame
+
+	assert_eq(
+		instance.mesh.surface_get_array_index_len(0),
+		20036 * 3,
+		"both clothing masks should contribute",
+	)
+
+	elegant_suit.queue_free()
+
+	await get_tree().process_frame
+	await get_tree().process_frame
+
+	assert_eq(
+		instance.mesh.surface_get_array_index_len(0),
+		22892 * 3,
+		"removing one attachment should preserve the remaining clothing's mask",
 	)
 
 

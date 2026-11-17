@@ -129,4 +129,16 @@ func test_retargeted_pose() -> void:
 		[],
 	)
 	assert_eq(error, OK)
-	assert(saver.resource as MHPose)
+	var pose := saver.resource as MHPose
+	assert_approx_eq(
+		pose.rotations["LeftHand"],
+		Quaternion(0.040740359575, 0.565748810768, -0.065018884838, 0.821000039577),
+		1e-6,
+		"retargeted LeftHand rotation",
+	)
+	assert_approx_eq(
+		pose.rotations["LeftFoot"],
+		Quaternion(0.138811320066, 0.713120698929, -0.666480422020, 0.167314529419),
+		1e-6,
+		"retargeted LeftFoot rotation",
+	)

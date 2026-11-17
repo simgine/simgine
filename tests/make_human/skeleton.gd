@@ -1,289 +1,317 @@
 extends TestSuite
+## Bone transforms, poses, and lifecycle.
 
-const BODY_VERTICES: PackedVector3Array = [Vector3(1, 2, 3), Vector3(3, 2, 3), Vector3(3, 5, 3)]
-# Blender +X with +90° roll, and Blender +Z with -90° roll, converted to Y-up.
-const ROOT_REST := Transform3D(
-	Basis(Vector3(0, -1, 0), Vector3(1, 0, 0), Vector3(0, 0, 1)),
-	Vector3(1, 2, 3),
-)
-const CHILD_REST := Transform3D(
-	Basis(Vector3(0, 0, 1), Vector3(0, 1, 0), Vector3(-1, 0, 0)),
-	Vector3(3, 2, 3),
-)
+const STANDING_POSE: String = "res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json"
 
-# Local root Z rotation cancels its native axes.
-const REFERENCE_ROOT := Transform3D(Basis.IDENTITY, Vector3(3, 1, 3))
-# Child X rotation follows that root.
-const REFERENCE_CHILD := Transform3D(
-	Basis(Vector3(0, 0, 1), Vector3(0, -1, 0), Vector3(1, 0, 0)),
-	Vector3(2, 3, 3),
-)
-const PROFILE_ROOT_BASIS := Basis(Vector3(0, 0, -1), Vector3(0, 1, 0), Vector3(1, 0, 0))
+# Recorded on body.tres at default modifiers, in skeleton space (meters).
+# Hips captures root displacement. Hand and foot sample upper/lower-body chains.
+const STANDING_TRANSFORMS: Dictionary[StringName, Transform3D] = {
+	"Hips": Transform3D(
+		Basis(
+			Vector3(0.995012462139, -0.005390553735, -0.099604874849),
+			Vector3(0.005390553735, 0.999985456467, -0.000269137439),
+			Vector3(0.099604874849, -0.000269130280, 0.995027005672),
+		),
+		Vector3(-0.000000000640, 0.480750143528, 0.012644580565),
+	),
+	"LeftHand": Transform3D(
+		Basis(
+			Vector3(0.201827913523, -0.080776333809, -0.976084113121),
+			Vector3(0.027914753184, -0.995714008808, 0.088172756135),
+			Vector3(-0.979022920132, -0.045042708516, -0.198707938194),
+		),
+		Vector3(0.216554537416, 0.470166176558, 0.089762307703),
+	),
+	"LeftFoot": Transform3D(
+		Basis(
+			Vector3(-0.862118065357, -0.053686965257, 0.503855228424),
+			Vector3(0.505827486515, -0.149756446481, 0.849536061287),
+			Vector3(0.029846549034, 0.987264215946, 0.156264066696),
+		),
+		Vector3(0.096380837262, -0.325517892838, -0.074810929596),
+	),
+}
+const T_POSE_TRANSFORMS: Dictionary[StringName, Transform3D] = {
+	"Hips": Transform3D(
+		Basis(
+			Vector3(1.000000000000, 0.000000000000, 0.000000000000),
+			Vector3(0.000000000000, 1.000000000000, 0.000000029802),
+			Vector3(0.000000000000, -0.000000029802, 1.000000000000),
+		),
+		Vector3(0.000000000058, 0.873886346817, 0.013216649182),
+	),
+	"LeftHand": Transform3D(
+		Basis(
+			Vector3(-0.000000013039, -0.000000014901, -1.000000000000),
+			Vector3(1.000000000000, 0.000000000466, -0.000000013039),
+			Vector3(0.000000000466, -1.000000000000, 0.000000014901),
+		),
+		Vector3(0.649723172188, 1.350847601891, 0.032009497285),
+	),
+	"LeftFoot": Transform3D(
+		Basis(
+			Vector3(-1.000000000000, -0.000000007451, 0.000000003725),
+			Vector3(0.000000003725, 0.000000000000, 1.000000000000),
+			Vector3(-0.000000007451, 1.000000000000, -0.000000000000),
+		),
+		Vector3(0.093936726451, 0.065180748701, 0.019135668874),
+	),
+}
 
-const SKIN_POINT := Vector3(4, 3, 5)
+
+func requires_editor() -> bool:
+	# Skeleton save notifications are skipped outside of the editor.
+	return true
 
 
-func test_joints() -> void:
-	var vertices: PackedVector3Array = [
-		Vector3(100, -50, 20),
-		Vector3(1, 2, 3),
-		Vector3(3, 4, 5),
-		Vector3(-40, 90, 10),
-		Vector3(-2, 1, 4),
-		Vector3(4, 3, -1),
-		Vector3(9, 0, 4),
-		Vector3(30, 20, -60),
-	]
+func test_rest_transforms() -> void:
+	var instance := _create_instance()
 
-	var groups := MHVertexGroups.new()
-	# Unequal range lengths catch averaging range centers instead of all vertices.
-	groups.ranges = { "joint-test": PackedInt32Array([1, 2, 4, 6]) }
+	await get_tree().process_frame
 
-	var endpoint := _vertex(5)
-	endpoint.default_position = Vector3(999, 999, 999)
+	# Parent-relative rests: profile root, pelvis, and a deeper T-pose arm joint.
+	var expected_rests: Dictionary[StringName, Transform3D] = {
+		"Root": Transform3D.IDENTITY,
+		"Hips": Transform3D(Basis.IDENTITY, Vector3(0.000000000058, 0.873886346817, 0.013216649182)),
+		"LeftUpperArm": Transform3D(
+			Basis(Vector3(-1, 0, 0), Vector3(0, 1, 0), Vector3(0, 0, -1)),
+			Vector3(-0.005248412490, 0.147960007191, 0.016419172287),
+		),
+	}
+	var skeleton := instance.skeleton_node
+	for bone_name in expected_rests:
+		var bone_index := skeleton.find_bone(bone_name)
+		assert(bone_index >= 0, "missing bone %s" % bone_name)
+		assert_approx_eq(
+			skeleton.get_bone_rest(bone_index),
+			expected_rests[bone_name],
+			1e-6,
+			bone_name,
+		)
+
+
+func test_skin_binds() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	var skeleton := instance.skeleton_node
+	# Recorded mesh-to-bone binds include the reference pose and profile-axis compensation.
+	var expected_binds: Dictionary[StringName, Transform3D] = {
+		"LeftUpperArm": Transform3D(
+			Basis(
+				Vector3(0.020021120086, 0.682402729988, -0.730702459812),
+				Vector3(-0.037421703339, -0.729825198650, -0.682609021664),
+				Vector3(-0.999099135399, 0.041010711342, 0.010924790055),
+			),
+			Vector3(0.065243273973, 0.846633791924, 1.025134086609),
+		),
+		"LeftHand": Transform3D(
+			Basis(
+				Vector3(0.406064927578, 0.563435018063, -0.719480693340),
+				Vector3(-0.450506031513, -0.561570882797, -0.694033563137),
+				Vector3(-0.795082211494, 0.605953156948, 0.025796771049),
+			),
+			Vector3(0.419199317694, 0.203976318240, 1.026079654694),
+		),
+	}
+	for bone_name in expected_binds:
+		var bone_index := skeleton.find_bone(bone_name)
+		assert(bone_index >= 0, "missing bone %s" % bone_name)
+		assert_eq(
+			instance.skin.get_bind_bone(bone_index),
+			bone_index,
+			"bind order must match skeleton bone order for %s" % bone_name,
+		)
+		assert_approx_eq(
+			instance.skin.get_bind_pose(bone_index),
+			expected_binds[bone_name],
+			1e-6,
+			"skin bind for %s" % bone_name,
+		)
+
+
+func test_body_shape_updates() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	var skeleton := instance.skeleton_node
+	var hips_index := skeleton.find_bone("Hips")
+	assert(hips_index >= 0, "missing bone Hips")
+	var hand_index := skeleton.find_bone("LeftHand")
+	assert(hand_index >= 0, "missing bone LeftHand")
+
+	var initial_hips_rest := skeleton.get_bone_global_rest(hips_index)
+	var initial_hand_rest := skeleton.get_bone_global_rest(hand_index)
+	var initial_hand_bind := instance.skin.get_bind_pose(hand_index)
+	var initial_motion_scale := skeleton.motion_scale
+
+	instance.set_modifier("height", 0.8)
+
+	await get_tree().process_frame
+
+	# Recorded global rests and hand bind at height 0.8, in meters.
 	assert_approx_eq(
-		endpoint.resolve(vertices, groups),
-		Vector3(4, 3, -1),
+		skeleton.get_bone_global_rest(hips_index),
+		Transform3D(Basis.IDENTITY, Vector3(0.0, 1.136813879013, 0.014811557718)),
+	)
+	assert_approx_eq(
+		skeleton.get_bone_global_rest(hand_index),
+		Transform3D(
+			Basis(Vector3(0, 0, -1), Vector3(1, 0, 0), Vector3(0, -1, 0)),
+			Vector3(0.815312564373, 1.716493010521, 0.047614835203),
+		),
+	)
+	assert_approx_eq(
+		instance.skin.get_bind_pose(hand_index),
+		Transform3D(
+			Basis(
+				Vector3(0.407844543457, 0.563433289528, -0.718474864960),
+				Vector3(-0.451992481947, -0.559122443199, -0.695042908192),
+				Vector3(-0.793325901031, 0.608214557171, 0.026632487774),
+			),
+			Vector3(0.541042089462, 0.261427193880, 1.294720053673),
+		),
 		1e-6,
-		"vertex endpoints use the current body vertex",
 	)
+	assert_approx_eq(skeleton.motion_scale, 1.136813879013)
 
-	endpoint.strategy = MHRigPosition.Strategy.MEAN
-	endpoint.vertex_indices = [0, 3, 7]
-	assert_approx_eq(
-		endpoint.resolve(vertices, groups),
-		Vector3(30, 20, -10),
-		1e-6,
-		"mean endpoints average only the explicitly selected vertices",
-	)
+	instance.set_modifier("height", MHMacroRegistry.DEFAULT_VALUE)
 
-	endpoint.strategy = MHRigPosition.Strategy.CUBE
-	endpoint.cube_name = "joint-test"
-	assert_approx_eq(
-		endpoint.resolve(vertices, groups),
-		Vector3(3, 2, 3),
-		1e-6,
-		"joint groups average every vertex in all inclusive ranges, excluding gaps",
-	)
+	await get_tree().process_frame
+
+	assert_approx_eq(skeleton.get_bone_global_rest(hips_index), initial_hips_rest)
+	assert_approx_eq(skeleton.get_bone_global_rest(hand_index), initial_hand_rest)
+	assert_approx_eq(instance.skin.get_bind_pose(hand_index), initial_hand_bind)
+	assert_approx_eq(skeleton.motion_scale, initial_motion_scale)
 
 
-func test_rests() -> void:
-	const CHILD_LOCAL_REST := Transform3D(
-		Basis(Vector3(0, 0, 1), Vector3(-1, 0, 0), Vector3(0, -1, 0)),
-		Vector3(0, 2, 0),
-	)
+func test_save_restore() -> void:
+	var instance := _create_instance()
+	var skeleton := instance.skeleton_node
+	instance.owner = skeleton
+	skeleton.pose = load(
+		"res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json"
+	) as MHPose
 
-	var rig := _rig()
-	var skeleton := _skeleton()
-	var skin := skeleton.rebuild(rig, MHVertexGroups.new(), BODY_VERTICES)
+	await get_tree().process_frame
 
-	_assert_layout(skeleton, skin, ["root", "child"])
-	assert_approx_eq(skeleton.get_bone_global_rest(0), ROOT_REST)
-	assert_approx_eq(skeleton.get_bone_global_rest(1), CHILD_REST)
-	assert_approx_eq(skeleton.get_bone_rest(0), ROOT_REST)
-	assert_approx_eq(skeleton.get_bone_rest(1), CHILD_LOCAL_REST)
+	var hierarchy_before := _bone_hierarchy(skeleton)
+	var transforms_before := _bone_transforms(skeleton)
 
-	# Without a reference pose, skinning at rest must leave the mesh unchanged.
-	assert_approx_eq(skin.get_bind_pose(0), ROOT_REST.affine_inverse())
-	assert_approx_eq(skin.get_bind_pose(1), CHILD_REST.affine_inverse())
-	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT)
+	assert(skeleton.get_bone_count() > 0)
 
+	var packed := PackedScene.new()
+	# pack() does not send the editor's save notifications.
+	skeleton.propagate_notification(Node.NOTIFICATION_EDITOR_PRE_SAVE)
+	assert_eq(skeleton.get_bone_count(), 0, "bones must be removed right before serialization")
+	var error := packed.pack(skeleton)
+	skeleton.propagate_notification(Node.NOTIFICATION_EDITOR_POST_SAVE)
+	assert_eq(error, OK)
 
-func test_rebuild() -> void:
-	var rig := _rig()
-	var groups := MHVertexGroups.new()
-	var skeleton := _skeleton()
-	skeleton.rebuild(rig, groups, BODY_VERTICES)
+	assert_eq(_bone_hierarchy(skeleton), hierarchy_before)
+	assert_approx_eq(_bone_transforms(skeleton), transforms_before)
 
-	# Change both bone directions and lengths, while keeping the rig's saved endpoints.
-	var morphed_vertices: PackedVector3Array = [
-		Vector3(-2, 1, 4),
-		Vector3(-2, 4, 4),
-		Vector3(2, 4, 4),
-	]
-	var morphed_root := Transform3D(
-		Basis(Vector3(0, 0, -1), Vector3(0, 1, 0), Vector3(1, 0, 0)),
-		Vector3(-2, 1, 4),
-	)
-	var morphed_child := Transform3D(
-		Basis(Vector3(0, 1, 0), Vector3(1, 0, 0), Vector3(0, 0, -1)),
-		Vector3(-2, 4, 4),
-	)
-	var skin := skeleton.rebuild(rig, groups, morphed_vertices)
+	var restored := packed.instantiate() as MHSkeleton
+	assert_eq(restored.get_bone_count(), 0)
+	add_child(restored)
 
-	_assert_layout(skeleton, skin, ["root", "child"])
-	assert_approx_eq(skeleton.get_bone_global_rest(0), morphed_root)
-	assert_approx_eq(skeleton.get_bone_global_rest(1), morphed_child)
-	assert_approx_eq(skeleton.get_bone_rest(1), morphed_root.affine_inverse() * morphed_child)
-	assert_approx_eq(skin.get_bind_pose(0), morphed_root.affine_inverse())
-	assert_approx_eq(skin.get_bind_pose(1), morphed_child.affine_inverse())
-	_assert_deformation(skeleton, skin, SKIN_POINT, SKIN_POINT)
+	await get_tree().process_frame
+
+	assert_eq(_bone_hierarchy(restored), hierarchy_before)
+	assert_approx_eq(_bone_transforms(restored), transforms_before)
 
 
-func test_reference_pose() -> void:
-	var rig := _rig()
-	var skeleton := _skeleton()
-	var skin := skeleton.rebuild(rig, MHVertexGroups.new(), BODY_VERTICES, _reference_pose(rig))
+func test_pose_reapplication() -> void:
+	var instance := _create_instance()
 
-	_assert_layout(skeleton, skin, ["root", "child"])
-	assert_approx_eq(skeleton.get_bone_global_rest(0), REFERENCE_ROOT)
-	assert_approx_eq(skeleton.get_bone_global_rest(1), REFERENCE_CHILD)
-	assert_approx_eq(
-		skeleton.get_bone_rest(1),
-		Transform3D(REFERENCE_CHILD.basis, Vector3(-1, 2, 0)),
-	)
-	assert_approx_eq(
-		skin.get_bind_pose(0),
-		ROOT_REST.affine_inverse(),
-		1e-6,
-		"root bind undoes the native rest",
-	)
-	assert_approx_eq(
-		skin.get_bind_pose(1),
-		CHILD_REST.affine_inverse(),
-		1e-6,
-		"child bind undoes the native rest",
-	)
+	await get_tree().process_frame
 
-	# (4, 3, 5) has native bone-local coordinates (-1, 3, 2) and (2, 1, -1).
-	# The reference rests move those to (2, 4, 5) and (1, 2, 5).
-	_assert_deformation(skeleton, skin, Vector3(2, 4, 5), Vector3(1, 2, 5))
+	var standing := load(STANDING_POSE) as MHPose
+	instance.skeleton_node.pose = standing
+	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
+
+	instance.skeleton_node.pose = standing
+	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
 
 
-func test_profile_mapping() -> void:
-	const PROFILE_CHILD_BASIS := Basis(Vector3(0, 1, 0), Vector3(0, 0, 1), Vector3(1, 0, 0))
+func test_pose_replacement() -> void:
+	var instance := _create_instance()
 
-	var rig := _rig()
-	var skeleton := _skeleton()
-	var groups := MHVertexGroups.new()
-	var bone_map := _bone_map()
-	var skin := skeleton.rebuild(rig, groups, BODY_VERTICES, null, bone_map)
+	await get_tree().process_frame
 
-	var mapped_root := Transform3D(PROFILE_ROOT_BASIS, ROOT_REST.origin)
-	var mapped_child := Transform3D(PROFILE_CHILD_BASIS, CHILD_REST.origin)
+	instance.skeleton_node.pose = load(STANDING_POSE) as MHPose
+	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
 
-	_assert_layout(skeleton, skin, ["MappedRoot", "MappedChild"])
-	# Use profile axes, but keep body joint positions rather than profile positions.
-	# The child's global basis includes both profile bones' local rotations.
-	assert_approx_eq(skeleton.get_bone_global_rest(0), mapped_root)
-	assert_approx_eq(skeleton.get_bone_global_rest(1), mapped_child)
-	assert_approx_eq(skeleton.get_bone_rest(1), mapped_root.affine_inverse() * mapped_child)
-	_assert_deformation(
-		skeleton,
-		skin,
-		SKIN_POINT,
-		SKIN_POINT,
-		"changing axes alone must not deform the mesh",
-	)
-
-	skin = skeleton.rebuild(rig, groups, BODY_VERTICES, _reference_pose(rig), bone_map)
-	mapped_root.origin = REFERENCE_ROOT.origin
-	mapped_child.origin = REFERENCE_CHILD.origin
-	assert_approx_eq(skeleton.get_bone_global_rest(0), mapped_root)
-	assert_approx_eq(skeleton.get_bone_global_rest(1), mapped_child)
-	_assert_deformation(
-		skeleton,
-		skin,
-		Vector3(2, 4, 5),
-		Vector3(1, 2, 5),
-		"mapping must preserve reference deformation",
-	)
+	# The bundled game-engine T-pose is native, so use its production map and reference.
+	var body := instance.body
+	var t_pose := body.reference_pose.retarget(body.bone_map, body.reference_pose)
+	instance.skeleton_node.pose = t_pose
+	_assert_global_transforms(instance.skeleton_node, T_POSE_TRANSFORMS)
 
 
-static func _assert_layout(
-	skeleton: MHSkeleton,
-	skin: Skin,
-	names: PackedStringArray,
-	msg: String = "",
-) -> void:
-	assert_eq(skeleton.get_bone_count(), 2, msg)
-	assert_eq(skin.get_bind_count(), 2, msg)
-	for bone_index in 2:
-		assert_eq(skeleton.get_bone_name(bone_index), names[bone_index], msg)
-		assert_eq(skeleton.get_bone_parent(bone_index), bone_index - 1, msg)
-		assert_eq(skin.get_bind_bone(bone_index), bone_index, msg)
+func test_pose_clearing() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	var initial: Dictionary[StringName, Transform3D]
+	for bone_name in STANDING_TRANSFORMS:
+		var bone_index := instance.skeleton_node.find_bone(bone_name)
+		assert(bone_index >= 0, "missing bone %s" % bone_name)
+		initial[bone_name] = instance.skeleton_node.get_bone_global_pose(bone_index)
+
+	instance.skeleton_node.pose = load(STANDING_POSE) as MHPose
+	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
+
+	instance.skeleton_node.pose = null
+	_assert_global_transforms(instance.skeleton_node, initial)
 
 
-static func _assert_deformation(
-	skeleton: MHSkeleton,
-	skin: Skin,
-	expected_root_point: Vector3,
-	expected_child_point: Vector3,
-	msg: String = "",
-) -> void:
-	var root_point := skeleton.get_bone_global_pose(0) * skin.get_bind_pose(0) * SKIN_POINT
-	var child_point := skeleton.get_bone_global_pose(1) * skin.get_bind_pose(1) * SKIN_POINT
-	assert_approx_eq(root_point, expected_root_point, 1e-6, msg)
-	assert_approx_eq(child_point, expected_child_point, 1e-6, msg)
-
-
-static func _rig() -> MHRig:
-	var root := MHBone.new()
-	root.head = _vertex(0)
-	root.tail = _vertex(1)
-	root.roll = PI * 0.5
-
-	var child := MHBone.new()
-	child.parent_name = "root"
-	child.head = _vertex(1)
-	child.tail = _vertex(2)
-	child.roll = -PI * 0.5
-
-	var rig := MHRig.new()
-	rig.bones = { "root": root, "child": child }
-
-	return rig
-
-
-static func _vertex(vertex_index: int) -> MHRigPosition:
-	var endpoint := MHRigPosition.new()
-	endpoint.strategy = MHRigPosition.Strategy.VERTEX
-	endpoint.vertex_indices = [vertex_index]
-
-	if vertex_index < BODY_VERTICES.size():
-		var position := BODY_VERTICES[vertex_index]
-		endpoint.default_position = Vector3(position.x, -position.z, position.y)
-
-	return endpoint
-
-
-func _skeleton() -> MHSkeleton:
+func _create_instance() -> MHBodyInstance:
 	var skeleton := MHSkeleton.new()
 	add_child(skeleton)
 
-	return skeleton
+	var instance := MHBodyInstance.new()
+	instance.body = load("res://characters/visuals/make_human/body.tres") as MHBody
+	skeleton.add_child(instance)
+	instance.skeleton_node = skeleton
+
+	return instance
 
 
-static func _reference_pose(rig: MHRig) -> MHNativePose:
-	var reference := MHNativePose.new()
-	reference.rig = rig
-	reference.rotations = {
-		"root": Quaternion(Vector3.BACK, PI * 0.5),
-		"child": Quaternion(Vector3.RIGHT, PI * 0.5),
-	}
-	reference.translations = { "root": Vector3(1, 2, 0), "child": Vector3(0, 1, 0) }
+static func _bone_hierarchy(skeleton: MHSkeleton) -> Array[Array]:
+	var hierarchy: Array[Array]
+	for bone_index in skeleton.get_bone_count():
+		hierarchy.append(
+			[
+				skeleton.get_bone_name(bone_index),
+				skeleton.get_bone_parent(bone_index),
+				skeleton.is_bone_enabled(bone_index),
+			]
+		)
+	return hierarchy
 
-	return reference
+
+static func _bone_transforms(skeleton: MHSkeleton) -> Array[Transform3D]:
+	var transforms: Array[Transform3D]
+	for bone_index in skeleton.get_bone_count():
+		transforms.append(skeleton.get_bone_rest(bone_index))
+		transforms.append(skeleton.get_bone_pose(bone_index))
+	return transforms
 
 
-static func _bone_map() -> BoneMap:
-	var profile := SkeletonProfile.new()
-	profile.bone_size = 2
-	profile.set_bone_name(0, "MappedRoot")
-	profile.set_bone_name(1, "MappedChild")
-	profile.set_bone_parent(1, "MappedRoot")
-	profile.set_reference_pose(0, Transform3D(PROFILE_ROOT_BASIS, Vector3(20, 30, 40)))
-	profile.set_reference_pose(
-		1,
-		Transform3D(
-			Basis(Vector3(0, 1, 0), Vector3(-1, 0, 0), Vector3(0, 0, 1)),
-			Vector3(50, 60, 70),
-		),
-	)
-
-	var bone_map := BoneMap.new()
-	bone_map.profile = profile
-	bone_map.set_skeleton_bone_name("MappedRoot", "root")
-	bone_map.set_skeleton_bone_name("MappedChild", "child")
-
-	return bone_map
+static func _assert_global_transforms(
+	skeleton: MHSkeleton,
+	expected: Dictionary[StringName, Transform3D],
+) -> void:
+	for bone_name in expected:
+		var bone_index := skeleton.find_bone(bone_name)
+		assert(bone_index >= 0, "bone %s should belong to the skeleton" % bone_name)
+		assert_approx_eq(
+			skeleton.get_bone_global_pose(bone_index),
+			expected[bone_name],
+			1e-6,
+			"global pose for %s" % bone_name,
+		)

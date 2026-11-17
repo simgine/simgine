@@ -1,244 +1,357 @@
 extends TestSuite
-
-const QUAD_INDICES: PackedInt32Array = [0, 1, 2, 3]
-const INITIAL_VERTICES: PackedVector3Array = [
-	Vector3.ZERO,
-	Vector3.RIGHT,
-	Vector3(1, 1, 0),
-	Vector3.UP,
-	Vector3.DOWN, # Non-rendered helper below ground.
-]
+## Body shape and mesh geometry.
 
 
-func test_modifier_updates() -> void:
-	var instance := _instance(_body(), _proxy())
+func test_uv_seam_normals() -> void:
+	var instance := _create_instance()
 
 	await get_tree().process_frame
 
-	# The source quad spans Y=10..20 dm and its helper is at Y=0 dm.
-	# After conversion and grounding, the quad spans Y=0..1 m and the helper is at -1 m.
-	_assert_positions(instance, INITIAL_VERTICES)
-	_assert_skinning(instance)
+	# Neck vertex 745 has two UVs but shares one smooth normal across the seam.
+	var geometry_indices := instance.body.geometry.topology.geometry_indices
+	var seam_indices: PackedInt32Array
+	for render_index in geometry_indices.size():
+		if geometry_indices[render_index] == 745:
+			seam_indices.append(render_index)
+	assert_eq(seam_indices.size(), 2)
 
-	var expected := INITIAL_VERTICES.duplicate()
+	var surface := instance.mesh.surface_get_arrays(0)
+	var normals: PackedVector3Array = surface[Mesh.ARRAY_NORMAL]
+	var uvs: PackedVector2Array = surface[Mesh.ARRAY_TEX_UV]
+	assert_approx_eq(
+		[uvs[seam_indices[0]], uvs[seam_indices[1]]],
+		[Vector2(0.343712002039, 0.046560000628), Vector2(0.930362999439, 0.656949996948)],
+	)
+	for render_index in seam_indices:
+		assert_approx_eq(
+			normals[render_index],
+			Vector3(-0.952099800110, -0.296429157257, 0.075071737170),
+		)
 
-	instance.set_modifier("height", 0.75)
+	instance.set_modifier("height", 0.8)
 
 	await get_tree().process_frame
 
-	expected[2] += Vector3.UP
-	_assert_positions(instance, expected, "height updates the body and attachment")
+	surface = instance.mesh.surface_get_arrays(0)
+	normals = surface[Mesh.ARRAY_NORMAL]
+	assert_eq(surface[Mesh.ARRAY_TEX_UV], uvs)
+	for render_index in seam_indices:
+		assert_approx_eq(
+			normals[render_index],
+			Vector3(-0.948856115341, -0.308167397976, 0.068591743708),
+			1e-6,
+			"seam normals should be rebuilt after deformation",
+		)
 
-	instance.set_modifier("width", 1.0)
+
+func test_modifier_properties() -> void:
+	var instance := _create_instance()
 
 	await get_tree().process_frame
 
-	expected[2] += Vector3.RIGHT
-	_assert_positions(instance, expected, "local update preserves macro")
+	# Collect property list to verify they're visible in the inspector.
+	# Checkig on the instance would just trigger `_get()`.
+	var property_names: Dictionary[StringName, bool]
+	for property in instance.get_property_list():
+		property_names[property.name] = true
 
-	instance.set_modifier("width", 0.5)
+	assert("modifiers/height" in property_names)
+	instance.set("modifiers/height", 0.8)
+	assert_eq(instance.get_modifier("height"), 0.8)
+	assert_eq(instance.get("modifiers/height"), 0.8)
+
+	assert("modifiers/race/african" in property_names)
+	instance.set("modifiers/race/african", 0.2)
+	assert_eq(instance.get_modifier("african"), 0.2)
+	assert_eq(instance.get("modifiers/race/african"), 0.2)
+
+	assert("modifiers/torso/torso-scale-depth-decr-incr" in property_names)
+	instance.set("modifiers/torso/torso-scale-depth-decr-incr", 0.65)
+	assert_eq(instance.get_modifier("torso-scale-depth-decr-incr"), 0.65)
+	assert_eq(instance.get("modifiers/torso/torso-scale-depth-decr-incr"), 0.65)
+
+	assert("modifiers/arms/lowerarm-fat-decr-incr/left" in property_names)
+	instance.set("modifiers/arms/lowerarm-fat-decr-incr/left", -0.6)
+	assert_eq(instance.get_modifier("lowerarm-fat-decr-incr/left"), -0.6)
+	assert_eq(instance.get("modifiers/arms/lowerarm-fat-decr-incr/left"), -0.6)
+
+
+func test_modifiers() -> void:
+	var instance := _create_instance()
 
 	await get_tree().process_frame
 
-	expected[2] -= Vector3.RIGHT * 0.5
+	# Recorded from body.tres at default modifiers, in meters after grounding.
+	var initial_positions: Dictionary[int, Vector3] = {
+		881: Vector3(0.0, 1.659430980682, 0.050173383206), # Crown: overall height.
+		5796: Vector3(-0.167987123132, 0.003242790699, 0.156755611300), # Sole: near ground.
+		8985: Vector3(0.525523960590, 0.889064371586, 0.276422828436), # Outer left hand.
+		4093: Vector3(0.0, 1.124921679497, 0.139985859394), # Front torso.
+	}
+	_assert_positions(instance, initial_positions)
+
+	instance.set_modifier("head-round", 0.65)
+
+	await get_tree().process_frame
+
 	_assert_positions(
 		instance,
-		expected,
-		"changing width replaces its previous contribution while preserving macro deformation",
+		{
+			881: Vector3(0.0, 1.655530929565, 0.051538385451),
+			4093: Vector3(0.0, 1.124921679497, 0.139985859394),
+		},
+	)
+
+	instance.set_modifier("head-round", MHTargetRegistry.DEFAULT_VALUE)
+
+	await get_tree().process_frame
+
+	_assert_positions(instance, initial_positions)
+
+
+func test_opposite_modifiers() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	# Recorded crown and front-torso positions, in meters after grounding.
+	var initial_positions: Dictionary[int, Vector3] = {
+		881: Vector3(0.0, 1.659430980682, 0.050173383206),
+		4093: Vector3(0.0, 1.124921679497, 0.139985859394),
+	}
+	_assert_positions(instance, initial_positions)
+
+	instance.set_modifier("torso-scale-depth-decr-incr", 0.65)
+
+	await get_tree().process_frame
+
+	_assert_positions(
+		instance,
+		{
+			881: Vector3(0.0, 1.659430980682, 0.050173383206),
+			4093: Vector3(0.0, 1.124921679497, 0.157665863633),
+		},
+	)
+
+	instance.set_modifier("torso-scale-depth-decr-incr", MHTargetRegistry.DEFAULT_VALUE)
+
+	await get_tree().process_frame
+
+	_assert_positions(instance, initial_positions)
+
+
+func test_sided_modifiers() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	# Recorded left (10098) and right (3469) forearm samples.
+	var initial_left := instance.morphed_vertices[10098]
+	instance.set_modifier("lowerarm-fat-decr-incr/left", -0.6)
+	instance.set_modifier("lowerarm-fat-decr-incr/right", 0.8)
+
+	await get_tree().process_frame
+
+	_assert_positions(
+		instance,
+		{
+			10098: Vector3(0.385108053684, 1.123149514198, 0.083278357983),
+			3469: Vector3(-0.363518625498, 1.043293118477, 0.124034881592),
+		},
+	)
+
+	instance.set_modifier("lowerarm-fat-decr-incr/left", MHTargetRegistry.DEFAULT_VALUE)
+
+	await get_tree().process_frame
+
+	_assert_positions(
+		instance,
+		{ 10098: initial_left, 3469: Vector3(-0.363518625498, 1.043293118477, 0.124034881592) },
+	)
+
+
+func test_macro_modifiers() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	# Recorded crown and front-torso positions, in meters after grounding.
+	var initial_positions: Dictionary[int, Vector3] = {
+		881: Vector3(0.0, 1.659430980682, 0.050173383206),
+		4093: Vector3(0.0, 1.124921679497, 0.139985859394),
+	}
+	_assert_positions(instance, initial_positions)
+
+	# Recorded crown and front-torso positions, in meters after grounding.
+	instance.set_modifier("height", 0.8)
+	instance.set_modifier("gender", 0.25)
+	instance.set_modifier("age", 0.75)
+
+	await get_tree().process_frame
+
+	_assert_positions(
+		instance,
+		{
+			881: Vector3(0.0, 2.035971641541, 0.071170903742),
+			4093: Vector3(0.0, 1.427052021027, 0.161469981074),
+		},
+	)
+
+	# No proportions targets at its default value, so check a non-default value too.
+	instance.set_modifier("proportions", 0.75)
+
+	await get_tree().process_frame
+
+	_assert_positions(
+		instance,
+		{
+			881: Vector3(0.0, 2.039295196533, 0.071170903742),
+			4093: Vector3(0.0, 1.429024219513, 0.158694237471),
+		},
 	)
 
 	instance.set_modifier("height", MHMacroRegistry.DEFAULT_VALUE)
+	instance.set_modifier("gender", MHMacroRegistry.DEFAULT_VALUE)
+	instance.set_modifier("age", MHMacroRegistry.DEFAULT_VALUE)
+	instance.set_modifier("proportions", MHMacroRegistry.DEFAULT_VALUE)
 
 	await get_tree().process_frame
 
-	expected[2] -= Vector3.UP
-	_assert_positions(instance, expected, "resetting the macro preserves local deformation")
-	_assert_skinning(instance)
+	_assert_positions(instance, initial_positions)
 
-	instance.set_modifier("width", MHTargetRegistry.DEFAULT_VALUE)
+
+func test_macro_weight_exclusions() -> void:
+	var instance := _create_instance()
 
 	await get_tree().process_frame
 
-	_assert_positions(instance, INITIAL_VERTICES, "restoring defaults removes all deformation")
+	# Recorded breast vertex, in meters after grounding.
+	var initial_positions: Dictionary[int, Vector3] = {
+		1834: Vector3(-0.086785726249, 1.183422803879, 0.139404252172),
+	}
+	_assert_positions(instance, initial_positions)
+
+	# Breast targets select the female component without multiplying by its gender weight.
+	instance.set_modifier("gender", 0.25)
+	instance.set_modifier("cupsize", 0.8)
+	instance.set_modifier("firmness", 0.7)
+
+	await get_tree().process_frame
+
+	_assert_positions(instance, { 1834: Vector3(-0.081886738539, 1.108692646027, 0.153901517391) })
+
+	instance.set_modifier("gender", MHMacroRegistry.DEFAULT_VALUE)
+	instance.set_modifier("cupsize", MHMacroRegistry.DEFAULT_VALUE)
+	instance.set_modifier("firmness", MHMacroRegistry.DEFAULT_VALUE)
+
+	await get_tree().process_frame
+
+	_assert_positions(instance, initial_positions)
+
+
+func test_race_modifiers() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	# Recorded crown and front-torso positions, in meters after grounding.
+	var initial_positions: Dictionary[int, Vector3] = {
+		881: Vector3(0.0, 1.659430980682, 0.050173383206),
+		4093: Vector3(0.0, 1.124921679497, 0.139985859394),
+	}
+	_assert_positions(instance, initial_positions)
+
+	instance.set_modifier("african", 0.2)
+	instance.set_modifier("asian", 0.3)
+	instance.set_modifier("caucasian", 0.5)
+
+	await get_tree().process_frame
+
+	_assert_positions(
+		instance,
+		{
+			881: Vector3(0.0, 1.654455184937, 0.050955366343),
+			4093: Vector3(0.0, 1.121914863586, 0.139595344663),
+		},
+	)
+
+	for race in MHMacroRegistry.RACES:
+		instance.set_modifier(race, MHMacroRegistry.DEFAULT_RACE_VALUE)
+
+	await get_tree().process_frame
+
+	_assert_positions(instance, initial_positions)
 
 
 func test_instance_isolation() -> void:
-	var body := _body()
-	var proxy := _proxy()
-	var source_body_vertices := body.geometry.vertices.duplicate()
-	var source_proxy_vertices := proxy.geometry.vertices.duplicate()
-
-	var first := _instance(body, proxy)
-	var second := _instance(body, proxy)
+	var first := _create_instance()
+	var second := _create_instance()
+	var body := first.body
+	assert_eq(second.body, body)
+	var source_vertices := body.geometry.vertices.duplicate()
 
 	await get_tree().process_frame
 
-	_assert_positions(first, INITIAL_VERTICES)
-	_assert_positions(second, INITIAL_VERTICES)
+	var initial_positions: Dictionary[int, Vector3] = {
+		881: second.morphed_vertices[881],
+		4093: second.morphed_vertices[4093],
+	}
+	_assert_positions(first, initial_positions)
 
-	first.set_modifier("height", 0.75)
-	first.set_modifier("width", 1.0)
-
-	await get_tree().process_frame
-
-	var expected := INITIAL_VERTICES.duplicate()
-	expected[2] += Vector3.UP + Vector3.RIGHT
-	_assert_positions(first, expected)
-	_assert_positions(second, INITIAL_VERTICES, "modifying first leaves second unchanged")
-
-	# Rebuild the second instance too, to detect a corrupted shared base or macro cache.
-	second.set_modifier("width", MHTargetRegistry.DEFAULT_VALUE)
+	first.set_modifier("height", 0.8)
+	first.set_modifier("torso-scale-depth-decr-incr", 0.65)
 
 	await get_tree().process_frame
 
-	_assert_positions(first, expected, "rebuilding second instance leaves first unchanged")
-	_assert_positions(second, INITIAL_VERTICES)
-	assert_eq(body.geometry.vertices, source_body_vertices)
-	assert_eq(proxy.geometry.vertices, source_proxy_vertices)
+	var modified_positions: Dictionary[int, Vector3] = {
+		881: Vector3(0.0, 2.078630208969, 0.061192732304),
+		4093: Vector3(0.0, 1.448368668556, 0.182198420167),
+	}
+	_assert_positions(first, modified_positions)
+	_assert_positions(second, initial_positions)
+	assert_eq(body.geometry.vertices, source_vertices, "shared source geometry is unchanged")
+
+	second.set_modifier("height", MHMacroRegistry.DEFAULT_VALUE)
+
+	await get_tree().process_frame
+
+	_assert_positions(second, initial_positions)
+	_assert_positions(first, modified_positions)
+	assert_eq(body.geometry.vertices, source_vertices, "rebuilding preserves source geometry")
 
 
-static func _assert_positions(
-	instance: MHBodyInstance,
-	expected: PackedVector3Array,
-	msg: String = "",
-) -> void:
-	assert_approx_eq(instance.morphed_vertices, expected, 1e-6, msg)
-
-	var rendered := expected.slice(0, 4)
-	assert_approx_eq(instance.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX], rendered, 1e-6, msg)
-
-	var attachment: MHProxyInstance = instance.get_node("Attachment")
-	assert_approx_eq(attachment.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX], rendered, 1e-6, msg)
-
-
-static func _assert_skinning(instance: MHBodyInstance) -> void:
-	var body_surface := instance.mesh.surface_get_arrays(0)
-	assert_eq(body_surface[Mesh.ARRAY_BONES], instance.body.skinning.render_bones)
-	assert_approx_eq(body_surface[Mesh.ARRAY_WEIGHTS], instance.body.skinning.render_weights)
-
-	var attachment: MHProxyInstance = instance.get_node("Attachment")
-	var proxy_surface := attachment.mesh.surface_get_arrays(0)
-	var proxy_skinning := instance.body.get_proxy_skinning(attachment.proxy)
-	assert_eq(proxy_surface[Mesh.ARRAY_BONES], proxy_skinning.render_bones)
-	assert_approx_eq(proxy_surface[Mesh.ARRAY_WEIGHTS], proxy_skinning.render_weights)
-
-
-func _instance(body: MHBody, proxy: MHProxy) -> MHBodyInstance:
-	var instance := MHBodyInstance.new()
+func _create_instance() -> MHBodyInstance:
 	var skeleton := MHSkeleton.new()
-	instance.add_child(skeleton)
-	instance.skeleton_node = skeleton
-	instance.body = body
+	add_child(skeleton)
 
-	var attachment := MHProxyInstance.new()
-	attachment.name = "Attachment"
-	attachment.proxy = proxy
-	instance.add_child(attachment)
-	add_child(instance)
+	var instance := MHBodyInstance.new()
+	instance.body = load("res://characters/visuals/make_human/body.tres") as MHBody
+	skeleton.add_child(instance)
+	instance.skeleton_node = skeleton
 
 	return instance
 
 
-static func _body() -> MHBody:
-	var body := MHBody.new()
-	body.geometry = MHBodyGeometry.new()
-	body.geometry.vertices = [
-		Vector3(0, 10, 0),
-		Vector3(10, 10, 0),
-		Vector3(10, 20, 0),
-		Vector3(0, 20, 0),
-		Vector3.ZERO, # Helper, excluded from rendered faces and the ground search.
-	]
-	body.geometry.uvs = [Vector2.ZERO, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN]
-	body.geometry.quads = [_quad()]
-	body.vertex_groups = MHVertexGroups.new()
-	body.vertex_groups.ranges = { "body": PackedInt32Array([0, 3]) }
-
-	# At height=0.75, vertex 2 moves up 1 m. At width=1.0, it moves right 1 m.
-	var part := MHMacroPart.new()
-	part.lowest = 0.5
-	part.highest = 1.0
-	part.high = "tall"
-
-	var macro := MHMacro.new()
-	macro.parts = [part]
-
-	var combination := MHMacroCombination.new()
-	combination.dimensions = ["height"]
-	combination.targets = { "tall": _target(Vector3.UP * 20) }
-
-	body.macro_registry = MHMacroRegistry.new()
-	body.macro_registry.macrotargets = { "height": macro }
-	body.macro_registry.combinations = [combination]
-
-	var category := MHTargetCategory.new()
-	category.targets = { "width": _target(Vector3.RIGHT * 10) }
-
-	var section := MHTargetSection.new()
-	section.categories = [category]
-
-	body.target_registry = MHTargetRegistry.new()
-	body.target_registry.sections = [section]
-
-	# A single bone supplies valid skinning without testing skeleton mathematics.
-	var bone := MHBone.new()
-	bone.head = MHRigPosition.new()
-	bone.head.strategy = MHRigPosition.Strategy.VERTEX
-	bone.head.vertex_indices = [0]
-	bone.tail = MHRigPosition.new()
-	bone.tail.strategy = MHRigPosition.Strategy.VERTEX
-	bone.tail.vertex_indices = [3]
-	body.rig = MHRig.new()
-	body.rig.bones = { "root": bone }
-
-	var bone_weights := MHBoneWeights.new()
-	bone_weights.vertices = [0, 1, 2, 3, 4]
-	bone_weights.weights = [1, 1, 1, 1, 1]
-
-	body.rig_weights = MHRigWeights.new()
-	body.rig_weights.bones = { "root": bone_weights }
-
-	return body
-
-
-static func _proxy() -> MHProxy:
-	var proxy := MHProxy.new()
-	proxy.geometry = MHGeometry.new()
-	proxy.geometry.vertices = [
-		Vector3.ZERO,
-		Vector3.RIGHT * 10,
-		Vector3(10, 10, 0),
-		Vector3.UP * 10,
-	]
-	proxy.geometry.uvs = [Vector2.ZERO, Vector2.RIGHT, Vector2.ONE, Vector2.DOWN]
-	proxy.geometry.quads = [_quad()]
-	# Mirror the body quad exactly, so both meshes have the same expected positions.
-	proxy.ref_a = QUAD_INDICES
-	proxy.ref_b = QUAD_INDICES
-	proxy.ref_c = QUAD_INDICES
-	proxy.weights = [Vector3.RIGHT, Vector3.RIGHT, Vector3.RIGHT, Vector3.RIGHT]
-	proxy.offsets = [Vector3.ZERO, Vector3.ZERO, Vector3.ZERO, Vector3.ZERO]
-
-	var scale := MHScale.new()
-	scale.min_vertex = 0
-	scale.max_vertex = 2
-	scale.factor = 1.0
-	proxy.x_scale = scale
-	proxy.y_scale = scale
-	proxy.z_scale = scale
-
-	return proxy
-
-
-static func _quad() -> MHQuad:
-	var quad := MHQuad.new()
-	quad.vertex_indices = QUAD_INDICES
-	quad.uv_indices = QUAD_INDICES
-	return quad
-
-
-static func _target(offset: Vector3) -> MHTarget:
-	var target := MHTarget.new()
-	target.vertex_indices = [2]
-	target.offsets = [offset]
-	return target
+static func _assert_positions(
+	instance: MHBodyInstance,
+	expected_positions: Dictionary[int, Vector3],
+) -> void:
+	var surface := instance.mesh.surface_get_arrays(0)
+	var rendered_vertices: PackedVector3Array = surface[Mesh.ARRAY_VERTEX]
+	var geometry_indices := instance.body.geometry.topology.geometry_indices
+	for vertex_index in expected_positions:
+		var expected := expected_positions[vertex_index]
+		assert_approx_eq(
+			instance.morphed_vertices[vertex_index],
+			expected,
+			1e-6,
+			"body vertex %d" % vertex_index,
+		)
+		var render_index := geometry_indices.find(vertex_index)
+		assert(render_index >= 0, "sample must belong to the rendered body")
+		assert_approx_eq(
+			rendered_vertices[render_index],
+			expected,
+			1e-6,
+			"render vertex %d" % vertex_index,
+		)

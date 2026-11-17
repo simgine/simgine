@@ -1,112 +1,139 @@
 extends TestSuite
+## Vertex bone influences.
+
+# Configured with the game-engine rig and its bone weights.
+const BODY: String = "res://characters/visuals/make_human/body.tres"
+
+
+func test_mesh_weights() -> void:
+	var instance := _create_instance()
+
+	await get_tree().process_frame
+
+	var skeleton := instance.skeleton_node
+	var surface := instance.mesh.surface_get_arrays(0)
+	var geometry_indices := instance.body.geometry.topology.geometry_indices
+
+	# The torso sample blends pelvis and spine bones in the emitted mesh.
+	var offset := geometry_indices.find(4093) * MHSkinning.MAX_INFLUENCES
+	var render_bones: PackedInt32Array = surface[Mesh.ARRAY_BONES]
+	var render_weights: PackedFloat32Array = surface[Mesh.ARRAY_WEIGHTS]
+	var bone_names: PackedStringArray
+	for bone_index in render_bones.slice(offset, offset + 4):
+		bone_names.append(skeleton.get_bone_name(bone_index))
+	assert_eq(bone_names, ["Hips", "Spine", "Chest", "UpperChest"])
+	assert_approx_eq(
+		render_weights.slice(offset, offset + MHSkinning.MAX_INFLUENCES),
+		[0.012588692829, 0.148210883141, 0.309025704861, 0.530144214630, 0, 0, 0, 0],
+	)
 
 
 func test_body_weights() -> void:
-	var rig := MHRig.new()
-	rig.bones = { "unweighted": MHBone.new(), "first": MHBone.new(), "second": MHBone.new() }
+	var body := load(BODY) as MHBody
 
-	var rig_weights := MHRigWeights.new()
-	# Deliberately reverse the rig order and omit the unweighted bone.
-	rig_weights.bones = {
-		"second": _bone_weights([2, 0], [0.6, 0.25]),
-		"first": _bone_weights([1, 2, 0], [1.0, 0.4, 0.75]),
-	}
-
-	var geometry := _geometry(3, [2, 0, 1, 0])
-	var skinning := MHSkinning.new()
-	skinning.build_from_rig(geometry, rig, rig_weights)
-
-	assert_eq(skinning.get_vertex_count(), 3)
-	# fmt: off
-	assert_eq(
-		skinning.bones,
-		[
-			1, 2, 0, 0, 0, 0, 0, 0,
-			1, 0, 0, 0, 0, 0, 0, 0,
-			1, 2, 0, 0, 0, 0, 0, 0,
-		],
+	# Recorded rigid head vertex and neck seam with the configured game-engine rig.
+	_assert_influences(
+		body.skinning,
+		body.geometry,
+		4848,
+		[22, 0, 0, 0, 0, 0, 0, 0],
+		[1, 0, 0, 0, 0, 0, 0, 0],
 	)
-	assert_approx_eq(
-		skinning.weights,
-		[
-			0.75, 0.25, 0, 0, 0, 0, 0, 0,
-			1.0, 0, 0, 0, 0, 0, 0, 0,
-			0.4, 0.6, 0, 0, 0, 0, 0, 0,
-		],
+	# neck_01 precedes head in rig order, despite having the smaller weight.
+	_assert_influences(
+		body.skinning,
+		body.geometry,
+		745,
+		[21, 22, 0, 0, 0, 0, 0, 0],
+		[0.349899947643, 0.650099992752, 0, 0, 0, 0, 0, 0],
 	)
-	assert_eq(
-		skinning.render_bones,
-		[
-			1, 2, 0, 0, 0, 0, 0, 0,
-			1, 2, 0, 0, 0, 0, 0, 0,
-			1, 0, 0, 0, 0, 0, 0, 0,
-			1, 2, 0, 0, 0, 0, 0, 0,
-		],
-	)
-	assert_approx_eq(
-		skinning.render_weights,
-		[
-			0.4, 0.6, 0, 0, 0, 0, 0, 0,
-			0.75, 0.25, 0, 0, 0, 0, 0, 0,
-			1.0, 0, 0, 0, 0, 0, 0, 0,
-			0.75, 0.25, 0, 0, 0, 0, 0, 0,
-		],
-	)
-	# fmt: on
 
 
 func test_proxy_weights() -> void:
-	var body := _body_skinning([[0.75, 0.25, 0.5], [0.25, 0, 0], [0, 0.75, 0], [0, 0, 0.5]])
+	var body := load(BODY) as MHBody
+	# Contains three-reference blends and UV seams.
+	var proxy := load(
+		"res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
+	) as MHProxy
+	var skinning := body.get_proxy_skinning(proxy)
 
-	var proxy := _proxy(Vector3(0.5, 0.2, 0.3))
-	proxy.geometry = _geometry(2, [1, 0, 1])
-	proxy.ref_a = [2, 0]
-	proxy.ref_b = [0, 1]
-	proxy.ref_c = [1, 2]
-	proxy.weights.append(Vector3(1, 0, 0))
-	proxy.offsets.append(Vector3.ZERO)
+	# Recorded on the sportsuit with the configured game-engine rig.
+	# Upper torso: spine_03, spine_02, upperarm_l, spine_01.
+	# A sub-threshold influence is filtered before normalization.
+	_assert_influences(
+		skinning,
+		proxy.geometry,
+		0,
+		[12, 11, 15, 10, 0, 0, 0, 0],
+		[0.864434003830, 0.120375126600, 0.010799696669, 0.004391174763, 0, 0, 0, 0],
+	)
+	# Shoulder UV seam: clavicle_l, upperarm_l, neck_01, spine_03.
+	# All render copies must retain the same blended influences.
+	_assert_influences(
+		skinning,
+		proxy.geometry,
+		44,
+		[13, 15, 21, 12, 0, 0, 0, 0],
+		[0.437000513077, 0.267681658268, 0.183887720108, 0.111430101097, 0, 0, 0, 0],
+	)
+
+
+func test_direct_mapping() -> void:
+	var body := load(BODY) as MHBody
+	# Includes direct vertex mappings alongside its three-reference fits.
+	var proxy := load("res://characters/visuals/make_human/items/hair/afro01/afro01.mhclo") as MHProxy
+	var skinning := body.get_proxy_skinning(proxy)
+
+	# Afro vertex 887 maps only to body vertex 12015: head and neck_01.
+	# The other two references have zero fitting factors.
+	_assert_influences(
+		skinning,
+		proxy.geometry,
+		887,
+		[22, 21, 0, 0, 0, 0, 0, 0],
+		[0.992800712585, 0.007199279964, 0, 0, 0, 0, 0, 0],
+	)
+
+
+func test_influence_filtering() -> void:
+	var body := load(BODY) as MHBody
+	# Has negative fitting factors that yield negative bone contributions.
+	var proxy := load(
+		"res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
+	) as MHProxy
+	var skinning := body.get_proxy_skinning(proxy)
+
+	# spine_01 contributes about -0.00207: rejected despite its magnitude exceeding 0.001.
+	# spine_03 and spine_02 are renormalized.
+	_assert_influences(
+		skinning,
+		proxy.geometry,
+		792,
+		[12, 11, 0, 0, 0, 0, 0, 0],
+		[0.979588508606, 0.020411482081, 0, 0, 0, 0, 0, 0],
+	)
+
+
+func test_missing_bone_weights() -> void:
+	var body := load(BODY) as MHBody
+
+	# The bundled weights include every bone, but MPFB2 allows missing entries.
+	# Omit the empty Root entry from a copy to test that case.
+	var rig_weights := MHRigWeights.new()
+	rig_weights.bones = body.rig_weights.bones.duplicate()
+	rig_weights.bones.erase("Root")
 
 	var skinning := MHSkinning.new()
-	skinning.build_from_proxy(body, proxy)
+	skinning.build_from_rig(body.geometry, body.rig, rig_weights)
 
-	assert_eq(skinning.get_vertex_count(), 2)
-	# Bone 0 receives 0.5 * 0.5 + 0.75 * 0.2 + 0.25 * 0.3 = 0.475.
-	# The second vertex maps directly to body vertex 0, with no accumulated influences.
-	# fmt: off
-	assert_eq(
-		skinning.bones,
-		[
-			0, 3, 2, 1, 0, 0, 0, 0,
-			0, 1, 0, 0, 0, 0, 0, 0,
-		],
-	)
-	assert_approx_eq(
-		skinning.weights,
-		[
-			0.475, 0.25, 0.225, 0.05, 0, 0, 0, 0,
-			0.75, 0.25, 0, 0, 0, 0, 0, 0,
-		],
-	)
-	assert_eq(
-		skinning.render_bones,
-		[
-			0, 1, 0, 0, 0, 0, 0, 0,
-			0, 3, 2, 1, 0, 0, 0, 0,
-			0, 1, 0, 0, 0, 0, 0, 0,
-		],
-	)
-	assert_approx_eq(
-		skinning.render_weights,
-		[
-			0.75, 0.25, 0, 0, 0, 0, 0, 0,
-			0.475, 0.25, 0.225, 0.05, 0, 0, 0, 0,
-			0.75, 0.25, 0, 0, 0, 0, 0, 0,
-		],
-	)
-	# fmt: on
+	assert_eq(skinning.bones, body.skinning.bones, "missing weights must not shift bone indices")
+	assert_eq(skinning.weights, body.skinning.weights)
+	assert_eq(skinning.render_bones, body.skinning.render_bones)
+	assert_eq(skinning.render_weights, body.skinning.render_weights)
 
 
 func test_influence_pruning() -> void:
+	# No bundled proxy needs pruning with the configured rig, so use synthetic weights.
 	# Each reference has four normalized influences.
 	# References 0 and 2 share bone 3.
 	var body := _body_skinning(
@@ -139,38 +166,49 @@ func test_influence_pruning() -> void:
 	# fmt: on
 
 
-func test_influence_filtering() -> void:
-	var body := _body_skinning(
-		[
-			[0.5, 0.5, 0.25],
-			[0.25, 0, 0.5],
-			[0.125, 0.25, 0],
-			[0.12475, 0.2495, 0],
-			[0.00025, 0.0005, 0],
-			[0, 0, 0.25],
-		],
-	)
+func _create_instance() -> MHBodyInstance:
+	var skeleton := MHSkeleton.new()
+	add_child(skeleton)
 
-	var skinning := MHSkinning.new()
-	# Negative fitting factors occur in real proxies such as afro01.mhclo.
-	skinning.build_from_proxy(body, _proxy(Vector3(1, 0.5, -0.5)))
+	var instance := MHBodyInstance.new()
+	instance.body = load("res://characters/visuals/make_human/body.tres") as MHBody
+	skeleton.add_child(instance)
+	instance.skeleton_node = skeleton
 
-	# Bone 1 cancels to zero, bone 4 contributes only 0.0005, and bone 5 is negative.
-	assert_eq(skinning.bones, [0, 2, 3, 0, 0, 0, 0, 0])
-	assert_approx_eq(
-		skinning.weights,
-		[0.625 / 1.1245, 0.25 / 1.1245, 0.2495 / 1.1245, 0, 0, 0, 0, 0],
-	)
+	return instance
 
 
-static func _bone_weights(
-	vertex_indices: PackedInt32Array,
-	vertex_weights: PackedFloat32Array,
-) -> MHBoneWeights:
-	var bone_weights := MHBoneWeights.new()
-	bone_weights.vertices = vertex_indices
-	bone_weights.weights = vertex_weights
-	return bone_weights
+static func _assert_influences(
+	skinning: MHSkinning,
+	geometry: MHGeometry,
+	vertex_index: int,
+	expected_bones: PackedInt32Array,
+	expected_weights: PackedFloat32Array,
+) -> void:
+	var offset := vertex_index * MHSkinning.MAX_INFLUENCES
+	var end := offset + MHSkinning.MAX_INFLUENCES
+	assert_eq(skinning.bones.slice(offset, end), expected_bones)
+	assert_approx_eq(skinning.weights.slice(offset, end), expected_weights)
+
+	var geometry_indices := geometry.topology.geometry_indices
+	assert(geometry_indices.has(vertex_index), "sample must belong to the rendered geometry")
+	for render_index in geometry_indices.size():
+		if geometry_indices[render_index] != vertex_index:
+			continue
+
+		offset = render_index * MHSkinning.MAX_INFLUENCES
+		end = offset + MHSkinning.MAX_INFLUENCES
+		assert_eq(
+			skinning.render_bones.slice(offset, end),
+			expected_bones,
+			"render vertex %d bones" % render_index,
+		)
+		assert_approx_eq(
+			skinning.render_weights.slice(offset, end),
+			expected_weights,
+			1e-6,
+			"render vertex %d weights" % render_index,
+		)
 
 
 static func _body_skinning(weights_by_bone: Array[PackedFloat32Array]) -> MHSkinning:

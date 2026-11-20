@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Pose" format=3]
+
+[ext_resource type="Script" path="res://characters/pose.gd" id="1_pose"]
+
+[resource]
+script = ExtResource("1_pose")
+name = "Standing Natural"
+license = "CC-by"
+author = "callharvey3d"
+asset_path = "uid://b4c2lnu65dm3s"

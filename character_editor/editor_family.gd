@@ -5,6 +5,10 @@ signal current_member_changed(character: Character)
 signal current_item_added(item: LookItem)
 signal current_item_removed(item: LookItem)
 
+const DEFAULT_POSE: Pose = preload(
+	"res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/standingnatural.tres"
+)
+
 ## The character currently shown on the scene.
 ##
 ## Setting it hides the previously active character.
@@ -18,6 +22,7 @@ func _create_member(character_type: CharacterType) -> void:
 		return
 
 	add_child(member)
+	member.visual.set_pose(DEFAULT_POSE)
 	member_added.emit(member)
 
 

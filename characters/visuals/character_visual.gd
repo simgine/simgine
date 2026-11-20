@@ -94,6 +94,11 @@ func _detach_item(item: LookItem) -> void
 func get_item_dir() -> String
 
 
+## Returns a directory where to search for [Pose] resources.
+@abstract
+func get_pose_dir() -> String
+
+
 ## Returns the directory where to recursively search for [BodyModifier] resources.
 @abstract
 func get_modifiers_dir() -> String
@@ -158,3 +163,10 @@ func set_modifier(key: StringName, value: float) -> void:
 ## Applies a modifier value to the visual.
 @abstract
 func _apply_modifier(key: StringName, value: float) -> void
+
+
+## Applies [param pose] to the character's skeleton, or resets it to rest if null.
+##
+## The node should be ready before calling this.
+@abstract
+func set_pose(pose: Pose) -> void

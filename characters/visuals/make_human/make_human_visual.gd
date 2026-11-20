@@ -85,6 +85,10 @@ func get_item_dir() -> String:
 	return "res://characters/visuals/make_human/items/"
 
 
+func get_pose_dir() -> String:
+	return "res://characters/visuals/make_human/data/poses/"
+
+
 func get_modifiers_dir() -> String:
 	return "res://characters/visuals/make_human/modifiers/"
 
@@ -200,3 +204,25 @@ func get_modifier(key: StringName) -> float:
 
 func _apply_modifier(key: StringName, value: float) -> void:
 	body_instance.set_modifier(key, value)
+
+
+func set_pose(pose: Pose) -> void:
+	var skeleton := body_instance.skeleton_node
+	if not skeleton:
+		return
+
+	if not pose:
+		skeleton.pose = null
+		return
+
+	var res := ResourceLoader.load(pose.asset_path)
+	if not res:
+		Log.warn("Unable to load '%s'", pose.asset_path)
+		return
+
+	var mh_pose := res as MHPose
+	if not mh_pose:
+		Log.warn("'%s' must be an MHPose", pose.asset_path)
+		return
+
+	skeleton.pose = mh_pose

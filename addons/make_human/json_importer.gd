@@ -94,11 +94,10 @@ func _import(
 	_gen_files: Array,
 ) -> Error:
 	var text := FileAccess.get_file_as_string(source_file)
-	if FileAccess.get_open_error() != OK:
-		push_error(
-			"Unable to open '%s': %s" % [source_file, error_string(FileAccess.get_open_error())]
-		)
-		return ERR_PARSE_ERROR
+	var open_error := FileAccess.get_open_error()
+	if open_error != OK:
+		push_error("Unable to open '%s': %s" % [source_file, error_string(open_error)])
+		return open_error
 
 	var json := JSON.new()
 	if json.parse(text) != OK:

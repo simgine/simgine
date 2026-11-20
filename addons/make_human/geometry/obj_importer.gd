@@ -50,10 +50,9 @@ func _import(
 ) -> Error:
 	var file := FileAccess.open(source_file, FileAccess.READ)
 	if not file:
-		push_error(
-			"Unable to open '%s': %s" % [source_file, error_string(FileAccess.get_open_error())]
-		)
-		return ERR_PARSE_ERROR
+		var open_error := FileAccess.get_open_error()
+		push_error("Unable to open '%s': %s" % [source_file, error_string(open_error)])
+		return open_error
 
 	var is_body := source_file.ends_with("3dobjs/base.obj")
 

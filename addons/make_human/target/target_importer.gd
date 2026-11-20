@@ -41,11 +41,10 @@ func _import(
 	_gen_files: Array,
 ) -> Error:
 	var bytes := FileAccess.get_file_as_bytes(source_file)
-	if FileAccess.get_open_error() != OK:
-		push_error(
-			"Unable to open '%s': %s" % [source_file, error_string(FileAccess.get_open_error())]
-		)
-		return ERR_PARSE_ERROR
+	var open_error := FileAccess.get_open_error()
+	if open_error != OK:
+		push_error("Unable to open '%s': %s" % [source_file, error_string(open_error)])
+		return open_error
 
 	if source_file.get_extension().to_lower() == "gz":
 		bytes = bytes.decompress_dynamic(-1, FileAccess.COMPRESSION_GZIP)

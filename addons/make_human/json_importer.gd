@@ -93,7 +93,7 @@ func _import(
 	_platform_variants: Array,
 	_gen_files: Array,
 ) -> Error:
-	var string := FileAccess.get_file_as_string(source_file)
+	var text := FileAccess.get_file_as_string(source_file)
 	if FileAccess.get_open_error() != OK:
 		push_error(
 			"Unable to open '%s': %s" % [source_file, error_string(FileAccess.get_open_error())]
@@ -101,7 +101,7 @@ func _import(
 		return ERR_PARSE_ERROR
 
 	var json := JSON.new()
-	if json.parse(string) != OK:
+	if json.parse(text) != OK:
 		push_error(
 			"Unable to parse: '%s' at line %d" % [json.get_error_message(), json.get_error_line()]
 		)

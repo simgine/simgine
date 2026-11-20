@@ -38,3 +38,8 @@ script = ExtResource("4_v8yi7")
 
 [node name="Light" type="DirectionalLight3D" parent="Preview" unique_id=1197551859]
 transform = Transform3D(0.8253356, 0.47513026, -0.3050776, 0, 0.5403023, 0.841471, 0.5646425, -0.694496, 0.44593075, 0, 0, 0)
+
+[connection signal="preview_requested" from="Features" to="Preview" method="request_preview"]
+[connection signal="preview_requested" from="Wardrobe" to="Preview" method="request_preview"]
+[connection signal="preview_ready" from="Preview" to="Features" method="set_item_preview"]
+[connection signal="preview_ready" from="Preview" to="Wardrobe" method="set_item_preview"]

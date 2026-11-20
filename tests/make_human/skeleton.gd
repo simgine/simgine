@@ -1,34 +1,34 @@
 extends TestSuite
 ## Bone transforms, poses, and lifecycle.
 
-const STANDING_POSE: String = "res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json"
+const STANDING_POSE: String = "res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh"
 
-# Recorded on body.tres at default modifiers, in skeleton space (meters).
+# Recorded from STANDING_POSE on body.tres at default modifiers, in skeleton space (meters).
 # Hips captures root displacement. Hand and foot sample upper/lower-body chains.
 const STANDING_TRANSFORMS: Dictionary[StringName, Transform3D] = {
 	"Hips": Transform3D(
 		Basis(
-			Vector3(0.995012462139, -0.005390553735, -0.099604874849),
-			Vector3(0.005390553735, 0.999985456467, -0.000269137439),
-			Vector3(0.099604874849, -0.000269130280, 0.995027005672),
+			Vector3(0.99501246, -0.00539069, -0.099604845),
+			Vector3(0.00539069, 0.99998546, -0.00026913738),
+			Vector3(0.099604845, -0.00026914378, 0.99502707),
 		),
-		Vector3(-0.000000000640, 0.480750143528, 0.012644580565),
+		Vector3(0, 0.8816923, -0.05156396),
 	),
 	"LeftHand": Transform3D(
 		Basis(
-			Vector3(0.201827913523, -0.080776333809, -0.976084113121),
-			Vector3(0.027914753184, -0.995714008808, 0.088172756135),
-			Vector3(-0.979022920132, -0.045042708516, -0.198707938194),
+			Vector3(0.18558466, -0.084220335, -0.9790125),
+			Vector3(0.07495832, -0.9922037, 0.09956439),
+			Vector3(-0.97976506, -0.09186296, -0.17782488),
 		),
-		Vector3(0.216554537416, 0.470166176558, 0.089762307703),
+		Vector3(0.21654437, 0.87110287, 0.025527492),
 	),
 	"LeftFoot": Transform3D(
 		Basis(
-			Vector3(-0.862118065357, -0.053686965257, 0.503855228424),
-			Vector3(0.505827486515, -0.149756446481, 0.849536061287),
-			Vector3(0.029846549034, 0.987264215946, 0.156264066696),
+			Vector3(-0.86011964, 0.038700204, 0.50862193),
+			Vector3(0.50827587, -0.019044086, 0.8609838),
+			Vector3(0.043006472, 0.9990694, -0.003290169),
 		),
-		Vector3(0.096380837262, -0.325517892838, -0.074810929596),
+		Vector3(0.09638484, 0.07542476, -0.13902646),
 	),
 }
 const T_POSE_TRANSFORMS: Dictionary[StringName, Transform3D] = {
@@ -191,9 +191,8 @@ func test_save_restore() -> void:
 	var instance := _create_instance()
 	var skeleton := instance.skeleton_node
 	instance.owner = skeleton
-	skeleton.pose = load(
-		"res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json"
-	) as MHPose
+	skeleton.pose = load(STANDING_POSE) as MHPose
+	assert(skeleton.pose)
 
 	await get_tree().process_frame
 

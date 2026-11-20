@@ -129,7 +129,7 @@ func test_retargeted_pose() -> void:
 	ResourceSaver.add_resource_format_saver(saver, true)
 
 	var error := importer._import(
-		"res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json",
+		"res://characters/visuals/make_human/data/poses/default_fk/t-pose.json",
 		"",
 		{
 			"rig": "res://characters/visuals/make_human/data/rigs/rig.default.json",
@@ -141,15 +141,14 @@ func test_retargeted_pose() -> void:
 	)
 	assert_eq(error, OK)
 	var pose := saver.resource as MHPose
-	assert_approx_eq(
-		pose.rotations["LeftHand"],
-		Quaternion(0.040740359575, 0.565748810768, -0.065018884838, 0.821000039577),
-		1e-6,
-		"retargeted LeftHand rotation",
-	)
-	assert_approx_eq(
-		pose.rotations["LeftFoot"],
-		Quaternion(0.138811320066, 0.713120698929, -0.666480422020, 0.167314529419),
-		1e-6,
-		"retargeted LeftFoot rotation",
-	)
+
+	for bone_name: StringName in ["LeftHand", "LeftFoot"]:
+		var rest := pose.profile.get_reference_pose(pose.profile.find_bone(bone_name))
+		assert_approx_eq(
+			Basis(pose.rotations[bone_name]),
+			rest.basis,
+			1e-6,
+			"'%s' should match the profile rest pose when the source pose is also the reference"
+			% bone_name,
+		)
+	assert(pose.translations.is_empty())

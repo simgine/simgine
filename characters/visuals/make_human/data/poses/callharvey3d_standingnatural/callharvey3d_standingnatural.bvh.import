@@ -1,0 +1,17 @@
+[remap]
+
+importer="make_human.bvh_importer"
+type="Resource"
+uid="uid://b4c2lnu65dm3s"
+path="res://.godot/imported/callharvey3d_standingnatural.bvh-13664628d99e3ef5791e4894922c00f5.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh"
+dest_files=["res://.godot/imported/callharvey3d_standingnatural.bvh-13664628d99e3ef5791e4894922c00f5.res"]
+
+[params]
+
+rig="res://characters/visuals/make_human/data/rigs/rig.default.json"
+bone_map="res://characters/visuals/make_human/data/rigs/default_bone_map.tres"
+reference_pose="res://characters/visuals/make_human/data/poses/default_fk/t-pose.json"

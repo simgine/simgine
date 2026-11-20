@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://dydsd3cotcikj" path="res://characters/visuals/make_human/items/eyelashes/eyelashes01/eyelashes01.tres" id="5_l3p8a"]
 [ext_resource type="Resource" uid="uid://rgx1ew4aa2ov" path="res://characters/visuals/make_human/items/eyebrows/eyebrow001/eyebrow001.tres" id="6_xeu00"]
 [ext_resource type="Script" uid="uid://cw78o1pbhhjm7" path="res://characters/character_look.gd" id="7_look"]
-[ext_resource type="Resource" uid="uid://b4c2lnu65dm3s" path="res://characters/visuals/make_human/data/poses/default_fk/callharvey3d_standingnatural.json" id="8_fakd8"]
+[ext_resource type="Resource" uid="uid://b4c2lnu65dm3s" path="res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh" id="8_fakd8"]
 
 [sub_resource type="Resource" id="Resource_k538c"]
 script = ExtResource("7_look")

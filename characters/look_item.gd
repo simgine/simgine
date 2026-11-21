@@ -16,6 +16,11 @@ extends Resource
 ## Author of the asset.
 @export var author: String
 
+## Descriptors such as `casual`, `curly`, `male`, or `female`.
+##
+## Unisex items omit both gender tags.
+@export var tags: PackedStringArray
+
 ## Occupied slot.
 ##
 ## Items without a slot are skipped at load time.

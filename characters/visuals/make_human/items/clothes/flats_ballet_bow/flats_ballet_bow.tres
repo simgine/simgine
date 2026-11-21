@@ -8,6 +8,7 @@ script = ExtResource("1_flats_ballet_bow")
 name = "Flats Ballet Bow"
 license = "CC0"
 author = "MRT"
+tags = PackedStringArray("female", "shoes", "ballet-flats", "bow")
 slot = ExtResource("2_shoes")
 asset_path = "uid://cdxyglidhs06k"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

@@ -8,6 +8,7 @@ script = ExtResource("1_turtleneck_halter")
 name = "Turtleneck Halter"
 license = "CC0"
 author = "MRT"
+tags = PackedStringArray("female", "top", "halter", "sleeveless", "turtleneck")
 slot = ExtResource("2_top")
 asset_path = "uid://w5hi35lua0u8"
 metadata/_custom_type_script = "uid://bc4jama1ho3n0"

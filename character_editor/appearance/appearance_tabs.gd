@@ -4,6 +4,7 @@ extends TabContainer
 @onready var body_tabs: BodyTabs = $BodyTabs
 @onready var features_tabs: LookItemsTabs = $Features
 @onready var wardrobe_tabs: LookItemsTabs = $Wardrobe
+@onready var preview: LookItemPreview = $Preview
 
 
 func load_state(visual: CharacterVisual) -> void:

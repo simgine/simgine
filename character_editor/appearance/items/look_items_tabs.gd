@@ -21,14 +21,14 @@ func populate(items: Array[LookItem]) -> void:
 		# so a new tab starts when the slot changes.
 		if item.slot != current_slot:
 			current_slot = item.slot
-			list = _create_look_item_list(current_slot)
+			list = _create_item_list(current_slot)
 
 		list.add_look_item(item)
 
 	Log.debug("Created %d look slot tabs", get_tab_count())
 
 
-func _create_look_item_list(slot: LookSlot) -> LookItemList:
+func _create_item_list(slot: LookSlot) -> LookItemList:
 	const LOOK_ITEM_LIST := preload("res://character_editor/appearance/items/look_item_list.tscn")
 	var list: LookItemList = LOOK_ITEM_LIST.instantiate()
 	list.name = slot.name

@@ -33,7 +33,7 @@ func populate(items: Array[LookItem]) -> void:
 func _create_item_list(slot: LookSlot) -> LookItemList:
 	const LOOK_ITEM_LIST := preload("res://character_editor/appearance/items/look_item_list.tscn")
 	var list: LookItemList = LOOK_ITEM_LIST.instantiate()
-	list.setup(slot)
+	list.slot = slot
 
 	list.look_item_selected.connect(item_selected.emit)
 	list.look_item_deselected.connect(item_deselected.emit)

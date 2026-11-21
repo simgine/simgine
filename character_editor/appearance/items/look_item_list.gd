@@ -5,7 +5,7 @@ signal look_item_selected(item: LookItem)
 signal look_item_deselected(item: LookItem)
 signal preview_requested(item: LookItem)
 
-var _slot: LookSlot
+var slot: LookSlot
 var _items: Array[LookItem]
 var _item_indices: Dictionary[LookItem, int]
 
@@ -22,14 +22,10 @@ static func _create_placeholder() -> Texture2D:
 
 
 func _ready() -> void:
+	multi_selected.connect(_on_multi_selected)
 	get_v_scroll_bar().value_changed.connect(_check_visible_previews.unbind(1))
 	resized.connect(_check_visible_previews)
 	visibility_changed.connect(_check_visible_previews)
-
-
-func setup(slot: LookSlot) -> void:
-	_slot = slot
-	multi_selected.connect(_on_multi_selected)
 
 
 func add_look_item(item: LookItem) -> void:
@@ -53,7 +49,7 @@ static func _build_tooltip(item: LookItem) -> String:
 func load_selected(visual: CharacterVisual) -> void:
 	deselect_all()
 
-	var item := visual.look.get_item(_slot)
+	var item := visual.look.get_item(slot)
 	if item:
 		select(_item_indices[item])
 
@@ -80,7 +76,7 @@ func _on_multi_selected(index: int, selected: bool) -> void:
 	else:
 		select(index)
 		# Ignore deselection if the slot is required.
-		if not _slot.permanent:
+		if not slot.permanent:
 			look_item_deselected.emit(_items[index])
 
 

@@ -14,7 +14,7 @@ var _current_tabs: AppearanceTabs
 var _visual_tabs: Dictionary[GDScript, AppearanceTabs]
 
 
-func _show_character(character: Character) -> void:
+func _load_state(character: Character) -> void:
 	Log.debug("Loading appearance for '%s'", character.name)
 
 	var visual := character.visual

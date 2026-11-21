@@ -205,8 +205,8 @@ light_energy = 0.35
 
 [connection signal="current_item_added" from="EditorFamily" to="UI/Content/AppearanceBox" method="_select_item"]
 [connection signal="current_item_removed" from="EditorFamily" to="UI/Content/AppearanceBox" method="_deselect_item"]
-[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/ProfileBox" method="_show_character"]
-[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/AppearanceBox" method="_show_character"]
+[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/ProfileBox" method="_load_state"]
+[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/AppearanceBox" method="_load_state"]
 [connection signal="member_added" from="EditorFamily" to="UI/Content/FamilyBox" method="_create_button"]
 [connection signal="button_pressed" from="UI/Content/FamilyBox" to="EditorFamily" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyBox" to="EditorFamily" method="_remove_member"]

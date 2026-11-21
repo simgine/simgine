@@ -23,7 +23,7 @@ func _ready() -> void:
 
 
 ## Fills the fields when the current member changes.
-func _show_character(character: Character) -> void:
+func _load_state(character: Character) -> void:
 	_first_name_edit.text = character.first_name
 	_last_name_edit.text = character.last_name
 

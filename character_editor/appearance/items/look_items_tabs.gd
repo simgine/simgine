@@ -64,12 +64,10 @@ func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
 ## Selects the item's icon in the list of its slot.
 func select_item(item: LookItem) -> void:
 	var list: LookItemList = _lists.get(item.slot)
-	if list:
-		list.select_item(item)
+	list.select_item(item)
 
 
 ## Deselects the item's icon in the list of its slot.
 func deselect_item(item: LookItem) -> void:
 	var list: LookItemList = _lists.get(item.slot)
-	if list:
-		list.deselect_item(item)
+	list.deselect_item(item)

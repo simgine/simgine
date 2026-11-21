@@ -14,10 +14,14 @@ func load_state(visual: CharacterVisual) -> void:
 
 
 func select_item(item: LookItem) -> void:
-	features_tabs.select_item(item)
-	wardrobe_tabs.select_item(item)
+	if item.slot.permanent:
+		features_tabs.select_item(item)
+	else:
+		wardrobe_tabs.select_item(item)
 
 
 func deselect_item(item: LookItem) -> void:
-	features_tabs.deselect_item(item)
-	wardrobe_tabs.deselect_item(item)
+	if item.slot.permanent:
+		features_tabs.deselect_item(item)
+	else:
+		wardrobe_tabs.deselect_item(item)

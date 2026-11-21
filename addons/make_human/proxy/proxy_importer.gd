@@ -116,6 +116,10 @@ func _import(
 					proxy.z_scale = scale
 			"z_depth", "max_pole":
 				pass
+			"vertexboneweights_file":
+				# TODO: add support for this. Right now skinning
+				# is derived from the active body rig.
+				pass
 			"verts":
 				if value != "0":
 					push_error("Unsupported verts start at %d: '%s'" % [line_index, value])

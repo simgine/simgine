@@ -105,6 +105,12 @@ func load_value(visual: CharacterVisual) -> void:
 		_slider.set_value_no_signal(visual.get_modifier(_params.modifier.key))
 
 
+## Mirrors the value to the other side of the range.
+func mirror_value() -> void:
+	var mirrored := _params.value_range.x + _params.value_range.y - _slider.value
+	_slider.set_value(mirrored)
+
+
 func _apply_link_visibility(linked: bool) -> void:
 	_slider_box.visible = linked
 	_left_slider_box.visible = not linked

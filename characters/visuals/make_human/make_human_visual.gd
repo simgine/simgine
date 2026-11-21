@@ -202,6 +202,10 @@ func get_modifier(key: StringName) -> float:
 	return body_instance.get_modifier(key)
 
 
+func get_gender_modifier_name() -> StringName:
+	return "gender"
+
+
 func _apply_modifier(key: StringName, value: float) -> void:
 	body_instance.set_modifier(key, value)
 

@@ -152,6 +152,11 @@ func get_bone_position(bone: String) -> Vector3
 func get_modifier(key: StringName) -> float
 
 
+## Returns the name of the modifier that controls the character's gender.
+@abstract
+func get_gender_modifier_name() -> StringName
+
+
 ## Sets a modifier value.
 ##
 ## The node should be ready before calling this.

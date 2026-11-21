@@ -3,6 +3,9 @@ extends TabContainer
 
 signal modifier_changed(key: StringName, value: float)
 
+## The slider of the visual's gender modifier.
+var gender_slider: ModifierSlider
+
 
 func populate(visual: CharacterVisual) -> void:
 	var current_category: ModifierCategory = null
@@ -18,6 +21,7 @@ func populate(visual: CharacterVisual) -> void:
 
 	var left_suffix := visual.get_left_modifier_suffix()
 	var right_suffix := visual.get_right_modifier_suffix()
+	var gender_key := visual.get_gender_modifier_name()
 	for param in params:
 		# Backends emit modifiers grouped by category,
 		# so a new tab starts when the category changes.
@@ -26,7 +30,9 @@ func populate(visual: CharacterVisual) -> void:
 
 			list = _create_modifier_list(current_category)
 
-		list.add_modifier(param, left_suffix, right_suffix)
+		var slider := list.add_modifier(param, left_suffix, right_suffix)
+		if param.modifier.key == gender_key:
+			gender_slider = slider
 
 	Log.debug("Created %d modifier category tabs", get_tab_count())
 

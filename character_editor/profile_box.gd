@@ -1,15 +1,17 @@
 extends VBoxContainer
 
+## Emitted when the member's gender is switched while it's linked to the body.
+signal body_gender_changed
+
 @onready var _first_name_edit: LineEdit = %FirstName
 @onready var _last_name_edit: LineEdit = %LastName
 
 @onready var _male_button: Button = %Male
 @onready var _female_button: Button = %Female
-@onready var _customize_button: Button = %Customize
 
-@onready var _animations_row: HBoxContainer = $AnimationsRow
 @onready var _feminine_button: Button = %Feminine
 @onready var _masculine_button: Button = %Masculine
+@onready var _link_gender_checkbox: CheckBox = %LinkGender
 
 @export var _gender_group: ButtonGroup
 @export var _animation_group: ButtonGroup
@@ -49,7 +51,6 @@ func _load_state(character: Character) -> void:
 	else:
 		_female_button.button_pressed = true
 		_feminine_button.button_pressed = true
-	_animations_row.visible = false
 
 
 func _set_first_name(value: String, character: Character) -> void:
@@ -64,10 +65,15 @@ func _set_gender(button: Button, character: Character) -> void:
 	match button:
 		_male_button:
 			_set_animation(_masculine_button, character)
+			_emit_gender_changed()
 		_female_button:
 			_set_animation(_feminine_button, character)
+			_emit_gender_changed()
 
-	_animations_row.visible = button == _customize_button
+
+func _emit_gender_changed() -> void:
+	if _link_gender_checkbox.button_pressed:
+		body_gender_changed.emit()
 
 
 func _set_animation(button: Button, character: Character) -> void:

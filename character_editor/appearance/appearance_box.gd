@@ -33,6 +33,11 @@ func _on_current_member_changed(previous: Character, current: Character) -> void
 	tabs.load_state(visual)
 
 
+## Mirrors the gender slider when the profile switches the member's gender.
+func _mirror_gender_slider() -> void:
+	_current_tabs.body_tabs.gender_slider.mirror_value()
+
+
 static func _disconnect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> void:
 	tabs.body_tabs.modifier_changed.disconnect(visual.set_modifier)
 	tabs.features_tabs.item_selected.disconnect(visual.look.add)

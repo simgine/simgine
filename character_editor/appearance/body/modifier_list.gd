@@ -6,17 +6,19 @@ signal modifier_changed(key: StringName, value: float)
 @onready var _content: VBoxContainer = %Content
 
 
+## Adds a slider for the modifier and returns it.
 func add_modifier(
 	params: BodyModifierParams,
 	left_suffix: StringName,
 	right_suffix: StringName,
-) -> void:
+) -> ModifierSlider:
 	const MODIFIER_SLIDER := preload("res://character_editor/appearance/body/modifier_slider.tscn")
 	var slider: ModifierSlider = MODIFIER_SLIDER.instantiate()
 	slider.setup(params, left_suffix, right_suffix)
 
 	slider.modifier_changed.connect(modifier_changed.emit)
 	_content.add_child(slider)
+	return slider
 
 
 ## Loads the shown values without emitting [signal modifier_changed].

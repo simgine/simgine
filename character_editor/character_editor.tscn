@@ -141,27 +141,36 @@ toggle_mode = true
 button_group = SubResource("ButtonGroup_mgv58")
 text = "Customize"
 
-[node name="AnimationsRow" type="HBoxContainer" parent="UI/Content/ProfileBox" unique_id=812293696]
+[node name="CustomizeBox" type="VBoxContainer" parent="UI/Content/ProfileBox" unique_id=635212209]
 visible = false
 layout_mode = 2
 
-[node name="Animations" type="Label" parent="UI/Content/ProfileBox/AnimationsRow" unique_id=895871392]
+[node name="AnimationsRow" type="HBoxContainer" parent="UI/Content/ProfileBox/CustomizeBox" unique_id=812293696]
+layout_mode = 2
+
+[node name="Animations" type="Label" parent="UI/Content/ProfileBox/CustomizeBox/AnimationsRow" unique_id=895871392]
 layout_mode = 2
 text = "Animations:"
 
-[node name="Feminine" type="Button" parent="UI/Content/ProfileBox/AnimationsRow" unique_id=846629284]
+[node name="Feminine" type="Button" parent="UI/Content/ProfileBox/CustomizeBox/AnimationsRow" unique_id=846629284]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_inhhd")
 text = "Feminine"
 
-[node name="Masculine" type="Button" parent="UI/Content/ProfileBox/AnimationsRow" unique_id=756231323]
+[node name="Masculine" type="Button" parent="UI/Content/ProfileBox/CustomizeBox/AnimationsRow" unique_id=756231323]
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
 button_group = SubResource("ButtonGroup_inhhd")
 text = "Masculine"
+
+[node name="LinkGender" type="CheckBox" parent="UI/Content/ProfileBox/CustomizeBox" unique_id=1803854561]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+text = "Link gender to body"
 
 [node name="AppearanceBox" type="VBoxContainer" parent="UI/Content" unique_id=1872450931]
 layout_mode = 1
@@ -209,3 +218,5 @@ light_energy = 0.35
 [connection signal="button_pressed" from="UI/Content/FamilyBox" to="EditorFamily" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyBox" to="EditorFamily" method="_remove_member"]
 [connection signal="type_selected" from="UI/Content/FamilyBox/AddMember" to="EditorFamily" method="_create_member"]
+[connection signal="body_gender_changed" from="UI/Content/ProfileBox" to="UI/Content/AppearanceBox" method="_mirror_gender_slider"]
+[connection signal="toggled" from="UI/Content/ProfileBox/GenderRow/Customize" to="UI/Content/ProfileBox/CustomizeBox" method="set_visible"]

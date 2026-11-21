@@ -46,14 +46,6 @@ static func _build_tooltip(item: LookItem) -> String:
 	return tooltip
 
 
-func load_selected(visual: CharacterVisual) -> void:
-	deselect_all()
-
-	var item := visual.look.get_item(slot)
-	if item:
-		select(_item_indices[item])
-
-
 func select_item(item: LookItem) -> void:
 	select(_item_indices[item])
 

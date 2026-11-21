@@ -67,4 +67,9 @@ func deselect_item(item: LookItem) -> void:
 
 func load_state(visual: CharacterVisual) -> void:
 	for slot in _lists:
-		_lists[slot].load_selected(visual)
+		var list := _lists[slot]
+		list.deselect_all()
+
+		var item := visual.look.get_item(slot)
+		if item:
+			list.select_item(item)

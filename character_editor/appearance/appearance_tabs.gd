@@ -1,0 +1,22 @@
+class_name AppearanceTabs
+extends TabContainer
+
+@onready var body_tabs: BodyTabs = $BodyTabs
+@onready var features_tabs: LookItemsTabs = $Features
+@onready var wardrobe_tabs: LookItemsTabs = $Wardrobe
+
+
+func load_state(visual: CharacterVisual) -> void:
+	body_tabs.load_state(visual)
+	features_tabs.load_state(visual)
+	wardrobe_tabs.load_state(visual)
+
+
+func select_item(item: LookItem) -> void:
+	features_tabs.select_item(item)
+	wardrobe_tabs.select_item(item)
+
+
+func deselect_item(item: LookItem) -> void:
+	features_tabs.deselect_item(item)
+	wardrobe_tabs.deselect_item(item)

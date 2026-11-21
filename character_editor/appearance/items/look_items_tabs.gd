@@ -1,6 +1,6 @@
-class_name LookItemsTab
+class_name LookItemsTabs
 extends TabContainer
-## An appearance tab that groups [LookItem]s into subtabs by slot.
+## An appearance tab set that groups [LookItem]s into subtabs by slot.
 
 signal item_selected(item: LookItem)
 signal item_deselected(item: LookItem)

@@ -1,31 +1,31 @@
 [gd_scene format=3 uid="uid://cfwryc806q502"]
 
-[ext_resource type="Script" uid="uid://cfaaaq0t8oyog" path="res://character_editor/appearance/appearance_view.gd" id="1_appearance_view"]
-[ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://character_editor/appearance/body/body_tab.gd" id="2_body_tab"]
-[ext_resource type="Script" uid="uid://bqsh54hcofd35" path="res://character_editor/appearance/items/look_items_tab.gd" id="3_look_items_tab"]
+[ext_resource type="Script" uid="uid://cfaaaq0t8oyog" path="res://character_editor/appearance/appearance_tabs.gd" id="1_appearance_tabs"]
+[ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://character_editor/appearance/body/body_tabs.gd" id="2_body_tabs"]
+[ext_resource type="Script" uid="uid://bqsh54hcofd35" path="res://character_editor/appearance/items/look_items_tabs.gd" id="3_look_items_tabs"]
 [ext_resource type="Script" uid="uid://b4wbb1vo82x7e" path="res://character_editor/appearance/items/look_item_preview.gd" id="4_v8yi7"]
 
-[node name="AppearanceView" type="TabContainer" unique_id=1586993996]
+[node name="AppearanceTabs" type="TabContainer" unique_id=1586993996]
 size_flags_vertical = 3
 current_tab = 0
-script = ExtResource("1_appearance_view")
+script = ExtResource("1_appearance_tabs")
 
-[node name="Body" type="TabContainer" parent="." unique_id=870442469]
+[node name="BodyTabs" type="TabContainer" parent="." unique_id=870442469]
 layout_mode = 2
-script = ExtResource("2_body_tab")
+script = ExtResource("2_body_tabs")
 metadata/_tab_index = 0
 
 [node name="Features" type="TabContainer" parent="." unique_id=1772322629]
 visible = false
 layout_mode = 2
-script = ExtResource("3_look_items_tab")
+script = ExtResource("3_look_items_tabs")
 permanent = true
 metadata/_tab_index = 1
 
 [node name="Wardrobe" type="TabContainer" parent="." unique_id=1828982093]
 visible = false
 layout_mode = 2
-script = ExtResource("3_look_items_tab")
+script = ExtResource("3_look_items_tabs")
 metadata/_tab_index = 2
 
 [node name="Preview" type="SubViewport" parent="." unique_id=1562166991]

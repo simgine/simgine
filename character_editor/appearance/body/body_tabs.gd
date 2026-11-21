@@ -1,4 +1,4 @@
-class_name BodyTab
+class_name BodyTabs
 extends TabContainer
 
 signal modifier_changed(key: StringName, value: float)

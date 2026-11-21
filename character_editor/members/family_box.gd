@@ -17,7 +17,7 @@ func _create_button(character: Character) -> void:
 	add_child(button)
 	move_child(button, -2)
 
-	button.portrait.setup(character.visual)
+	button.portrait.connect_visual(character.visual)
 	button.press()
 
 	_update_removal_allowed()

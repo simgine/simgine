@@ -13,8 +13,7 @@ func _ready() -> void:
 	texture = _viewport.get_texture()
 
 
-## Shows the given visual.
-func setup(visual: CharacterVisual) -> void:
+func connect_visual(visual: CharacterVisual) -> void:
 	# Wait for queued rebuilds before reading the head position.
 	visual.look_changed.connect(_refresh.bind(visual), CONNECT_DEFERRED)
 	visual.body_changed.connect(_refresh.bind(visual), CONNECT_DEFERRED)

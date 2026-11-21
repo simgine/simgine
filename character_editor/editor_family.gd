@@ -1,9 +1,10 @@
 extends Node3D
 
+## Emitted when a member is created and added to the family.
 signal member_added(character: Character)
-signal current_member_changed(character: Character)
-signal current_item_added(item: LookItem)
-signal current_item_removed(item: LookItem)
+
+## Emitted when the selected member changes.
+signal current_member_changed(previous: Character, current: Character)
 
 const DEFAULT_POSE: Pose = preload(
 	"res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/standingnatural.tres"
@@ -39,42 +40,11 @@ func _set_current_member(index: int) -> void:
 	if _current_member == member:
 		return
 
-	if _current_member:
-		_current_member.visual.look.item_added.disconnect(current_item_added.emit)
-		_current_member.visual.look.item_removed.disconnect(current_item_removed.emit)
-		_current_member.visible = false
+	var previous := _current_member
+	if previous:
+		previous.visible = false
 
 	Log.info("Selecting '%s'", member.name)
 	_current_member = member
 	_current_member.visible = true
-	member.visual.look.item_added.connect(current_item_added.emit)
-	member.visual.look.item_removed.connect(current_item_removed.emit)
-	current_member_changed.emit(member)
-
-
-func _set_first_name(value: String) -> void:
-	_current_member.first_name = value
-
-
-func _set_last_name(value: String) -> void:
-	_current_member.last_name = value
-
-
-func _set_animation_style(style: CharacterVisual.AnimationStyle) -> void:
-	_current_member.visual.anim_style = style
-
-
-func _set_modifier(key: StringName, value: float) -> void:
-	Log.debug("Changing modifier '%s' to %.2f", key, value)
-	_current_member.visual.set_modifier(key, value)
-
-
-func _add_look_item(item: LookItem) -> void:
-	Log.info("Adding look item '%s'", item.name)
-	_current_member.visual.look.add(item)
-
-
-func _remove_look_item(item: LookItem) -> void:
-	assert(not item.slot.permanent, "Permanent look items cannot be removed")
-	Log.info("Removing look item '%s'", item.name)
-	_current_member.visual.look.remove(item)
+	current_member_changed.emit(previous, _current_member)

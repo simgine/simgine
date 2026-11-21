@@ -4,20 +4,19 @@ extends VBoxContainer
 ## Shows the [AppearanceTabs] for each [CharacterVisual] type and keeps
 ## them in sync with the member's look.
 
-signal modifier_changed(key: StringName, value: float)
-signal item_selected(item: LookItem)
-signal item_deselected(item: LookItem)
-
 var _current_tabs: AppearanceTabs
 
 ## Cached tab sets for different [CharacterVisual] types.
 var _visual_tabs: Dictionary[GDScript, AppearanceTabs]
 
 
-func _load_state(character: Character) -> void:
-	Log.debug("Loading appearance for '%s'", character.name)
+func _on_current_member_changed(previous: Character, current: Character) -> void:
+	if previous:
+		var previous_tabs := _visual_tabs[previous.visual.get_script()]
+		_disconnect_visual(previous_tabs, previous.visual)
 
-	var visual := character.visual
+	Log.debug("Loading appearance for '%s'", current.name)
+	var visual := current.visual
 	var key: GDScript = visual.get_script()
 	if not _visual_tabs.has(key):
 		_visual_tabs[key] = _create_tabs(visual)
@@ -30,7 +29,28 @@ func _load_state(character: Character) -> void:
 		_current_tabs = tabs
 		tabs.show()
 
+	_connect_visual(tabs, visual)
 	tabs.load_state(visual)
+
+
+static func _disconnect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> void:
+	tabs.body_tabs.modifier_changed.disconnect(visual.set_modifier)
+	tabs.features_tabs.item_selected.disconnect(visual.look.add)
+	tabs.features_tabs.item_deselected.disconnect(visual.look.remove)
+	tabs.wardrobe_tabs.item_selected.disconnect(visual.look.add)
+	tabs.wardrobe_tabs.item_deselected.disconnect(visual.look.remove)
+	visual.look.item_added.disconnect(tabs.select_item)
+	visual.look.item_removed.disconnect(tabs.deselect_item)
+
+
+static func _connect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> void:
+	tabs.body_tabs.modifier_changed.connect(visual.set_modifier)
+	tabs.features_tabs.item_selected.connect(visual.look.add)
+	tabs.features_tabs.item_deselected.connect(visual.look.remove)
+	tabs.wardrobe_tabs.item_selected.connect(visual.look.add)
+	tabs.wardrobe_tabs.item_deselected.connect(visual.look.remove)
+	visual.look.item_added.connect(tabs.select_item)
+	visual.look.item_removed.connect(tabs.deselect_item)
 
 
 func _create_tabs(visual: CharacterVisual) -> AppearanceTabs:
@@ -41,27 +61,12 @@ func _create_tabs(visual: CharacterVisual) -> AppearanceTabs:
 	# since we access @onready members later.
 	add_child(tabs)
 
-	tabs.body_tabs.modifier_changed.connect(modifier_changed.emit)
 	tabs.body_tabs.populate(visual)
 
 	var items := LookItem.load_from(visual.get_item_dir())
-
-	tabs.features_tabs.item_selected.connect(item_selected.emit)
-	tabs.features_tabs.item_deselected.connect(item_deselected.emit)
 	tabs.features_tabs.populate(items)
-
-	tabs.wardrobe_tabs.item_selected.connect(item_selected.emit)
-	tabs.wardrobe_tabs.item_deselected.connect(item_deselected.emit)
 	tabs.wardrobe_tabs.populate(items)
 
 	tabs.preview.setup(visual.get_preview_scene_path())
 
 	return tabs
-
-
-func _select_item(item: LookItem) -> void:
-	_current_tabs.select_item(item)
-
-
-func _deselect_item(item: LookItem) -> void:
-	_current_tabs.deselect_item(item)

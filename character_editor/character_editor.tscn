@@ -203,17 +203,9 @@ light_energy = 0.25
 transform = Transform3D(-0.95448, -0.16364262, 0.24937722, 0, 0.8360651, 0.54863024, -0.29827487, 0.5236566, -0.7980074, 0, 0, 0)
 light_energy = 0.35
 
-[connection signal="current_item_added" from="EditorFamily" to="UI/Content/AppearanceBox" method="_select_item"]
-[connection signal="current_item_removed" from="EditorFamily" to="UI/Content/AppearanceBox" method="_deselect_item"]
-[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/ProfileBox" method="_load_state"]
-[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/AppearanceBox" method="_load_state"]
+[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/ProfileBox" method="_on_current_member_changed"]
+[connection signal="current_member_changed" from="EditorFamily" to="UI/Content/AppearanceBox" method="_on_current_member_changed"]
 [connection signal="member_added" from="EditorFamily" to="UI/Content/FamilyBox" method="_create_button"]
 [connection signal="button_pressed" from="UI/Content/FamilyBox" to="EditorFamily" method="_set_current_member"]
 [connection signal="button_removed" from="UI/Content/FamilyBox" to="EditorFamily" method="_remove_member"]
 [connection signal="type_selected" from="UI/Content/FamilyBox/AddMember" to="EditorFamily" method="_create_member"]
-[connection signal="animation_style_changed" from="UI/Content/ProfileBox" to="EditorFamily" method="_set_animation_style"]
-[connection signal="text_changed" from="UI/Content/ProfileBox/NameRow/FirstName" to="EditorFamily" method="_set_first_name"]
-[connection signal="text_changed" from="UI/Content/ProfileBox/NameRow/LastName" to="EditorFamily" method="_set_last_name"]
-[connection signal="item_deselected" from="UI/Content/AppearanceBox" to="EditorFamily" method="_remove_look_item"]
-[connection signal="item_selected" from="UI/Content/AppearanceBox" to="EditorFamily" method="_add_look_item"]
-[connection signal="modifier_changed" from="UI/Content/AppearanceBox" to="EditorFamily" method="_set_modifier"]

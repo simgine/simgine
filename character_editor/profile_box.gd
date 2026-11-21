@@ -1,7 +1,5 @@
 extends VBoxContainer
 
-signal animation_style_changed(style: CharacterVisual.AnimationStyle)
-
 @onready var _first_name_edit: LineEdit = %FirstName
 @onready var _last_name_edit: LineEdit = %LastName
 
@@ -17,12 +15,28 @@ signal animation_style_changed(style: CharacterVisual.AnimationStyle)
 @export var _animation_group: ButtonGroup
 
 
-func _ready() -> void:
-	_gender_group.pressed.connect(_select_gender)
-	_animation_group.pressed.connect(_select_animation)
+func _on_current_member_changed(previous: Character, current: Character) -> void:
+	if previous:
+		_disconnect_character()
+
+	_load_state(current)
+	_connect_character(current)
 
 
-## Fills the fields when the current member changes.
+func _disconnect_character() -> void:
+	_first_name_edit.text_changed.disconnect(_set_first_name)
+	_last_name_edit.text_changed.disconnect(_set_last_name)
+	_gender_group.pressed.disconnect(_set_gender)
+	_animation_group.pressed.disconnect(_set_animation)
+
+
+func _connect_character(character: Character) -> void:
+	_first_name_edit.text_changed.connect(_set_first_name.bind(character))
+	_last_name_edit.text_changed.connect(_set_last_name.bind(character))
+	_gender_group.pressed.connect(_set_gender.bind(character))
+	_animation_group.pressed.connect(_set_animation.bind(character))
+
+
 func _load_state(character: Character) -> void:
 	_first_name_edit.text = character.first_name
 	_last_name_edit.text = character.last_name
@@ -31,42 +45,45 @@ func _load_state(character: Character) -> void:
 	# strictly match male or female, select the customize button.
 	if character.visual.anim_style == CharacterVisual.AnimationStyle.MASCULINE:
 		_male_button.button_pressed = true
+		_masculine_button.button_pressed = true
 	else:
 		_female_button.button_pressed = true
+		_feminine_button.button_pressed = true
+	_animations_row.visible = false
 
 
-func _select_gender(button: Button) -> void:
+func _set_first_name(value: String, character: Character) -> void:
+	character.first_name = value
+
+
+func _set_last_name(value: String, character: Character) -> void:
+	character.last_name = value
+
+
+func _set_gender(button: Button, character: Character) -> void:
 	match button:
 		_male_button:
-			_set_animation_style(CharacterVisual.AnimationStyle.MASCULINE)
+			_set_animation(_masculine_button, character)
 		_female_button:
-			_set_animation_style(CharacterVisual.AnimationStyle.FEMININE)
+			_set_animation(_feminine_button, character)
 
 	_animations_row.visible = button == _customize_button
 
 
-func _select_animation(button: Button) -> void:
-	match button:
-		_feminine_button:
-			_set_animation_style(CharacterVisual.AnimationStyle.FEMININE)
-		_masculine_button:
-			_set_animation_style(CharacterVisual.AnimationStyle.MASCULINE)
-
-
-func _set_animation_style(style: CharacterVisual.AnimationStyle) -> void:
-	var button := _get_animation_button(style)
+func _set_animation(button: Button, character: Character) -> void:
 	if button.button_pressed:
 		return
 
 	button.button_pressed = true
-	animation_style_changed.emit(style)
+	character.visual.anim_style = _get_animation_style(button)
 
 
-func _get_animation_button(style: CharacterVisual.AnimationStyle) -> Button:
-	match style:
-		CharacterVisual.AnimationStyle.FEMININE:
-			return _feminine_button
-		CharacterVisual.AnimationStyle.MASCULINE:
-			return _masculine_button
-
-	return null
+func _get_animation_style(button: Button) -> CharacterVisual.AnimationStyle:
+	match button:
+		_feminine_button:
+			return CharacterVisual.AnimationStyle.FEMININE
+		_masculine_button:
+			return CharacterVisual.AnimationStyle.MASCULINE
+		_:
+			push_error("%s is not an animation button" % button)
+			return CharacterVisual.AnimationStyle.FEMININE

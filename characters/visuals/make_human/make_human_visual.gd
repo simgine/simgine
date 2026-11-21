@@ -81,6 +81,10 @@ func _detach_item(item: LookItem) -> void:
 	_attachments.erase(item)
 
 
+func get_item_mesh(item: LookItem) -> MeshInstance3D:
+	return _attachments.get(item) as MeshInstance3D
+
+
 func get_item_dir() -> String:
 	return "res://characters/visuals/make_human/items/"
 

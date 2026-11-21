@@ -62,13 +62,31 @@ func _render_preview(item: LookItem) -> void:
 	# Wait for the attachment rebuild, which is deferred.
 	await get_tree().process_frame
 
-	if not _activate_camera(item.slot):
+	var slot := item.slot
+	var camera := _visual.get_node_or_null(slot.preview_camera) as Camera3D
+	if not camera:
+		Log.error("Preview camera '%s' of the '%s' slot is missing", slot.preview_camera, slot.name)
 		return
+
+	camera.current = true
+
+	# Render item separately if the requested camera has a non-default cull mask.
+	const DEFAULT_CULL_MASK := (1 << 20) - 1
+	var mesh := _visual.get_item_mesh(item)
+	var use_camera_layers := mesh and camera.cull_mask != DEFAULT_CULL_MASK
+	var original_layers: int
+	if use_camera_layers:
+		original_layers = mesh.layers
+		mesh.layers = camera.cull_mask
 
 	render_target_update_mode = SubViewport.UPDATE_ONCE
 	await get_tree().process_frame
 
 	var image := get_texture().get_image()
+
+	if use_camera_layers:
+		mesh.layers = original_layers
+
 	if not image:
 		Log.debug("Skipping the preview of '%s': no rendered image", item.name)
 		return
@@ -83,14 +101,3 @@ func _restore_base_look() -> void:
 		_visual.look.add(displaced_item)
 	_displaced.clear()
 	_layered_item = null
-
-
-func _activate_camera(slot: LookSlot) -> bool:
-	var camera_name := slot.preview_camera
-	var camera := _visual.get_node_or_null(camera_name) as Camera3D
-	if not camera:
-		Log.error("Preview camera '%s' of the '%s' slot is missing", camera_name, slot.name)
-		return false
-
-	camera.current = true
-	return true

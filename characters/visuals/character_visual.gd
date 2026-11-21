@@ -89,6 +89,11 @@ func _attach_item(item: LookItem) -> bool
 func _detach_item(item: LookItem) -> void
 
 
+## Returns the equipped item's mesh instance, or [code]null[/code] if it has none.
+@abstract
+func get_item_mesh(_item: LookItem) -> MeshInstance3D
+
+
 ## Returns a directory where to search for [LookItem] resources.
 @abstract
 func get_item_dir() -> String

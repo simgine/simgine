@@ -50,14 +50,7 @@ func _queue_preview(item: LookItem) -> void:
 func _render_preview(item: LookItem) -> void:
 	Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
-
-	# Record conflicting items to restore before the next item.
-	for look_item: LookItem in _visual.look.items:
-		if item.conflicts_with(look_item):
-			_displaced.append(look_item)
-
-	_visual.look.add(item)
-	_layered_item = item
+	_set_item(item)
 
 	# Wait for the attachment rebuild, which is deferred.
 	await get_tree().process_frame
@@ -101,3 +94,13 @@ func _restore_base_look() -> void:
 		_visual.look.add(displaced_item)
 	_displaced.clear()
 	_layered_item = null
+
+
+func _set_item(item: LookItem) -> void:
+	# Record conflicting items to restore before the next item.
+	for look_item: LookItem in _visual.look.items:
+		if item.conflicts_with(look_item):
+			_displaced.append(look_item)
+
+	_visual.look.add(item)
+	_layered_item = item

@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://dw8ck87dlpnu5"
+path="res://.godot/imported/male_casualsuit01.mhclo-7f5d8bf628b2f6a34411d6f4c71dc755.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_casualsuit01/male_casualsuit01.mhclo"
+dest_files=["res://.godot/imported/male_casualsuit01.mhclo-7f5d8bf628b2f6a34411d6f4c71dc755.res"]
+
+[params]
+

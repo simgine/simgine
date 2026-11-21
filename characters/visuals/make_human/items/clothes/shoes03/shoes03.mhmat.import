@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://qo4s2cdevd2u"
+path="res://.godot/imported/shoes03.mhmat-0c5dc52bdd1e599a1903f7a0e2764fce.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/shoes03/shoes03.mhmat"
+dest_files=["res://.godot/imported/shoes03.mhmat-0c5dc52bdd1e599a1903f7a0e2764fce.res"]
+
+[params]
+

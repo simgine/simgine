@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://dtoxf6hjs08o4"
+path="res://.godot/imported/male_worksuit01.obj-0ac85193d4e703e2e6911283421befae.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_worksuit01/male_worksuit01.obj"
+dest_files=["res://.godot/imported/male_worksuit01.obj-0ac85193d4e703e2e6911283421befae.res"]
+
+[params]
+

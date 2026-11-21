@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://cf7du8yj3jo07"
+path="res://.godot/imported/tongue01.mhclo-597c8378893bdf87800287c71c2a271e.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/tongue/tongue01/tongue01.mhclo"
+dest_files=["res://.godot/imported/tongue01.mhclo-597c8378893bdf87800287c71c2a271e.res"]
+
+[params]
+

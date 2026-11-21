@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://bg20n0oh68lsr"
+path="res://.godot/imported/female_casualsuit01.obj-a289af327d0d471a314a0326294db27c.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/female_casualsuit01/female_casualsuit01.obj"
+dest_files=["res://.godot/imported/female_casualsuit01.obj-a289af327d0d471a314a0326294db27c.res"]
+
+[params]
+

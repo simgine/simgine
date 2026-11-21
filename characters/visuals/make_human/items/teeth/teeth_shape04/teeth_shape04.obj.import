@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://v7j7txrc87el"
+path="res://.godot/imported/teeth_shape04.obj-f396dbbb8e059629a1ca5bc24a4092ff.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/teeth/teeth_shape04/teeth_shape04.obj"
+dest_files=["res://.godot/imported/teeth_shape04.obj-f396dbbb8e059629a1ca5bc24a4092ff.res"]
+
+[params]
+

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LookSlot" format=3 uid="uid://e6b7blsmnpe5"]
+
+[ext_resource type="Script" uid="uid://v4rpudpmubdt" path="res://characters/look_slots/look_slot.gd" id="1_slot"]
+
+[resource]
+script = ExtResource("1_slot")
+name = "Teeth"
+permanent = true
+preview_camera = "Mouth"
+conflicts = Array[ExtResource("1_slot")]([])
+metadata/_custom_type_script = "uid://v4rpudpmubdt"

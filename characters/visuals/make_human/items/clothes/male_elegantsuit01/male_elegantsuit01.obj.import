@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://d0d8ecgje5fgp"
+path="res://.godot/imported/male_elegantsuit01.obj-20bad9df7eab20ff30cb39566fb51e11.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_elegantsuit01/male_elegantsuit01.obj"
+dest_files=["res://.godot/imported/male_elegantsuit01.obj-20bad9df7eab20ff30cb39566fb51e11.res"]
+
+[params]
+

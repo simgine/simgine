@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://cmjs4x5p5gg03"
+path="res://.godot/imported/male_casualsuit02.mhmat-64643aa325414a203bb79d6c4f08d114.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_casualsuit02/male_casualsuit02.mhmat"
+dest_files=["res://.godot/imported/male_casualsuit02.mhmat-64643aa325414a203bb79d6c4f08d114.res"]
+
+[params]
+

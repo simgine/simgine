@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="LookItem" format=3 uid="uid://boclgrf64byp0"]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_item"]
+[ext_resource type="Resource" uid="uid://bw2x5pmx8j7e8" path="res://characters/look_slots/full_body.tres" id="2_slot"]
+
+[resource]
+script = ExtResource("1_item")
+name = "Female Casual Suit 02"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
+tags = PackedStringArray("female", "casual", "t-shirt", "shorts", "denim")
+slot = ExtResource("2_slot")
+asset_path = "res://characters/visuals/make_human/items/clothes/female_casualsuit02/female_casualsuit02.mhclo"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

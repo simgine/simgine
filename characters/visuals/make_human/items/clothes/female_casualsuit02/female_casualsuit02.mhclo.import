@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://bswdua1bsgr10"
+path="res://.godot/imported/female_casualsuit02.mhclo-a56523f40243d07f16d7d6fd34d215a8.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/female_casualsuit02/female_casualsuit02.mhclo"
+dest_files=["res://.godot/imported/female_casualsuit02.mhclo-a56523f40243d07f16d7d6fd34d215a8.res"]
+
+[params]
+

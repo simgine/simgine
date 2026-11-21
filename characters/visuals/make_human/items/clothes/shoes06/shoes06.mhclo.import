@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://b3p0kwusembqu"
+path="res://.godot/imported/shoes06.mhclo-a371aa0173dac7129bf6ebcd07ffc9b2.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/shoes06/shoes06.mhclo"
+dest_files=["res://.godot/imported/shoes06.mhclo-a371aa0173dac7129bf6ebcd07ffc9b2.res"]
+
+[params]
+

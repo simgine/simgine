@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://bhytwo6kbwf3a"
+path="res://.godot/imported/fedora_cocked.obj-e7fa7b925f18c1efc52ba0cfa5b09388.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/fedora_cocked/fedora_cocked.obj"
+dest_files=["res://.godot/imported/fedora_cocked.obj-e7fa7b925f18c1efc52ba0cfa5b09388.res"]
+
+[params]
+

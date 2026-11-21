@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://dqh4utgsudwxk"
+path="res://.godot/imported/teeth_shape03.mhclo-a2b42e093b0ba09fbbfafe582c94e056.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/teeth/teeth_shape03/teeth_shape03.mhclo"
+dest_files=["res://.godot/imported/teeth_shape03.mhclo-a2b42e093b0ba09fbbfafe582c94e056.res"]
+
+[params]
+

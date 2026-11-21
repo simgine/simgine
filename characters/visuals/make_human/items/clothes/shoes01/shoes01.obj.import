@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://dwepd88ry6gqi"
+path="res://.godot/imported/shoes01.obj-2aafc6de1ab58490dc15177a5cce729a.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/shoes01/shoes01.obj"
+dest_files=["res://.godot/imported/shoes01.obj-2aafc6de1ab58490dc15177a5cce729a.res"]
+
+[params]
+

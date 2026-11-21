@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="LookItem" format=3 uid="uid://djwfulsrc5110"]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_item"]
+[ext_resource type="Resource" uid="uid://du1yeyj0ncall" path="res://characters/look_slots/shoes.tres" id="2_slot"]
+
+[resource]
+script = ExtResource("1_item")
+name = "Shoes 04"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
+tags = PackedStringArray("shoes", "formal", "lace-up", "leather", "socks")
+slot = ExtResource("2_slot")
+asset_path = "res://characters/visuals/make_human/items/clothes/shoes04/shoes04.mhclo"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

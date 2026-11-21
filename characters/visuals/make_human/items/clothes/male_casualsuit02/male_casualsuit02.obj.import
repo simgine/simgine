@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://dxy7o1vd58e71"
+path="res://.godot/imported/male_casualsuit02.obj-12272f4d7b36d943b814a6f7ab2c68ec.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_casualsuit02/male_casualsuit02.obj"
+dest_files=["res://.godot/imported/male_casualsuit02.obj-12272f4d7b36d943b814a6f7ab2c68ec.res"]
+
+[params]
+

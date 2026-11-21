@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.obj_importer"
+type="Resource"
+uid="uid://c88o03esjdnjl"
+path="res://.godot/imported/fedora.obj-0115f32783afb8fc9a574ba01bc635c5.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/fedora01/fedora.obj"
+dest_files=["res://.godot/imported/fedora.obj-0115f32783afb8fc9a574ba01bc635c5.res"]
+
+[params]
+

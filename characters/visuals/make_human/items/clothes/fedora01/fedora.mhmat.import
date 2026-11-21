@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://no7w88bw6aoo"
+path="res://.godot/imported/fedora.mhmat-23c59deabc36ce7fc50e4e405b092478.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/fedora01/fedora.mhmat"
+dest_files=["res://.godot/imported/fedora.mhmat-23c59deabc36ce7fc50e4e405b092478.res"]
+
+[params]
+

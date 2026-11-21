@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="LookItem" format=3 uid="uid://dklujilj7bghb"]
+
+[ext_resource type="Script" uid="uid://bc4jama1ho3n0" path="res://characters/look_item.gd" id="1_item"]
+[ext_resource type="Resource" uid="uid://e6b7blsmnpe5" path="res://characters/look_slots/teeth.tres" id="2_slot"]
+
+[resource]
+script = ExtResource("1_item")
+name = "Teeth Shape 03"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
+slot = ExtResource("2_slot")
+asset_path = "res://characters/visuals/make_human/items/teeth/teeth_shape03/teeth_shape03.mhclo"
+metadata/_custom_type_script = "uid://bc4jama1ho3n0"

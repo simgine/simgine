@@ -38,3 +38,9 @@ fov = 40.0
 [node name="FullBody" type="Camera3D" parent="." index="5" unique_id=16932003]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.66, 2.1)
 fov = 40.0
+
+[node name="Mouth" type="Camera3D" parent="." index="6" unique_id=1615707870]
+transform = Transform3D(0.9639931, -0.11220183, 0.24109963, 0, 0.906631, 0.42192423, -0.26592913, -0.40673164, 0.873986, 0.07765, 1.63, 0.3255)
+cull_mask = 2
+projection = 1
+size = 0.115

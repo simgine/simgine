@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://diw6kpjlcj4ob"
+path="res://.godot/imported/male_worksuit01.mhmat-ddf3a3bb0cb404370410abea6ff88d37.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_worksuit01/male_worksuit01.mhmat"
+dest_files=["res://.godot/imported/male_worksuit01.mhmat-ddf3a3bb0cb404370410abea6ff88d37.res"]
+
+[params]
+

@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://ccxwn11hg5dda"
+path="res://.godot/imported/female_casualsuit02.mhmat-ac933a79a9faf8bfd6d0c502146c7143.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/female_casualsuit02/female_casualsuit02.mhmat"
+dest_files=["res://.godot/imported/female_casualsuit02.mhmat-ac933a79a9faf8bfd6d0c502146c7143.res"]
+
+[params]
+

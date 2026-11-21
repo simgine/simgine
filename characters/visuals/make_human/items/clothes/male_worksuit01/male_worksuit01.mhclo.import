@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.proxy_importer"
+type="Resource"
+uid="uid://ceisct5k5eksu"
+path="res://.godot/imported/male_worksuit01.mhclo-430b57f132cf71b22d01e2a81bf3a086.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/clothes/male_worksuit01/male_worksuit01.mhclo"
+dest_files=["res://.godot/imported/male_worksuit01.mhclo-430b57f132cf71b22d01e2a81bf3a086.res"]
+
+[params]
+

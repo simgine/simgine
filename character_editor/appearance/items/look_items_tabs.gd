@@ -6,7 +6,7 @@ signal item_selected(item: LookItem)
 signal item_deselected(item: LookItem)
 signal preview_requested(item: LookItem)
 
-## Whether to show items with permanent slots, or items with the rest.
+## Whether to display tabs for permanent or non-permanent items.
 @export var permanent: bool
 
 

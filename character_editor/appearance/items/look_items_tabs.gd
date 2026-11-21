@@ -45,6 +45,16 @@ func _create_item_list(slot: LookSlot) -> LookItemList:
 	return list
 
 
+func load_state(visual: CharacterVisual) -> void:
+	for slot in _lists:
+		var list := _lists[slot]
+		list.deselect_all()
+
+		var item := visual.look.get_item(slot)
+		if item:
+			list.select_item(item)
+
+
 func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
 	var list: LookItemList = _lists.get(item.slot)
 	if list:
@@ -63,13 +73,3 @@ func deselect_item(item: LookItem) -> void:
 	var list: LookItemList = _lists.get(item.slot)
 	if list:
 		list.deselect_item(item)
-
-
-func load_state(visual: CharacterVisual) -> void:
-	for slot in _lists:
-		var list := _lists[slot]
-		list.deselect_all()
-
-		var item := visual.look.get_item(slot)
-		if item:
-			list.select_item(item)

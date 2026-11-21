@@ -84,7 +84,7 @@ func _check_visible_previews() -> void:
 	if not is_visible_in_tree() or _previewed.size() == _items.size():
 		return
 
-	var item_range := get_visible_item_range()
+	var item_range := _get_visible_item_range()
 	for index in range(item_range[0], item_range[1]):
 		var item := _items[index]
 		if not _previewed.has(item):
@@ -93,7 +93,7 @@ func _check_visible_previews() -> void:
 
 
 ## Returns the visible items as a `[first, end)` index range.
-func get_visible_item_range() -> Vector2i:
+func _get_visible_item_range() -> Vector2i:
 	var items_count := _items.size()
 	if items_count == 0:
 		return Vector2i(0, 0)

@@ -16,26 +16,38 @@ var _layered_item: LookItem
 var _displaced: Array[LookItem]
 
 
-func setup(scene_path: String) -> void:
-	_visual = _load_visual(scene_path)
+func load_scene(scene_path: String) -> void:
+	var scene := ResourceLoader.load(scene_path) as PackedScene
+	if not scene:
+		Log.error("Unable to load the preview scene '%s'", scene_path)
+		return
+
+	var node := scene.instantiate()
+	var visual := node as CharacterVisual
+	if not visual:
+		Log.error("The preview scene '%s' root is not a CharacterVisual", scene_path)
+		node.free()
+		return
+
+	add_child(visual)
+	_visual = visual
 
 
-func request_preview(item: LookItem) -> void:
+func _queue_preview(item: LookItem) -> void:
 	assert(not _queue.has(item))
 	_queue.append(item)
-	if not _rendering:
-		_rendering = true
-		_render_pending()
 
+	if _rendering:
+		return
 
-func _render_pending() -> void:
+	_rendering = true
 	while not _queue.is_empty():
-		await _render_next(_queue.pop_front())
+		await _render_preview(_queue.pop_front())
 
 	_rendering = false
 
 
-func _render_next(item: LookItem) -> void:
+func _render_preview(item: LookItem) -> void:
 	Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
 
@@ -82,20 +94,3 @@ func _activate_camera(slot: LookSlot) -> bool:
 
 	camera.current = true
 	return true
-
-
-func _load_visual(scene_path: String) -> CharacterVisual:
-	var scene := ResourceLoader.load(scene_path) as PackedScene
-	if not scene:
-		Log.error("Unable to load the preview scene '%s'", scene_path)
-		return null
-
-	var node := scene.instantiate()
-	var visual := node as CharacterVisual
-	if not visual:
-		Log.error("The preview scene '%s' root is not a CharacterVisual", scene_path)
-		node.free()
-		return null
-
-	add_child(visual)
-	return visual

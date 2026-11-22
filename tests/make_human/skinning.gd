@@ -2,7 +2,7 @@ extends TestSuite
 ## Vertex bone influences.
 
 # Configured with the game-engine rig and its bone weights.
-const BODY: String = "res://characters/visuals/make_human/body.tres"
+const BODY := preload("res://characters/visuals/make_human/body.tres")
 
 
 func test_mesh_weights() -> void:
@@ -29,20 +29,18 @@ func test_mesh_weights() -> void:
 
 
 func test_body_weights() -> void:
-	var body := load(BODY) as MHBody
-
 	# Recorded rigid head vertex and neck seam with the configured game-engine rig.
 	_assert_influences(
-		body.skinning,
-		body.geometry,
+		BODY.skinning,
+		BODY.geometry,
 		4848,
 		[22, 0, 0, 0, 0, 0, 0, 0],
 		[1, 0, 0, 0, 0, 0, 0, 0],
 	)
 	# neck_01 precedes head in rig order, despite having the smaller weight.
 	_assert_influences(
-		body.skinning,
-		body.geometry,
+		BODY.skinning,
+		BODY.geometry,
 		745,
 		[21, 22, 0, 0, 0, 0, 0, 0],
 		[0.349899947643, 0.650099992752, 0, 0, 0, 0, 0, 0],
@@ -50,12 +48,11 @@ func test_body_weights() -> void:
 
 
 func test_proxy_weights() -> void:
-	var body := load(BODY) as MHBody
 	# Contains three-reference blends and UV seams.
 	var proxy := load(
 		"res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
 	) as MHProxy
-	var skinning := body.get_proxy_skinning(proxy)
+	var skinning := BODY.get_proxy_skinning(proxy)
 
 	# Recorded on the sportsuit with the configured game-engine rig.
 	# Upper torso: spine_03, spine_02, upperarm_l, spine_01.
@@ -79,10 +76,9 @@ func test_proxy_weights() -> void:
 
 
 func test_direct_mapping() -> void:
-	var body := load(BODY) as MHBody
 	# Includes direct vertex mappings alongside its three-reference fits.
 	var proxy := load("res://characters/visuals/make_human/items/hair/afro01/afro01.mhclo") as MHProxy
-	var skinning := body.get_proxy_skinning(proxy)
+	var skinning := BODY.get_proxy_skinning(proxy)
 
 	# Afro vertex 887 maps only to body vertex 12015: head and neck_01.
 	# The other two references have zero fitting factors.
@@ -96,12 +92,11 @@ func test_direct_mapping() -> void:
 
 
 func test_influence_filtering() -> void:
-	var body := load(BODY) as MHBody
 	# Has negative fitting factors that yield negative bone contributions.
 	var proxy := load(
 		"res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
 	) as MHProxy
-	var skinning := body.get_proxy_skinning(proxy)
+	var skinning := BODY.get_proxy_skinning(proxy)
 
 	# spine_01 contributes about -0.00207: rejected despite its magnitude exceeding 0.001.
 	# spine_03 and spine_02 are renormalized.
@@ -115,21 +110,19 @@ func test_influence_filtering() -> void:
 
 
 func test_missing_bone_weights() -> void:
-	var body := load(BODY) as MHBody
-
 	# The bundled weights include every bone, but MPFB2 allows missing entries.
 	# Omit the empty Root entry from a copy to test that case.
 	var rig_weights := MHRigWeights.new()
-	rig_weights.bones = body.rig_weights.bones.duplicate()
+	rig_weights.bones = BODY.rig_weights.bones.duplicate()
 	rig_weights.bones.erase("Root")
 
 	var skinning := MHSkinning.new()
-	skinning.build_from_rig(body.geometry, body.rig, rig_weights)
+	skinning.build_from_rig(BODY.geometry, BODY.rig, rig_weights)
 
-	assert_eq(skinning.bones, body.skinning.bones, "missing weights must not shift bone indices")
-	assert_eq(skinning.weights, body.skinning.weights)
-	assert_eq(skinning.render_bones, body.skinning.render_bones)
-	assert_eq(skinning.render_weights, body.skinning.render_weights)
+	assert_eq(skinning.bones, BODY.skinning.bones, "missing weights must not shift bone indices")
+	assert_eq(skinning.weights, BODY.skinning.weights)
+	assert_eq(skinning.render_bones, BODY.skinning.render_bones)
+	assert_eq(skinning.render_weights, BODY.skinning.render_weights)
 
 
 func test_influence_pruning() -> void:
@@ -171,7 +164,7 @@ func _create_instance() -> MHBodyInstance:
 	add_child(skeleton)
 
 	var instance := MHBodyInstance.new()
-	instance.body = load("res://characters/visuals/make_human/body.tres") as MHBody
+	instance.body = BODY
 	skeleton.add_child(instance)
 	instance.skeleton_node = skeleton
 

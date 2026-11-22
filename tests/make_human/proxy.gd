@@ -1,8 +1,12 @@
 extends TestSuite
 ## Proxy instance integration.
 
-const ELEGANT_SUIT: String = "res://characters/visuals/make_human/items/clothes/female_elegantsuit01/female_elegantsuit01.mhclo"
-const SPORTS_SUIT: String = "res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
+const ELEGANT_SUIT := preload(
+	"res://characters/visuals/make_human/items/clothes/female_elegantsuit01/female_elegantsuit01.mhclo"
+)
+const SPORTS_SUIT := preload(
+	"res://characters/visuals/make_human/items/clothes/female_sportsuit01/female_sportsuit01.mhclo"
+)
 
 
 func test_clothing_lifecycle() -> void:
@@ -14,7 +18,7 @@ func test_clothing_lifecycle() -> void:
 	assert_eq(instance.mesh.surface_get_array_index_len(0), BODY_TRIANGLES * 3)
 
 	var clothing := MHProxyInstance.new()
-	clothing.proxy = load(ELEGANT_SUIT) as MHProxy
+	clothing.proxy = ELEGANT_SUIT
 	instance.add_child(clothing)
 
 	await get_tree().process_frame
@@ -89,15 +93,14 @@ func test_proxy_replacement() -> void:
 	await get_tree().process_frame
 
 	var clothing := MHProxyInstance.new()
-	clothing.proxy = load(ELEGANT_SUIT) as MHProxy
+	clothing.proxy = ELEGANT_SUIT
 	instance.add_child(clothing)
 
 	await get_tree().process_frame
 
 	assert_eq(instance.mesh.surface_get_array_index_len(0), 21746 * 3)
 
-	var sportsuit := load(SPORTS_SUIT) as MHProxy
-	clothing.proxy = sportsuit
+	clothing.proxy = SPORTS_SUIT
 
 	await get_tree().process_frame
 
@@ -106,11 +109,11 @@ func test_proxy_replacement() -> void:
 		22892 * 3,
 		"replacement should discard the previous clothing's delete mask",
 	)
-	assert_eq(clothing.mesh.surface_get_material(0), sportsuit.material)
+	assert_eq(clothing.mesh.surface_get_material(0), SPORTS_SUIT.material)
 	assert(instance.skin)
 	assert_eq(clothing.skin, instance.skin)
 	assert_eq(clothing.get_node(clothing.skeleton), instance.skeleton_node)
-	_assert_skinning(clothing, instance.body.get_proxy_skinning(sportsuit))
+	_assert_skinning(clothing, instance.body.get_proxy_skinning(SPORTS_SUIT))
 
 	# Recorded sportsuit torso (0), shoulder (44), and lower hem (1633),
 	# in meters after fitting and grounding.
@@ -131,11 +134,11 @@ func test_combined_masks() -> void:
 
 	# The suits overlap, but each also hides body regions the other leaves visible.
 	var elegant_suit := MHProxyInstance.new()
-	elegant_suit.proxy = load(ELEGANT_SUIT) as MHProxy
+	elegant_suit.proxy = ELEGANT_SUIT
 	instance.add_child(elegant_suit)
 
 	var sportsuit := MHProxyInstance.new()
-	sportsuit.proxy = load(SPORTS_SUIT) as MHProxy
+	sportsuit.proxy = SPORTS_SUIT
 	instance.add_child(sportsuit)
 
 	await get_tree().process_frame

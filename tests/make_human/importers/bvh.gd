@@ -1,7 +1,7 @@
 extends TestSuite
 
 const STANDING_POSE := "res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh"
-const RIG := "res://characters/visuals/make_human/data/rigs/rig.default.json"
+const RIG := preload("res://characters/visuals/make_human/data/rigs/rig.default.json")
 
 
 func requires_editor() -> bool:
@@ -17,14 +17,14 @@ func test_pose() -> void:
 	var error := importer._import(
 		STANDING_POSE,
 		"",
-		{ "rig": RIG, "bone_map": "", "reference_pose": "" },
+		{ "rig": RIG.resource_path, "bone_map": "", "reference_pose": "" },
 		[],
 		[],
 	)
 	assert_eq(error, OK)
 
 	var pose := saver.resource as MHNativePose
-	assert_eq(pose.rig, load(RIG))
+	assert_eq(pose.rig, RIG)
 	assert_eq(pose.rotations.size(), 163)
 	assert_approx_eq(
 		Basis(pose.rotations["wrist.L"]),
@@ -43,7 +43,7 @@ func test_retargeted_pose() -> void:
 		STANDING_POSE,
 		"",
 		{
-			"rig": RIG,
+			"rig": RIG.resource_path,
 			"bone_map": "res://characters/visuals/make_human/data/rigs/default_bone_map.tres",
 			"reference_pose": "res://characters/visuals/make_human/data/poses/default_fk/t-pose.json",
 		},

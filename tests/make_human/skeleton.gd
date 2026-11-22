@@ -1,7 +1,9 @@
 extends TestSuite
 ## Bone transforms, poses, and lifecycle.
 
-const STANDING_POSE: String = "res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh"
+const STANDING_POSE := preload(
+	"res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh"
+)
 
 # Recorded from STANDING_POSE on body.tres at default modifiers, in skeleton space (meters).
 # Hips captures root displacement. Hand and foot sample upper/lower-body chains.
@@ -191,7 +193,7 @@ func test_save_restore() -> void:
 	var instance := _create_instance()
 	var skeleton := instance.skeleton_node
 	instance.owner = skeleton
-	skeleton.pose = load(STANDING_POSE) as MHPose
+	skeleton.pose = STANDING_POSE
 	assert(skeleton.pose)
 
 	await get_tree().process_frame
@@ -227,11 +229,10 @@ func test_pose_reapplication() -> void:
 
 	await get_tree().process_frame
 
-	var standing := load(STANDING_POSE) as MHPose
-	instance.skeleton_node.pose = standing
+	instance.skeleton_node.pose = STANDING_POSE
 	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
 
-	instance.skeleton_node.pose = standing
+	instance.skeleton_node.pose = STANDING_POSE
 	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
 
 
@@ -240,7 +241,7 @@ func test_pose_replacement() -> void:
 
 	await get_tree().process_frame
 
-	instance.skeleton_node.pose = load(STANDING_POSE) as MHPose
+	instance.skeleton_node.pose = STANDING_POSE
 	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
 
 	# The bundled game-engine T-pose is native, so use its production map and reference.
@@ -261,7 +262,7 @@ func test_pose_clearing() -> void:
 		assert(bone_index >= 0, "missing bone %s" % bone_name)
 		initial[bone_name] = instance.skeleton_node.get_bone_global_pose(bone_index)
 
-	instance.skeleton_node.pose = load(STANDING_POSE) as MHPose
+	instance.skeleton_node.pose = STANDING_POSE
 	_assert_global_transforms(instance.skeleton_node, STANDING_TRANSFORMS)
 
 	instance.skeleton_node.pose = null

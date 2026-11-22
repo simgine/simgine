@@ -6,7 +6,7 @@ extends Resource
 signal item_added(item: LookItem)
 signal item_removed(item: LookItem)
 
-## Active items with an optional selected swatch.
+## Attached items with an optional selected swatch.
 ##
 ## A null value uses the item's default appearance.
 ## Entries should be mutated only through methods or via editor inspector.
@@ -34,9 +34,7 @@ func add(new_item: LookItem) -> void:
 	item_added.emit(new_item)
 
 
-## Removes the item.
-##
-## Returns whether it was equipped.
+## Removes the item if present.
 func remove(item: LookItem) -> void:
 	if not items.erase(item):
 		return
@@ -45,12 +43,12 @@ func remove(item: LookItem) -> void:
 	item_removed.emit(item)
 
 
-## Changes an equipped item's swatch without unequipping it.
+## Changes an attached item's swatch without detaching it.
 ##
 ## Null swatch restores the default appearance.
 func set_swatch(item: LookItem, swatch: LookSwatch) -> void:
 	if not items.has(item):
-		Log.warn("Unable set %s for non-equipped %s", swatch, item)
+		Log.warn("Unable to set %s because %s is not attached", swatch, item)
 		return
 
 	if items[item] == swatch:
@@ -63,12 +61,12 @@ func set_swatch(item: LookItem, swatch: LookSwatch) -> void:
 	items[item] = swatch
 
 
-## Returns the selected swatch, or null if the item is unequipped or uses its default appearance.
+## Returns the selected swatch, or null if the item is not attached or uses its default appearance.
 func get_swatch(item: LookItem) -> LookSwatch:
 	return items.get(item)
 
 
-## Returns the equipped item of the given slot.
+## Returns the attached item in the given slot.
 ##
 ## Returns `null` if the slot is empty.
 func get_item(slot: LookSlot) -> LookItem:

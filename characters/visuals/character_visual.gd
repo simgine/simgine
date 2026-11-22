@@ -15,7 +15,7 @@ signal look_changed
 ## Emitted when the body modifiers change.
 signal body_changed
 
-## Currently equipped items.
+## Currently attached items.
 @export var look: CharacterLook = CharacterLook.new():
 	set = _set_look
 
@@ -86,7 +86,7 @@ func _attach_item(item: LookItem) -> bool
 func _detach_item(item: LookItem) -> void
 
 
-## Returns the equipped item's mesh instance, or [code]null[/code] if it has none.
+## Returns the attached item's mesh instance, or [code]null[/code] if it has none.
 @abstract
 func get_item_mesh(_item: LookItem) -> MeshInstance3D
 

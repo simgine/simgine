@@ -33,11 +33,11 @@ func test_swatch_changes() -> void:
 
 	look.item_added.connect(
 		func(_item: LookItem) -> void:
-			panic("The item was equipped again"),
+			panic("The item was attached again"),
 	)
 	look.item_removed.connect(
 		func(_item: LookItem) -> void:
-			panic("The item was unequipped"),
+			panic("The item was detached"),
 	)
 
 	look.set_swatch(PONYTAIL, PONYTAIL_BLACK)

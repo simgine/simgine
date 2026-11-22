@@ -29,10 +29,7 @@ static func load_from(dir: String) -> Array[Pose]:
 
 
 static func _load_recursively(dir_path: String, poses: Array[Pose]) -> void:
-	var entries := ResourceLoader.list_directory(dir_path)
-	entries.sort()
-
-	for entry in entries:
+	for entry in ResourceLoader.list_directory(dir_path):
 		var path := dir_path.path_join(entry)
 
 		if entry.ends_with("/"):

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://do3h88ro00gjt"
-path="res://.godot/imported/ice_eye.png-542dcf2530ee771f597abb0dc186b583.ctex"
+uid="uid://tcmdcaxmcp8a"
+path="res://.godot/imported/blue_eye.png-6aed2513da1494e1ac2de416606fb6b8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://characters/visuals/make_human/items/eyes/high_poly_eye/materials/ice_eye.png"
-dest_files=["res://.godot/imported/ice_eye.png-542dcf2530ee771f597abb0dc186b583.ctex"]
+source_file="res://characters/visuals/make_human/items/eyes/high_poly_eye/swatches/blue/blue_eye.png"
+dest_files=["res://.godot/imported/blue_eye.png-6aed2513da1494e1ac2de416606fb6b8.ctex"]
 
 [params]
 

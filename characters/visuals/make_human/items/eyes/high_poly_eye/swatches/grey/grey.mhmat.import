@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://bvcaa6adub1cm"
+path="res://.godot/imported/grey.mhmat-2bb481b7df4c56ab3952ff20d25aaa4e.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/eyes/high_poly_eye/swatches/grey/grey.mhmat"
+dest_files=["res://.godot/imported/grey.mhmat-2bb481b7df4c56ab3952ff20d25aaa4e.res"]
+
+[params]
+

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LookSwatch" format=3 uid="uid://vbncvfvghirh"]
+
+[ext_resource type="Script" uid="uid://t652tsj6eqg8" path="res://characters/look_swatch.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Light brown"
+license = "CC0"
+author = "Data Collection AB, Joel Palmius, Jonas Hauquier"
+asset_path = "res://characters/visuals/make_human/items/eyes/high_poly_eye/swatches/brownlight/brownlight.mhmat"

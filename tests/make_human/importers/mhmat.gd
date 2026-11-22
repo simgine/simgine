@@ -52,7 +52,7 @@ func test_transparency() -> void:
 	ResourceSaver.add_resource_format_saver(saver, true)
 
 	var error := importer._import(
-		"res://characters/visuals/make_human/items/eyes/high_poly_eye/materials/brown.mhmat",
+		"res://characters/visuals/make_human/items/eyes/high_poly_eye/brown.mhmat",
 		"",
 		{ },
 		[],

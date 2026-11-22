@@ -44,7 +44,7 @@ func conflicts_with(other: LookItem) -> bool:
 ##
 ## The result is sorted by slot, then item name.
 static func load_from(dir: String) -> Array[LookItem]:
-	var items: Array[LookItem] = []
+	var items: Array[LookItem]
 	_load_recursively(dir, items)
 	items.sort_custom(_sort_by_slot_and_name)
 	return items

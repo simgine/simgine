@@ -28,6 +28,8 @@ const TEST_PREFIX: String = "test_"
 ## Regular and packed arrays are compared recursively element-wise,
 ## ignoring their storage types, and must have equal sizes.
 ##
+## Start [param msg] with a lowercase letter because it follows a colon.
+##
 ## Calls [method panic] if the arguments are not equal, printing their
 ## values and the optional [param msg].
 static func assert_eq(left: Variant, right: Variant, msg: String = "") -> void:

@@ -7,6 +7,9 @@ extends Resource
 ## Holds only metadata and a path to the visual asset, so actual assets are
 ## loaded on instantiation.
 
+## Directory with where to search for swatches.
+const _SWATCHES_DIR := "swatches"
+
 ## Display name.
 @export var name: String
 
@@ -31,6 +34,15 @@ extends Resource
 ## Supported resource types depend on the [CharacterVisual] implementation.
 @export_file var asset_path: String
 
+## Alternative asset variants.
+##
+## Loaded lazily on first access in from [constant _SWATCHES_DIR] relative
+## to this resource path.
+var swatches: Array[LookSwatch]:
+	get = _get_swatches
+
+var _swatches_loaded: bool
+
 
 ## Returns whether the items occupy conflicting slots.
 func conflicts_with(other: LookItem) -> bool:
@@ -42,6 +54,7 @@ func conflicts_with(other: LookItem) -> bool:
 
 ## Loads all items in the given directory recursively.
 ##
+## [constant _SWATCHES_DIR] will be ignored.
 ## The result is sorted by slot, then item name.
 static func load_from(dir: String) -> Array[LookItem]:
 	var items: Array[LookItem]
@@ -50,12 +63,25 @@ static func load_from(dir: String) -> Array[LookItem]:
 	return items
 
 
+func _get_swatches() -> Array[LookSwatch]:
+	if _swatches_loaded:
+		return swatches
+
+	_swatches_loaded = true
+	if resource_path and not is_built_in():
+		var dir := resource_path.get_base_dir().path_join(_SWATCHES_DIR)
+		swatches = LookSwatch.load_from(dir)
+
+	return swatches
+
+
 static func _load_recursively(dir_path: String, items: Array[LookItem]) -> void:
 	for entry in ResourceLoader.list_directory(dir_path):
 		var path := dir_path.path_join(entry)
 
 		if entry.ends_with("/"):
-			_load_recursively(path, items)
+			if entry != _SWATCHES_DIR + "/":
+				_load_recursively(path, items)
 			continue
 
 		if entry.get_extension() not in ["tres", "res"]:

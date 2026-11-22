@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LookSwatch" format=3 uid="uid://i6tdwye25gxm"]
+
+[ext_resource type="Script" uid="uid://t652tsj6eqg8" path="res://characters/look_swatch.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Gray"
+license = "CC0 (pack manifest); AGPLv3 (material header)"
+author = "bogdan666"
+asset_path = "res://characters/visuals/make_human/items/hair/short02/swatches/bogdan666_short_02_gray/bogdan666_short_02_gray.mhmat"

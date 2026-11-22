@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://dr1budvqcokoh"
+path="res://.godot/imported/toigo_short_04_gray.mhmat-3c2c292e4dbf13659f9f0ad85f8df8cd.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/short04/swatches/toigo_short_04_gray/toigo_short_04_gray.mhmat"
+dest_files=["res://.godot/imported/toigo_short_04_gray.mhmat-3c2c292e4dbf13659f9f0ad85f8df8cd.res"]
+
+[params]
+

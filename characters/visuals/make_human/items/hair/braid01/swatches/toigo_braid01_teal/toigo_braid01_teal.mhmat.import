@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://bicb2pf077n0o"
+path="res://.godot/imported/toigo_braid01_teal.mhmat-4b74027c41732c774960e799f9d5c80d.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/braid01/swatches/toigo_braid01_teal/toigo_braid01_teal.mhmat"
+dest_files=["res://.godot/imported/toigo_braid01_teal.mhmat-4b74027c41732c774960e799f9d5c80d.res"]
+
+[params]
+

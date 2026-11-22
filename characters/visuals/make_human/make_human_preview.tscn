@@ -8,10 +8,16 @@
 [ext_resource type="Resource" uid="uid://rgx1ew4aa2ov" path="res://characters/visuals/make_human/items/eyebrows/eyebrow001/eyebrow001.tres" id="6_xeu00"]
 [ext_resource type="Script" uid="uid://cw78o1pbhhjm7" path="res://characters/character_look.gd" id="7_look"]
 [ext_resource type="Resource" uid="uid://b4c2lnu65dm3s" path="res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/callharvey3d_standingnatural.bvh" id="8_fakd8"]
+[ext_resource type="Script" path="res://characters/look_swatch.gd" id="9_swatch"]
 
 [sub_resource type="Resource" id="Resource_k538c"]
 script = ExtResource("7_look")
-items = Array[ExtResource("2_ien3r")]([ExtResource("3_f4d7u"), ExtResource("4_fakd8"), ExtResource("5_l3p8a"), ExtResource("6_xeu00")])
+items = Dictionary[ExtResource("2_ien3r"), ExtResource("9_swatch")]({
+ExtResource("3_f4d7u"): null,
+ExtResource("4_fakd8"): null,
+ExtResource("5_l3p8a"): null,
+ExtResource("6_xeu00"): null
+})
 
 [node name="MakeHumanPreview" unique_id=344067901 instance=ExtResource("1_visual")]
 look = SubResource("Resource_k538c")

@@ -1,0 +1,39 @@
+name short02_green
+
+diffuseColor 0.1 0.1 0.1
+specularColor 0.5 0.5 0.5
+shininess 0.6
+emissiveColor 0.3 0.3 0.3
+opacity 0.1
+translucency 0.0
+
+shadeless False
+wireframe False
+transparent True
+alphaToCoverage True
+backfaceCull False
+depthless False
+
+castShadows True
+
+receiveShadows True
+
+diffuseTexture short02_green.png
+
+sssEnabled True
+sssRScale 5.0
+sssGScale 2.5
+sssBScale 1.0
+
+shader shaders/glsl/litsphere
+
+shaderParam litsphereTexture litspheres/lit_refl_sharp_aniso_hard_blonde.png
+
+shaderConfig ambientOcclusion True
+shaderConfig normal False
+shaderConfig bump True
+shaderConfig displacement False
+shaderConfig vertexColors True
+shaderConfig spec True
+shaderConfig transparency True
+shaderConfig diffuse True

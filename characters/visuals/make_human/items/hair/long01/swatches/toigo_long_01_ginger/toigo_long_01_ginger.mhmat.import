@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://cb85i3nu0b2p"
+path="res://.godot/imported/toigo_long_01_ginger.mhmat-6c1e432b1faab659d14fc58c1be7f4e2.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/long01/swatches/toigo_long_01_ginger/toigo_long_01_ginger.mhmat"
+dest_files=["res://.godot/imported/toigo_long_01_ginger.mhmat-6c1e432b1faab659d14fc58c1be7f4e2.res"]
+
+[params]
+

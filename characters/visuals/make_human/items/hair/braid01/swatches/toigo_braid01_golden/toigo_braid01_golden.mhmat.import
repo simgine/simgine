@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://btyd0bp3xng5d"
+path="res://.godot/imported/toigo_braid01_golden.mhmat-0c5e654d08e889f994423750387a76d4.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/braid01/swatches/toigo_braid01_golden/toigo_braid01_golden.mhmat"
+dest_files=["res://.godot/imported/toigo_braid01_golden.mhmat-0c5e654d08e889f994423750387a76d4.res"]
+
+[params]
+

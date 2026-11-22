@@ -35,9 +35,6 @@ func _set_look(new_look: CharacterLook) -> void:
 	if look == new_look:
 		return
 
-	# The look from the inspector may come with invalid or conflicting items.
-	new_look.remove_invalid()
-
 	var changed := false
 	if is_node_ready():
 		Log.trace("Removing old look")

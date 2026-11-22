@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LookSwatch" format=3 uid="uid://bnxqbjeqcq6ij"]
+
+[ext_resource type="Script" uid="uid://t652tsj6eqg8" path="res://characters/look_swatch.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Deep red"
+license = "CC0 (pack manifest); AGPLv3 (material header)"
+author = "MTKnife"
+asset_path = "res://characters/visuals/make_human/items/hair/ponytail01/swatches/mtknife_ponytail01_deep_red/mtknife_ponytail01_deep_red.mhmat"

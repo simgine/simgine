@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://k7ms3iwttxbp"
+path="res://.godot/imported/toigo_long_01_gray.mhmat-78e1b62f07c4c59fa52ce5b5d06c4fde.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/long01/swatches/toigo_long_01_gray/toigo_long_01_gray.mhmat"
+dest_files=["res://.godot/imported/toigo_long_01_gray.mhmat-78e1b62f07c4c59fa52ce5b5d06c4fde.res"]
+
+[params]
+

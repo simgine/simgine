@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://c1gc0n37t0m6x"
+path="res://.godot/imported/toigo_short_04_blue.mhmat-9844e96e26ab5b6a5dc2ff37a36b800b.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/short04/swatches/toigo_short_04_blue/toigo_short_04_blue.mhmat"
+dest_files=["res://.godot/imported/toigo_short_04_blue.mhmat-9844e96e26ab5b6a5dc2ff37a36b800b.res"]
+
+[params]
+

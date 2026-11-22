@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LookSwatch" format=3 uid="uid://cy01kvqbbbngn"]
+
+[ext_resource type="Script" uid="uid://t652tsj6eqg8" path="res://characters/look_swatch.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Blond"
+license = "CC0"
+author = "Joel Palmius"
+asset_path = "res://characters/visuals/make_human/items/hair/long01/swatches/joepal_long_01_blond/joepal_long_01_blond.mhmat"

@@ -50,3 +50,7 @@ static func _load_recursively(dir: String, swatches: Array[LookSwatch]) -> void:
 			Log.warn("Loaded resource '%s' is not a LookSwatch, skipping", path)
 		else:
 			swatches.append(swatch)
+
+
+func _to_string() -> String:
+	return "LookSwatch('%s', '%s')" % [name, asset_path]

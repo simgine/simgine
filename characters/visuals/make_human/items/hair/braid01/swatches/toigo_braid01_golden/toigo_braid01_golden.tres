@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LookSwatch" format=3 uid="uid://cy73158dkwc0e"]
+
+[ext_resource type="Script" uid="uid://t652tsj6eqg8" path="res://characters/look_swatch.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Golden"
+license = "CC0"
+author = "MargaretToigo"
+asset_path = "res://characters/visuals/make_human/items/hair/braid01/swatches/toigo_braid01_golden/toigo_braid01_golden.mhmat"

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LookSwatch" format=3 uid="uid://dc2nbpitgaa47"]
+
+[ext_resource type="Script" uid="uid://t652tsj6eqg8" path="res://characters/look_swatch.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Pink"
+license = "CC0 (pack manifest); AGPLv3 (material header)"
+author = "dariush086"
+asset_path = "res://characters/visuals/make_human/items/hair/ponytail01/swatches/dariush086_ponytail01_pink/dariush086_ponytail01_pink.mhmat"

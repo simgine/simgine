@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://pdv3btq22851"
+path="res://.godot/imported/toigo_braid01_fuchsia.mhmat-180e605c05c8f00967a7762d60f5acac.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/braid01/swatches/toigo_braid01_fuchsia/toigo_braid01_fuchsia.mhmat"
+dest_files=["res://.godot/imported/toigo_braid01_fuchsia.mhmat-180e605c05c8f00967a7762d60f5acac.res"]
+
+[params]
+

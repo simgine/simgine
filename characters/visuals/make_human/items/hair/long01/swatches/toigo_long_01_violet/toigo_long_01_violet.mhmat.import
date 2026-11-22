@@ -1,0 +1,14 @@
+[remap]
+
+importer="make_human.mhmat_importer"
+type="Resource"
+uid="uid://db6d6otsfrdbl"
+path="res://.godot/imported/toigo_long_01_violet.mhmat-2ffa76bedc4b31285908843da98df9c1.res"
+
+[deps]
+
+source_file="res://characters/visuals/make_human/items/hair/long01/swatches/toigo_long_01_violet/toigo_long_01_violet.mhmat"
+dest_files=["res://.godot/imported/toigo_long_01_violet.mhmat-2ffa76bedc4b31285908843da98df9c1.res"]
+
+[params]
+

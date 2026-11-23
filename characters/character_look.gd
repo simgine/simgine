@@ -6,6 +6,11 @@ extends Resource
 signal item_added(item: LookItem)
 signal item_removed(item: LookItem)
 
+## Emitted after an attached item's swatch changes.
+##
+## Null swatch means the default appearance.
+signal item_swatch_changed(item: LookItem, swatch: LookSwatch)
+
 ## Attached items with an optional selected swatch.
 ##
 ## A null value uses the item's default appearance.
@@ -61,6 +66,7 @@ func set_swatch(item: LookItem, swatch: LookSwatch) -> void:
 		return
 
 	items[item] = swatch
+	item_swatch_changed.emit(item, swatch)
 
 
 ## Returns the selected swatch, or null if the item is not attached or uses its default appearance.

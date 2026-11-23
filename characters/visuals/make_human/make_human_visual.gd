@@ -2,87 +2,89 @@
 class_name MakeHumanVisual
 extends CharacterVisual
 
+const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
+
 @onready var body_instance: MHBodyInstance = %Body
 
-var _attachments: Dictionary[LookItem, Object]
+## Runtime attachments for items that add a proxy mesh.
+var _proxy_attachments: Dictionary[LookItem, ProxyAttachment]
+
+## The skin item that sets the body's [member GeometryInstance3D.material_override]
+## instead of adding a proxy mesh.
+var _body_material_item: LookItem
 
 
 func _attach_item(item: LookItem) -> bool:
-	if _attachments.has(item):
+	if item == _body_material_item or _proxy_attachments.has(item):
 		return false
 
-	var attachment := _create_attachment(item.asset_path)
+	var asset := ResourceLoader.load(item.asset_path)
+	if not asset:
+		Log.error("Unable to load '%s'", item.asset_path)
+		return false
+
+	var material := asset as StandardMaterial3D
+	if material:
+		if item.slot != SKIN_SLOT:
+			Log.error("Material-only item %s must use the skin slot", item)
+			return false
+
+		_body_material_item = item
+		body_instance.material_override = material
+		return true
+
+	var attachment := ProxyAttachment.from_asset(asset)
 	if not attachment:
 		return false
 
-	var material := attachment as StandardMaterial3D
-	if material:
-		body_instance.material_override = material
-	else:
-		body_instance.add_child(attachment)
-
-	_attachments[item] = attachment
+	body_instance.add_child(attachment.instance)
+	_proxy_attachments[item] = attachment
 	return true
 
 
-static func _create_attachment(asset_path: String) -> Object:
-	var res := ResourceLoader.load(asset_path)
-	if not res:
-		Log.error("Unable to load '%s'", asset_path)
-		return null
+func _apply_item_swatch(item: LookItem, swatch: LookSwatch) -> void:
+	var mesh: MeshInstance3D
+	var material: Material
 
-	var material := res as StandardMaterial3D
-	if material:
-		return material
+	if item == _body_material_item:
+		mesh = body_instance
+		if not swatch:
+			# Restore the original
+			material = ResourceLoader.load(item.asset_path) as StandardMaterial3D
+			if not material:
+				Log.error("Body material asset '%s' must be a StandardMaterial3D", item.asset_path)
+				return
+	else:
+		var attachment: ProxyAttachment = _proxy_attachments.get(item)
+		if not attachment:
+			return
+		mesh = attachment.instance
+		material = attachment.default_material
 
-	var proxy := res as MHProxy
-	if proxy:
-		# Allow paths to a proxy for simple items.
-		var instance := MHProxyInstance.new()
-		instance.proxy = proxy
-		return instance
+	if swatch:
+		material = ResourceLoader.load(swatch.asset_path) as Material
+		if not material:
+			Log.error("Swatch asset '%s' must be a Material", swatch.asset_path)
+			return
 
-	var scene := res as PackedScene
-	if scene:
-		var node := scene.instantiate()
-		if not node:
-			Log.error("Unable to instantiate '%s'", asset_path)
-			return null
-
-		var instance := node as MHProxyInstance
-		if not instance:
-			Log.error("PackedScene '%s' root is not an MHProxyInstance", asset_path)
-			node.free()
-			return null
-
-		return instance
-
-	Log.error(
-		"'%s' must be a StandardMaterial3D, MHProxy resource, or PackedScene with an MHProxyInstance root",
-		asset_path,
-	)
-	return null
+	mesh.material_override = material
 
 
 func _detach_item(item: LookItem) -> void:
-	var attachment: Object = _attachments.get(item)
-	if not attachment:
+	if item == _body_material_item:
+		_body_material_item = null
+		body_instance.material_override = null
 		return
 
-	var material := attachment as StandardMaterial3D
-	if material:
-		# A conflicting material may already have replaced this one.
-		if body_instance.material_override == material:
-			body_instance.material_override = null
-	else:
-		var instance := attachment as MHProxyInstance
-		instance.queue_free()
-
-	_attachments.erase(item)
+	var attachment: ProxyAttachment = _proxy_attachments.get(item)
+	if attachment:
+		attachment.instance.queue_free()
+		_proxy_attachments.erase(item)
 
 
 func get_item_mesh(item: LookItem) -> MeshInstance3D:
-	return _attachments.get(item) as MeshInstance3D
+	var attachment: ProxyAttachment = _proxy_attachments.get(item)
+	return attachment.instance if attachment else null
 
 
 func get_item_dir() -> String:
@@ -234,3 +236,47 @@ func set_pose(pose: Pose) -> void:
 		return
 
 	skeleton.pose = mh_pose
+
+
+class ProxyAttachment:
+	var instance: MHProxyInstance
+
+	## The [member GeometryInstance3D.material_override] on [member instance] before any swatch is applied.
+	##
+	## Restored when the swatch is cleared.
+	var default_material: Material
+
+
+	func _init(p_instance: MHProxyInstance) -> void:
+		instance = p_instance
+		default_material = instance.material_override
+
+
+	static func from_asset(asset: Resource) -> ProxyAttachment:
+		var proxy := asset as MHProxy
+		if proxy:
+			# Allow paths to a proxy for simple items.
+			var proxy_instance := MHProxyInstance.new()
+			proxy_instance.proxy = proxy
+			return ProxyAttachment.new(proxy_instance)
+
+		var scene := asset as PackedScene
+		if scene:
+			var node := scene.instantiate()
+			if not node:
+				Log.error("Unable to instantiate '%s'", asset.resource_path)
+				return null
+
+			var proxy_instance := node as MHProxyInstance
+			if not proxy_instance:
+				Log.error("PackedScene '%s' root is not an MHProxyInstance", asset.resource_path)
+				node.free()
+				return null
+
+			return ProxyAttachment.new(proxy_instance)
+
+		Log.error(
+			"'%s' must be a StandardMaterial3D, MHProxy resource, or PackedScene with an MHProxyInstance root",
+			asset.resource_path,
+		)
+		return null

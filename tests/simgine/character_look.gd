@@ -91,6 +91,23 @@ func test_swatch_changes() -> void:
 	assert_eq(changes, [PONYTAIL_BLACK, null])
 
 
+func test_remove_item() -> void:
+	var look := CharacterLook.new()
+	look.add(PONYTAIL)
+	look.add(EYES)
+
+	var removed: Array[LookItem]
+	look.item_removed.connect(
+		func(item: LookItem) -> void:
+			removed.append(item),
+	)
+
+	look.remove(PONYTAIL)
+
+	assert_eq(look.items, { EYES: null })
+	assert_eq(removed, [PONYTAIL])
+
+
 func test_clear_items() -> void:
 	var look := CharacterLook.new()
 	look.add(PONYTAIL)

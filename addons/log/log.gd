@@ -129,6 +129,9 @@ class Settings:
 
 
 	func _init(filters_str: String) -> void:
+		if filters_str.is_empty():
+			return
+
 		_parse_filters(filters_str)
 
 		var filter_strings: PackedStringArray

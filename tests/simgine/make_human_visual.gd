@@ -39,8 +39,7 @@ func test_proxy_swatch() -> void:
 
 func test_look_replacement() -> void:
 	var look1 := CharacterLook.new()
-	look1.add(PONYTAIL)
-	look1.set_swatch(PONYTAIL, PONYTAIL_BLACK)
+	look1.add(PONYTAIL, PONYTAIL_BLACK)
 
 	var visual := VISUAL.instantiate() as MakeHumanVisual
 	visual.look = look1
@@ -75,20 +74,18 @@ func test_body_material_swatch() -> void:
 
 	var visual := VISUAL.instantiate() as MakeHumanVisual
 	add_child(visual)
-	visual.look.add(skin)
-
-	var original := load(skin.asset_path) as Material
-	assert_eq(visual.body_instance.material_override, original)
-	assert_eq(visual.get_item_mesh(skin), null)
+	visual.look.add(skin, swatch)
 
 	var swatch_material := load(swatch.asset_path) as Material
+	assert_eq(visual.body_instance.material_override, swatch_material)
+	assert_eq(visual.get_item_mesh(skin), null)
+
+	visual.look.set_swatch(skin, null)
+	assert_eq(visual.body_instance.material_override, load(skin.asset_path) as Material)
+
 	visual.look.set_swatch(skin, swatch)
 	assert_eq(visual.body_instance.material_override, swatch_material)
 
-	visual.look.set_swatch(skin, null)
-	assert_eq(visual.body_instance.material_override, original)
-
-	visual.look.set_swatch(skin, swatch)
 	visual.look.remove(skin)
 	assert_eq(visual.body_instance.material_override, null)
 

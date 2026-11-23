@@ -15,7 +15,7 @@ const PONYTAIL_BLACK := preload(
 
 func test_replace_item() -> void:
 	var look := CharacterLook.new()
-	look.add(PONYTAIL)
+	look.add(BRAID)
 
 	var events: Array[Array]
 	look.item_removed.connect(
@@ -23,14 +23,20 @@ func test_replace_item() -> void:
 			events.append(["removed", item]),
 	)
 	look.item_added.connect(
-		func(item: LookItem) -> void:
-			events.append(["added", item]),
+		func(item: LookItem, swatch: LookSwatch) -> void:
+			assert_eq(swatch, look.get_swatch(item), "the swatch is stored before the signal")
+			events.append(["added", item, swatch]),
+	)
+	look.item_swatch_changed.connect(
+		func(_item: LookItem, _swatch: LookSwatch) -> void:
+			panic("The initial swatch should already be set at attachment"),
 	)
 
-	look.add(BRAID)
+	look.add(PONYTAIL, PONYTAIL_BLACK)
+	look.add(PONYTAIL)
 
-	assert_eq(events, [["removed", PONYTAIL], ["added", BRAID]])
-	assert_eq(look.items, { BRAID: null })
+	assert_eq(events, [["removed", BRAID], ["added", PONYTAIL, PONYTAIL_BLACK]])
+	assert_eq(look.items, { PONYTAIL: PONYTAIL_BLACK })
 
 
 func test_item_validation() -> void:
@@ -39,12 +45,19 @@ func test_item_validation() -> void:
 	selection[PONYTAIL] = PONYTAIL_BLACK
 	selection[BRAID] = PONYTAIL_BLACK
 
+	var look := CharacterLook.new()
+	var swatches: Array[LookSwatch]
+	look.item_added.connect(
+		func(_item: LookItem, swatch: LookSwatch) -> void:
+			swatches.append(swatch),
+	)
+
 	expect_warning("Ignoring an invalid")
 	expect_warning("does not belong to")
-	var look := CharacterLook.new()
 	look.items = selection
 
 	assert_eq(look.items, { BRAID: null }, "the later item wins without the foreign swatch")
+	assert_eq(swatches, [PONYTAIL_BLACK, null], "the signal reports only actually applied swatches")
 
 
 func test_swatch_changes() -> void:
@@ -52,7 +65,7 @@ func test_swatch_changes() -> void:
 	look.add(PONYTAIL)
 
 	look.item_added.connect(
-		func(_item: LookItem) -> void:
+		func(_item: LookItem, _swatch: LookSwatch) -> void:
 			panic("The item was attached again"),
 	)
 	look.item_removed.connect(
@@ -97,8 +110,7 @@ func test_clear_items() -> void:
 
 func test_save_restore() -> void:
 	var look := CharacterLook.new()
-	look.add(PONYTAIL)
-	look.set_swatch(PONYTAIL, PONYTAIL_BLACK)
+	look.add(PONYTAIL, PONYTAIL_BLACK)
 	look.add(EYES)
 
 	var file := FileAccess.create_temp(FileAccess.READ, "character_look", "tres")

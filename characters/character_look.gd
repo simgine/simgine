@@ -3,7 +3,12 @@ class_name CharacterLook
 extends Resource
 ## Items and their selected appearances on a [CharacterVisual].
 
-signal item_added(item: LookItem)
+## Emitted after an item is attached.
+##
+## Null swatch means the default appearance.
+signal item_added(item: LookItem, swatch: LookSwatch)
+
+## Emitted after an item is removed.
 signal item_removed(item: LookItem)
 
 ## Emitted after an attached item's swatch changes.
@@ -19,13 +24,16 @@ signal item_swatch_changed(item: LookItem, swatch: LookSwatch)
 	set = _set_items
 
 
-## Adds the item, removing the items it conflicts with.
-func add(new_item: LookItem) -> void:
+## Adds the item with its initial swatch, removing the items it conflicts with.
+##
+## Already attached items keep their current swatch. A foreign swatch falls back to the default.
+func add(new_item: LookItem, swatch: LookSwatch = null) -> void:
 	assert(new_item)
 
 	if items.has(new_item):
 		return
 
+	Log.trace("Adding %s", new_item)
 	var conflicts: Array[LookItem]
 	for item in items:
 		if new_item.conflicts_with(item):
@@ -36,9 +44,12 @@ func add(new_item: LookItem) -> void:
 		items.erase(item)
 		item_removed.emit(item)
 
-	Log.trace("Adding %s", new_item)
-	items[new_item] = null
-	item_added.emit(new_item)
+	if swatch and not new_item.swatches.has(swatch):
+		Log.warn("Skipping '%s' which does not belong to adding %s", swatch, new_item)
+		swatch = null
+
+	items[new_item] = swatch
+	item_added.emit(new_item, swatch)
 
 
 ## Removes the item if present.
@@ -100,7 +111,7 @@ func _set_items(new_items: Dictionary[LookItem, LookSwatch]) -> void:
 			Log.warn("Ignoring an invalid %s", new_item)
 			continue
 
-		if not items.has(new_item):
-			add(new_item)
-
-		set_swatch(new_item, new_items[new_item])
+		if items.has(new_item):
+			set_swatch(new_item, new_items[new_item])
+		else:
+			add(new_item, new_items[new_item])

@@ -54,7 +54,7 @@ static func _connect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> vo
 	tabs.features_tabs.item_deselected.connect(visual.look.remove)
 	tabs.wardrobe_tabs.item_selected.connect(visual.look.add)
 	tabs.wardrobe_tabs.item_deselected.connect(visual.look.remove)
-	visual.look.item_added.connect(tabs.select_item)
+	visual.look.item_added.connect(tabs.select_item.unbind(1))
 	visual.look.item_removed.connect(tabs.deselect_item)
 
 

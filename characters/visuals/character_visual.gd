@@ -26,7 +26,7 @@ var anim_style: AnimationStyle
 func _ready() -> void:
 	_connect_look(look)
 	for item in look.items:
-		_attach_item_with_swatch(item)
+		_attach_item_with_swatch(item, look.get_swatch(item))
 
 
 ## Replaces the old look with a new one.
@@ -51,7 +51,7 @@ func _set_look(new_look: CharacterLook) -> void:
 	_connect_look(look)
 	for item in look.items:
 		if not previous.items.has(item):
-			_attach_item_with_swatch(item)
+			_attach_item_with_swatch(item, look.get_swatch(item))
 			changed = true
 			continue
 
@@ -68,7 +68,7 @@ func _connect_look(new_look: CharacterLook) -> void:
 	new_look.item_added.connect(_attach_item_with_swatch)
 	new_look.item_removed.connect(_detach_item)
 	new_look.item_swatch_changed.connect(_update_item_swatch)
-	new_look.item_added.connect(look_changed.emit.unbind(1))
+	new_look.item_added.connect(look_changed.emit.unbind(2))
 	new_look.item_removed.connect(look_changed.emit.unbind(1))
 
 
@@ -80,11 +80,10 @@ func _disconnect_look(old_look: CharacterLook) -> void:
 	old_look.item_removed.disconnect(look_changed.emit)
 
 
-func _attach_item_with_swatch(item: LookItem) -> void:
+func _attach_item_with_swatch(item: LookItem, swatch: LookSwatch) -> void:
 	if not _attach_item(item):
 		return
 
-	var swatch := look.get_swatch(item)
 	if swatch:
 		_apply_item_swatch(item, swatch)
 

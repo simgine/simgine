@@ -16,6 +16,8 @@ signal item_removed(item: LookItem)
 
 ## Adds the item, removing the items it conflicts with.
 func add(new_item: LookItem) -> void:
+	assert(new_item)
+
 	if items.has(new_item):
 		return
 

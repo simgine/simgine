@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://ce74mqh7dvlm1"]
 
 [ext_resource type="Script" uid="uid://dphs6ae1pyofj" path="res://character_editor/appearance/items/look_item_list.gd" id="1_look_item_list"]
-[ext_resource type="Script" uid="uid://ddywmsgbkra4n" path="res://character_editor/appearance/items/swatch_button.gd" id="2_ngjsl"]
 
 [node name="LookItemList" type="ItemList" unique_id=224020655]
 theme_override_constants/h_separation = 8
@@ -21,10 +20,8 @@ offset_bottom = 20.0
 focus_mode = 0
 theme_override_font_sizes/font_size = 13
 text = "⚙"
-script = ExtResource("2_ngjsl")
 
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]
-[connection signal="hovered_item_changed" from="." to="SwatchButton" method="set_hovered_item"]
 [connection signal="mouse_entered" from="." to="." method="_update_hovered_item"]
 [connection signal="mouse_exited" from="." to="." method="_update_hovered_item"]
 [connection signal="multi_selected" from="." to="." method="_on_multi_selected"]

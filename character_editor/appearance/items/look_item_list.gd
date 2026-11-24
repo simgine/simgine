@@ -5,11 +5,6 @@ signal look_item_selected(item: LookItem)
 signal look_item_deselected(item: LookItem)
 signal preview_requested(item: LookItem)
 
-## Emitted when the hovered item or its icon placement changes.
-##
-## The icon rect is in list-local coords, empty when the item is null.
-signal hovered_item_changed(item: LookItem, icon_rect: Rect2)
-
 var slot: LookSlot
 var _items: Array[LookItem]
 var _item_indices: Dictionary[LookItem, int]
@@ -17,10 +12,10 @@ var _item_indices: Dictionary[LookItem, int]
 ## Items whose previews were already requested.
 var _previewed: Dictionary[LookItem, bool]
 
-## Last hovered icon rect.
-##
-## Stored to emit events only when the hovered icon or its position changes.
 var _hovered_rect: Rect2
+var _hovered_item: LookItem
+
+@onready var _swatch_button: Button = $SwatchButton
 
 static var _placeholder: Texture2D = _create_placeholder()
 
@@ -137,9 +132,22 @@ func _update_hovered_item() -> void:
 		item = _items[index]
 		icon_rect = _get_item_icon_rect(index)
 
-	if icon_rect != _hovered_rect:
-		_hovered_rect = icon_rect
-		hovered_item_changed.emit(item, icon_rect)
+	if item == _hovered_item and icon_rect == _hovered_rect:
+		return
+
+	_hovered_item = item
+	_hovered_rect = icon_rect
+
+	_swatch_button.visible = _hovered_item and not _hovered_item.swatches.is_empty()
+	if _swatch_button.visible:
+		# Inset of the swatch button from the item icon's bottom-right corner.
+		const _MARGIN := 4.0
+
+		# Anchor the button to the icon's bottom-right corner.
+		_swatch_button.position = Vector2(
+			_hovered_rect.end.x - _MARGIN - _swatch_button.size.x,
+			_hovered_rect.end.y - _MARGIN - _swatch_button.size.y,
+		)
 
 
 func _get_item_icon_rect(index: int) -> Rect2:

@@ -5,12 +5,22 @@ signal look_item_selected(item: LookItem)
 signal look_item_deselected(item: LookItem)
 signal preview_requested(item: LookItem)
 
+## Emitted when the hovered item or its icon placement changes.
+##
+## The icon rect is in list-local coords, empty when the item is null.
+signal hovered_item_changed(item: LookItem, icon_rect: Rect2)
+
 var slot: LookSlot
 var _items: Array[LookItem]
 var _item_indices: Dictionary[LookItem, int]
 
 ## Items whose previews were already requested.
 var _previewed: Dictionary[LookItem, bool]
+
+## Last hovered icon rect.
+##
+## Stored to emit events only when the hovered icon or its position changes.
+var _hovered_rect: Rect2
 
 static var _placeholder: Texture2D = _create_placeholder()
 
@@ -24,6 +34,7 @@ static func _create_placeholder() -> Texture2D:
 func _ready() -> void:
 	multi_selected.connect(_on_multi_selected)
 	get_v_scroll_bar().value_changed.connect(_check_visible_previews.unbind(1))
+	get_v_scroll_bar().value_changed.connect(_update_hovered_item)
 	resized.connect(_check_visible_previews)
 	visibility_changed.connect(_check_visible_previews)
 
@@ -57,6 +68,11 @@ func deselect_item(item: LookItem) -> void:
 ## Sets the rendered preview as the item's icon.
 func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
 	set_item_icon(_item_indices[item], texture)
+
+
+func _on_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouse:
+		_update_hovered_item()
 
 
 func _on_multi_selected(index: int, selected: bool) -> void:
@@ -114,3 +130,34 @@ func _get_visible_item_range() -> Vector2i:
 	var end := mini(last_row * columns + columns, items_count)
 
 	return Vector2i(start, end)
+
+
+func _update_hovered_item() -> void:
+	var index := get_item_at_position(get_local_mouse_position(), true)
+	var item: LookItem
+	var icon_rect: Rect2
+	if index >= 0:
+		item = _items[index]
+		icon_rect = _get_item_icon_rect(index)
+
+	if icon_rect != _hovered_rect:
+		_hovered_rect = icon_rect
+		hovered_item_changed.emit(item, icon_rect)
+
+
+func _get_item_icon_rect(index: int) -> Rect2:
+	var icon_size := Vector2(get_fixed_icon_size())
+	# Cells are the icon plus separations, with the icon centered in them.
+	var cell := icon_size + Vector2(
+		get_theme_constant("h_separation"),
+		get_theme_constant("v_separation"),
+	)
+	var columns := get_max_columns()
+	var panel := get_theme_stylebox("panel")
+	@warning_ignore("integer_division")
+	var row := index / columns
+	var origin := Vector2(
+		panel.get_offset().x + (index % columns) * cell.x,
+		panel.get_offset().y + row * cell.y - get_v_scroll_bar().value,
+	)
+	return Rect2(origin + (cell - icon_size) / 2.0, icon_size)

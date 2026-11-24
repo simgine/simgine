@@ -27,4 +27,7 @@ script = ExtResource("2_ngjsl")
 [connection signal="hovered_item_changed" from="." to="SwatchButton" method="set_hovered_item"]
 [connection signal="mouse_entered" from="." to="." method="_update_hovered_item"]
 [connection signal="mouse_exited" from="." to="." method="_update_hovered_item"]
+[connection signal="multi_selected" from="." to="." method="_on_multi_selected"]
+[connection signal="resized" from="." to="." method="_check_visible_previews"]
+[connection signal="visibility_changed" from="." to="." method="_check_visible_previews"]
 [connection signal="mouse_exited" from="SwatchButton" to="." method="_update_hovered_item"]

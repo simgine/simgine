@@ -32,11 +32,8 @@ static func _create_placeholder() -> Texture2D:
 
 
 func _ready() -> void:
-	multi_selected.connect(_on_multi_selected)
 	get_v_scroll_bar().value_changed.connect(_check_visible_previews.unbind(1))
 	get_v_scroll_bar().value_changed.connect(_update_hovered_item)
-	resized.connect(_check_visible_previews)
-	visibility_changed.connect(_check_visible_previews)
 
 
 func add_look_item(item: LookItem) -> void:

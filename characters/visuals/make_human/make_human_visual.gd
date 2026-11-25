@@ -2,8 +2,6 @@
 class_name MakeHumanVisual
 extends CharacterVisual
 
-const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
-
 @onready var body_instance: MHBodyInstance = %Body
 
 ## Runtime attachments for items that add a proxy mesh.
@@ -25,6 +23,7 @@ func _attach_item(item: LookItem) -> bool:
 
 	var material := asset as StandardMaterial3D
 	if material:
+		const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
 		if item.slot != SKIN_SLOT:
 			Log.error("Material-only item %s must use the skin slot", item)
 			return false

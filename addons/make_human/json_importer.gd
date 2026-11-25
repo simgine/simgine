@@ -15,25 +15,6 @@ enum RotationMode {
 	QUATERNION,
 }
 
-## Additional metadata required to interpret `macro.json`.
-##
-## Some of this information is hardcoded in MPFB2 rather than stored
-## in `macro.json`, so it is represented explicitly here.
-const MACRO_METADATA: Dictionary[StringName, Dictionary] = {
-	"racegenderage": { "directory": "macrodetails" },
-	# MPFB2 names race-independent targets with the "universal" prefix.
-	"genderagemuscleweight": { "directory": "macrodetails", "prefix": "universal" },
-	"genderagemuscleweightproportions": { "directory": "macrodetails/proportions" },
-	"genderagemuscleweightheight": { "directory": "macrodetails/height" },
-	"genderagemuscleweightcupsizefirmness": {
-		"directory": "breast",
-		# MPFB2 uses only the female component for breast targets.
-		"allowed_components": { &"gender": [&"female"] },
-		# MPFB2 excludes gender from the breast target weight.
-		"weight_exclusions": [&"gender"],
-	},
-}
-
 
 func _get_importer_name() -> String:
 	return "make_human.json_importer"
@@ -223,6 +204,25 @@ static func _parse_combination(
 	macrotargets: Dictionary[StringName, MHMacro],
 	targets_dir: String,
 ) -> MHMacroCombination:
+	# Additional metadata required to interpret `macro.json`.
+	#
+	# Some of this information is hardcoded in MPFB2 rather than stored
+	# in `macro.json`, so it is represented explicitly here.
+	const MACRO_METADATA: Dictionary[StringName, Dictionary] = {
+		"racegenderage": { "directory": "macrodetails" },
+		# MPFB2 names race-independent targets with the "universal" prefix.
+		"genderagemuscleweight": { "directory": "macrodetails", "prefix": "universal" },
+		"genderagemuscleweightproportions": { "directory": "macrodetails/proportions" },
+		"genderagemuscleweightheight": { "directory": "macrodetails/height" },
+		"genderagemuscleweightcupsizefirmness": {
+			"directory": "breast",
+			# MPFB2 uses only the female component for breast targets.
+			"allowed_components": { &"gender": [&"female"] },
+			# MPFB2 excludes gender from the breast target weight.
+			"weight_exclusions": [&"gender"],
+		},
+	}
+
 	var combination := MHMacroCombination.new()
 	combination.dimensions.assign(dimensions)
 

@@ -33,32 +33,6 @@ const STANDING_TRANSFORMS: Dictionary[StringName, Transform3D] = {
 		Vector3(0.09638484, 0.07542476, -0.13902646),
 	),
 }
-const T_POSE_TRANSFORMS: Dictionary[StringName, Transform3D] = {
-	"Hips": Transform3D(
-		Basis(
-			Vector3(1.000000000000, 0.000000000000, 0.000000000000),
-			Vector3(0.000000000000, 1.000000000000, 0.000000029802),
-			Vector3(0.000000000000, -0.000000029802, 1.000000000000),
-		),
-		Vector3(0.000000000058, 0.873886346817, 0.013216649182),
-	),
-	"LeftHand": Transform3D(
-		Basis(
-			Vector3(-0.000000013039, -0.000000014901, -1.000000000000),
-			Vector3(1.000000000000, 0.000000000466, -0.000000013039),
-			Vector3(0.000000000466, -1.000000000000, 0.000000014901),
-		),
-		Vector3(0.649723172188, 1.350847601891, 0.032009497285),
-	),
-	"LeftFoot": Transform3D(
-		Basis(
-			Vector3(-1.000000000000, -0.000000007451, 0.000000003725),
-			Vector3(0.000000003725, 0.000000000000, 1.000000000000),
-			Vector3(-0.000000007451, 1.000000000000, -0.000000000000),
-		),
-		Vector3(0.093936726451, 0.065180748701, 0.019135668874),
-	),
-}
 
 
 func requires_editor() -> bool:
@@ -248,6 +222,34 @@ func test_pose_replacement() -> void:
 	var body := instance.body
 	var t_pose := body.reference_pose.retarget(body.bone_map, body.reference_pose)
 	instance.skeleton_node.pose = t_pose
+
+	# Recorded from the game-engine T-pose in skeleton space (meters).
+	const T_POSE_TRANSFORMS: Dictionary[StringName, Transform3D] = {
+		"Hips": Transform3D(
+			Basis(
+				Vector3(1.000000000000, 0.000000000000, 0.000000000000),
+				Vector3(0.000000000000, 1.000000000000, 0.000000029802),
+				Vector3(0.000000000000, -0.000000029802, 1.000000000000),
+			),
+			Vector3(0.000000000058, 0.873886346817, 0.013216649182),
+		),
+		"LeftHand": Transform3D(
+			Basis(
+				Vector3(-0.000000013039, -0.000000014901, -1.000000000000),
+				Vector3(1.000000000000, 0.000000000466, -0.000000013039),
+				Vector3(0.000000000466, -1.000000000000, 0.000000014901),
+			),
+			Vector3(0.649723172188, 1.350847601891, 0.032009497285),
+		),
+		"LeftFoot": Transform3D(
+			Basis(
+				Vector3(-1.000000000000, -0.000000007451, 0.000000003725),
+				Vector3(0.000000003725, 0.000000000000, 1.000000000000),
+				Vector3(-0.000000007451, 1.000000000000, -0.000000000000),
+			),
+			Vector3(0.093936726451, 0.065180748701, 0.019135668874),
+		),
+	}
 	_assert_global_transforms(instance.skeleton_node, T_POSE_TRANSFORMS)
 
 

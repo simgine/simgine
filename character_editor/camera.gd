@@ -14,11 +14,6 @@ enum Drag {
 @export var min_distance := 0.5
 @export var max_distance := 2.5
 
-## Keeps the character in view while panning in the camera's view plane.
-const _PAN_MIN := Vector2(-1.2, -0.5)
-const _PAN_MAX := Vector2(1.2, 1.7)
-const _PITCH_LIMIT := deg_to_rad(80.0)
-
 var _target_offset: Vector3 # X and Y are pan, Z is zoom distance.
 var _target_rotation := Vector2.ZERO
 var _drag: Drag = Drag.NONE
@@ -70,14 +65,18 @@ func _process(delta: float) -> void:
 
 
 func _pan(relative: Vector2) -> void:
+	# Keeps the character in view while panning in the camera's view plane.
+	const PAN_MIN := Vector2(-1.2, -0.5)
+	const PAN_MAX := Vector2(1.2, 1.7)
 	_target_offset += Vector3(-relative.x, relative.y, 0.0) * pan_speed * _target_offset.z
-	_target_offset.x = clampf(_target_offset.x, _PAN_MIN.x, _PAN_MAX.x)
-	_target_offset.y = clampf(_target_offset.y, _PAN_MIN.y, _PAN_MAX.y)
+	_target_offset.x = clampf(_target_offset.x, PAN_MIN.x, PAN_MAX.x)
+	_target_offset.y = clampf(_target_offset.y, PAN_MIN.y, PAN_MAX.y)
 
 
 func _rotate(relative: Vector2) -> void:
+	const PITCH_LIMIT := deg_to_rad(80.0)
 	_target_rotation -= Vector2(relative.y, relative.x) * rotate_speed
-	_target_rotation.x = clampf(_target_rotation.x, -_PITCH_LIMIT, _PITCH_LIMIT)
+	_target_rotation.x = clampf(_target_rotation.x, -PITCH_LIMIT, PITCH_LIMIT)
 	_target_rotation.y = wrapf(_target_rotation.y, -PI, PI)
 
 

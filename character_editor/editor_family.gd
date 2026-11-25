@@ -6,10 +6,6 @@ signal member_added(character: Character)
 ## Emitted when the selected member changes.
 signal current_member_changed(previous: Character, current: Character)
 
-const DEFAULT_POSE: Pose = preload(
-	"res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/standingnatural.tres"
-)
-
 ## The character currently shown on the scene.
 ##
 ## Setting it hides the previously active character.
@@ -17,6 +13,9 @@ var _current_member: Character
 
 
 func _create_member(character_type: CharacterType) -> void:
+	const DEFAULT_POSE: Pose = preload(
+		"res://characters/visuals/make_human/data/poses/callharvey3d_standingnatural/standingnatural.tres"
+	)
 	Log.info("Creating '%s'", character_type.name)
 	var member := character_type.create()
 	if not member:

@@ -141,12 +141,12 @@ func _update_hovered_item() -> void:
 	_swatch_button.visible = _hovered_item and not _hovered_item.swatches.is_empty()
 	if _swatch_button.visible:
 		# Inset of the swatch button from the item icon's bottom-right corner.
-		const _MARGIN := 4.0
+		const MARGIN := 4.0
 
 		# Anchor the button to the icon's bottom-right corner.
 		_swatch_button.position = Vector2(
-			_hovered_rect.end.x - _MARGIN - _swatch_button.size.x,
-			_hovered_rect.end.y - _MARGIN - _swatch_button.size.y,
+			_hovered_rect.end.x - MARGIN - _swatch_button.size.x,
+			_hovered_rect.end.y - MARGIN - _swatch_button.size.y,
 		)
 
 

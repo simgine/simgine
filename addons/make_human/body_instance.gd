@@ -2,7 +2,7 @@
 class_name MHBodyInstance
 extends MeshInstance3D
 
-const MODIFIERS_PREFIX := "modifiers/"
+const _MODIFIERS_PREFIX := "modifiers/"
 
 @export var body: MHBody:
 	set = set_body
@@ -118,7 +118,7 @@ func _add_category(
 
 func _slider(path: String, modifier_range: Vector2) -> Dictionary:
 	return {
-		"name": MODIFIERS_PREFIX + path,
+		"name": _MODIFIERS_PREFIX + path,
 		"type": TYPE_FLOAT,
 		"hint": PROPERTY_HINT_RANGE,
 		"hint_string": "%f,%f,0.01" % [modifier_range.x, modifier_range.y],
@@ -127,7 +127,7 @@ func _slider(path: String, modifier_range: Vector2) -> Dictionary:
 
 
 func _get(property: StringName) -> Variant:
-	if property.begins_with(MODIFIERS_PREFIX):
+	if property.begins_with(_MODIFIERS_PREFIX):
 		var modifier_name := _property_to_modifier_name(property)
 		return get_modifier(modifier_name)
 
@@ -135,7 +135,7 @@ func _get(property: StringName) -> Variant:
 
 
 func _set(property: StringName, value: Variant) -> bool:
-	if property.begins_with(MODIFIERS_PREFIX):
+	if property.begins_with(_MODIFIERS_PREFIX):
 		var modifier_name := _property_to_modifier_name(property)
 		set_modifier(modifier_name, value)
 		return true
@@ -145,10 +145,10 @@ func _set(property: StringName, value: Variant) -> bool:
 
 func _property_to_modifier_name(property: String) -> StringName:
 	# Strips prefix and inspector group.
-	var separator := property.find("/", MODIFIERS_PREFIX.length())
+	var separator := property.find("/", _MODIFIERS_PREFIX.length())
 	if separator == -1:
 		# Macro modifiers don't have an inspector group.
-		return property.substr(MODIFIERS_PREFIX.length())
+		return property.substr(_MODIFIERS_PREFIX.length())
 	return property.substr(separator + 1)
 
 

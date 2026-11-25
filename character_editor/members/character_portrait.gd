@@ -3,7 +3,7 @@ extends TextureRect
 ## A 3D portrait of a [Character]'s head.
 
 ## The camera distance from the head.
-@export var _distance: float = 0.6
+const _DISTANCE := 0.6
 
 @onready var _viewport: SubViewport = $Viewport
 @onready var _camera: Camera3D = %Camera
@@ -27,6 +27,6 @@ func connect_visual(visual: CharacterVisual) -> void:
 
 func _refresh(visual: CharacterVisual) -> void:
 	var focus := visual.get_bone_position("Head")
-	_camera.position = focus + Vector3(0.0, 0.0, _distance)
+	_camera.position = focus + Vector3(0.0, 0.0, _DISTANCE)
 	_camera.look_at(focus, Vector3.UP)
 	_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE

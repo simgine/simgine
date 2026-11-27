@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://ce74mqh7dvlm1"]
 
 [ext_resource type="Script" uid="uid://dphs6ae1pyofj" path="res://character_editor/appearance/items/look_item_list.gd" id="1_look_item_list"]
+[ext_resource type="PackedScene" uid="uid://c41e1n1rmx7br" path="res://character_editor/appearance/items/swatch_popup.tscn" id="3_2gwx3"]
 
 [node name="LookItemList" type="ItemList" unique_id=224020655]
 theme_override_constants/h_separation = 8
@@ -21,6 +22,8 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 13
 text = "⚙"
 
+[node name="SwatchPopup" parent="." unique_id=1129427920 instance=ExtResource("3_2gwx3")]
+
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]
 [connection signal="mouse_entered" from="." to="." method="_update_hovered_item"]
 [connection signal="mouse_exited" from="." to="." method="_update_hovered_item"]
@@ -28,3 +31,4 @@ text = "⚙"
 [connection signal="resized" from="." to="." method="_check_visible_previews"]
 [connection signal="visibility_changed" from="." to="." method="_check_visible_previews"]
 [connection signal="mouse_exited" from="SwatchButton" to="." method="_update_hovered_item"]
+[connection signal="pressed" from="SwatchButton" to="." method="_show_swatch_popup"]

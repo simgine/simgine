@@ -16,6 +16,7 @@ var _hovered_rect: Rect2
 var _hovered_item: LookItem
 
 @onready var _swatch_button: Button = $SwatchButton
+@onready var _swatch_popup: SwatchPopup = $SwatchPopup
 
 static var _placeholder: Texture2D = _create_placeholder()
 
@@ -166,3 +167,9 @@ func _get_item_icon_rect(index: int) -> Rect2:
 		panel.get_offset().y + row * cell.y - get_v_scroll_bar().value,
 	)
 	return Rect2(origin + (cell - icon_size) / 2.0, icon_size)
+
+
+## Shows the swatch popup for the hovered item, below its icon.
+func _show_swatch_popup() -> void:
+	var icon_rect := Rect2(get_screen_position() + _hovered_rect.position, _hovered_rect.size)
+	_swatch_popup.display(_hovered_item, icon_rect)

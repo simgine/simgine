@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://c41e1n1rmx7br"]
+
+[ext_resource type="Script" uid="uid://bm0be7rnr10mx" path="res://character_editor/appearance/items/swatch_popup.gd" id="1_3cnws"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dwoqb"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.1, 0.1, 0.1, 0.6)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.25)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[node name="SwatchPopup" type="PopupPanel" unique_id=1129427920]
+oversampling_override = 1.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dwoqb")
+script = ExtResource("1_3cnws")
+
+[node name="ItemList" type="ItemList" parent="." unique_id=606727679]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 96.0
+offset_bottom = 96.0
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+max_columns = 4
+fixed_column_width = 60
+icon_mode = 0
+fixed_icon_size = Vector2i(60, 80)
+
+[connection signal="popup_hide" from="." to="." method="_remove_click_catcher"]

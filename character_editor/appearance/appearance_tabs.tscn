@@ -42,5 +42,3 @@ layers = 3
 
 [connection signal="preview_requested" from="Features" to="Preview" method="_queue_preview"]
 [connection signal="preview_requested" from="Wardrobe" to="Preview" method="_queue_preview"]
-[connection signal="preview_ready" from="Preview" to="Features" method="set_item_preview"]
-[connection signal="preview_ready" from="Preview" to="Wardrobe" method="set_item_preview"]

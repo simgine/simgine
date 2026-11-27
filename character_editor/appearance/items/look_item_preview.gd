@@ -2,11 +2,9 @@ class_name LookItemPreview
 extends SubViewport
 ## Renders previews for [LookItem]s in a scene from [method CharacterVisual.get_preview_scene_path].
 
-signal preview_ready(item: LookItem, texture: ImageTexture)
-
 var _visual: CharacterVisual
 
-var _queue: Array[LookItem]
+var _queue: Array[PreviewRequest]
 var _rendering := false
 
 ## Item currently layered on the base look.
@@ -33,9 +31,11 @@ func load_scene(scene_path: String) -> void:
 	_visual = visual
 
 
-func _queue_preview(item: LookItem) -> void:
-	assert(not _queue.has(item))
-	_queue.append(item)
+func _queue_preview(item: LookItem, texture: ImageTexture) -> void:
+	var request := PreviewRequest.new()
+	request.item = item
+	request.texture = texture
+	_queue.append(request)
 
 	if _rendering:
 		return
@@ -47,7 +47,8 @@ func _queue_preview(item: LookItem) -> void:
 	_rendering = false
 
 
-func _render_preview(item: LookItem) -> void:
+func _render_preview(request: PreviewRequest) -> void:
+	var item := request.item
 	Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
 	_set_item(item)
@@ -84,7 +85,7 @@ func _render_preview(item: LookItem) -> void:
 		Log.debug("Skipping the preview of '%s': no rendered image", item.name)
 		return
 
-	preview_ready.emit(item, ImageTexture.create_from_image(image))
+	request.texture.set_image(image)
 
 
 func _restore_base_look() -> void:
@@ -104,3 +105,11 @@ func _set_item(item: LookItem) -> void:
 
 	_visual.look.add(item)
 	_layered_item = item
+
+
+class PreviewRequest:
+	## The item to render.
+	var item: LookItem
+
+	## The texture the rendered image is filled into in place.
+	var texture: ImageTexture

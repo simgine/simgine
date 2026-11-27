@@ -4,7 +4,7 @@ extends TabContainer
 
 signal item_selected(item: LookItem)
 signal item_deselected(item: LookItem)
-signal preview_requested(item: LookItem)
+signal preview_requested(item: LookItem, texture: ImageTexture)
 
 ## Whether to display tabs for permanent or non-permanent items.
 @export var permanent: bool
@@ -54,12 +54,6 @@ func load_state(visual: CharacterVisual) -> void:
 		var item := visual.look.get_item(slot)
 		if item:
 			list.select_item(item)
-
-
-func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
-	var list: LookItemList = _lists.get(item.slot)
-	if list:
-		list.set_item_preview(item, texture)
 
 
 ## Selects the item's icon in the list of its slot.

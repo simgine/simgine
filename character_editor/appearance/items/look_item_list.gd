@@ -3,7 +3,7 @@ extends ItemList
 
 signal look_item_selected(item: LookItem)
 signal look_item_deselected(item: LookItem)
-signal preview_requested(item: LookItem)
+signal preview_requested(item: LookItem, texture: ImageTexture)
 
 var slot: LookSlot
 var _items: Array[LookItem]
@@ -18,13 +18,8 @@ var _hovered_item: LookItem
 @onready var _swatch_button: Button = $SwatchButton
 @onready var _swatch_popup: SwatchPopup = $SwatchPopup
 
-static var _placeholder: Texture2D = _create_placeholder()
-
-
-static func _create_placeholder() -> Texture2D:
-	var image := Image.create_empty(150, 200, false, Image.FORMAT_RGBA8)
-	image.fill(Color(1, 1, 1, 0.15))
-	return ImageTexture.create_from_image(image)
+## Placeholder icon for unrendered items.
+@onready var _placeholder: ImageTexture = _create_item_texture()
 
 
 func _ready() -> void:
@@ -58,11 +53,6 @@ func deselect_item(item: LookItem) -> void:
 	deselect(_item_indices[item])
 
 
-## Sets the rendered preview as the item's icon.
-func set_item_preview(item: LookItem, texture: ImageTexture) -> void:
-	set_item_icon(_item_indices[item], texture)
-
-
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouse:
 		_update_hovered_item()
@@ -90,7 +80,21 @@ func _check_visible_previews() -> void:
 		var item := _items[index]
 		if not _previewed.has(item):
 			_previewed[item] = true
-			preview_requested.emit(item)
+			# We create a new icon instead of duplicating the old placeholder
+			# because it causes GPU -> CPU readback.
+			var texture := _create_item_texture()
+			set_item_icon(index, texture)
+			# The preview renderer fills the texture once the item is rendered.
+			preview_requested.emit(item, texture)
+
+
+## Creates a placeholder texture for an item icon.
+func _create_item_texture() -> ImageTexture:
+	const PLACEHOLDER_COLOR := Color(1, 1, 1, 0.15)
+	var icon_size := get_fixed_icon_size()
+	var image := Image.create_empty(icon_size.x, icon_size.y, false, Image.FORMAT_RGBA8)
+	image.fill(PLACEHOLDER_COLOR)
+	return ImageTexture.create_from_image(image)
 
 
 ## Returns the visible items as a `[first, end)` index range.

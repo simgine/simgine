@@ -75,3 +75,4 @@ func _show_click_catcher() -> void:
 
 func _remove_click_catcher() -> void:
 	_click_catcher.queue_free()
+	_click_catcher = null

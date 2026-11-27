@@ -12,36 +12,7 @@ var _proxy_attachments: Dictionary[LookItem, ProxyAttachment]
 var _body_material_item: LookItem
 
 
-func _attach_item(item: LookItem) -> bool:
-	if item == _body_material_item or _proxy_attachments.has(item):
-		return false
-
-	var asset := ResourceLoader.load(item.asset_path)
-	if not asset:
-		Log.error("Unable to load '%s'", item.asset_path)
-		return false
-
-	var material := asset as StandardMaterial3D
-	if material:
-		const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
-		if item.slot != SKIN_SLOT:
-			Log.error("Material-only item %s must use the skin slot", item)
-			return false
-
-		_body_material_item = item
-		body_instance.material_override = material
-		return true
-
-	var attachment := ProxyAttachment.from_asset(asset)
-	if not attachment:
-		return false
-
-	body_instance.add_child(attachment.instance)
-	_proxy_attachments[item] = attachment
-	return true
-
-
-func _apply_item_swatch(item: LookItem, swatch: LookSwatch) -> void:
+func _apply_item(item: LookItem, swatch: LookSwatch) -> void:
 	var mesh: MeshInstance3D
 	var material: Material
 
@@ -53,12 +24,35 @@ func _apply_item_swatch(item: LookItem, swatch: LookSwatch) -> void:
 			if not material:
 				Log.error("Body material asset '%s' must be a StandardMaterial3D", item.asset_path)
 				return
-	else:
-		var attachment: ProxyAttachment = _proxy_attachments.get(item)
-		if not attachment:
-			return
+	elif _proxy_attachments.has(item):
+		var attachment: ProxyAttachment = _proxy_attachments[item]
 		mesh = attachment.instance
 		material = attachment.default_material
+	else:
+		var asset := ResourceLoader.load(item.asset_path)
+		if not asset:
+			Log.error("Unable to load '%s'", item.asset_path)
+			return
+
+		var body_material := asset as StandardMaterial3D
+		if body_material:
+			const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
+			if item.slot != SKIN_SLOT:
+				Log.error("Material-only item %s must use the skin slot", item)
+				return
+
+			_body_material_item = item
+			mesh = body_instance
+			material = body_material
+		else:
+			var attachment := ProxyAttachment.from_asset(asset)
+			if not attachment:
+				return
+
+			body_instance.add_child(attachment.instance)
+			_proxy_attachments[item] = attachment
+			mesh = attachment.instance
+			material = attachment.default_material
 
 	if swatch:
 		material = ResourceLoader.load(swatch.asset_path) as Material

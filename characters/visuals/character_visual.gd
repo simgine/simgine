@@ -26,7 +26,7 @@ var anim_style: AnimationStyle
 func _ready() -> void:
 	_connect_look(look)
 	for item in look.items:
-		_attach_item_with_swatch(item, look.get_swatch(item))
+		_apply_item(item, look.get_swatch(item))
 
 
 ## Replaces the old look with a new one.
@@ -51,13 +51,13 @@ func _set_look(new_look: CharacterLook) -> void:
 	_connect_look(look)
 	for item in look.items:
 		if not previous.items.has(item):
-			_attach_item_with_swatch(item, look.get_swatch(item))
+			_apply_item(item, look.get_swatch(item))
 			changed = true
 			continue
 
 		var swatch := look.get_swatch(item)
 		if previous.get_swatch(item) != swatch:
-			_apply_item_swatch(item, swatch)
+			_apply_item(item, swatch)
 			changed = true
 
 	if changed:
@@ -65,45 +65,29 @@ func _set_look(new_look: CharacterLook) -> void:
 
 
 func _connect_look(new_look: CharacterLook) -> void:
-	new_look.item_added.connect(_attach_item_with_swatch)
+	new_look.item_added.connect(_apply_item)
 	new_look.item_removed.connect(_detach_item)
-	new_look.item_swatch_changed.connect(_update_item_swatch)
+	new_look.item_swatch_changed.connect(_apply_item)
 	new_look.item_added.connect(look_changed.emit.unbind(2))
 	new_look.item_removed.connect(look_changed.emit.unbind(1))
+	new_look.item_swatch_changed.connect(look_changed.emit.unbind(2))
 
 
 func _disconnect_look(old_look: CharacterLook) -> void:
-	old_look.item_added.disconnect(_attach_item_with_swatch)
+	old_look.item_added.disconnect(_apply_item)
 	old_look.item_removed.disconnect(_detach_item)
-	old_look.item_swatch_changed.disconnect(_update_item_swatch)
+	old_look.item_swatch_changed.disconnect(_apply_item)
 	old_look.item_added.disconnect(look_changed.emit)
 	old_look.item_removed.disconnect(look_changed.emit)
+	old_look.item_swatch_changed.disconnect(look_changed.emit)
 
 
-func _attach_item_with_swatch(item: LookItem, swatch: LookSwatch) -> void:
-	if not _attach_item(item):
-		return
-
-	if swatch:
-		_apply_item_swatch(item, swatch)
-
-
-func _update_item_swatch(item: LookItem, swatch: LookSwatch) -> void:
-	_apply_item_swatch(item, swatch)
-	look_changed.emit()
-
-
-## Displays item's visual.
+## Attaches item's visual if missing and applies its swatch.
 ##
-## Returns `false` if nothing was attached.
+## A null swatch means the item's default appearance.
 ## The node should be ready before calling this.
 @abstract
-func _attach_item(item: LookItem) -> bool
-
-
-## Applies a swatch to an attached item, or restores its default when null.
-@abstract
-func _apply_item_swatch(item: LookItem, swatch: LookSwatch) -> void
+func _apply_item(item: LookItem, swatch: LookSwatch) -> void
 
 
 ## Removes item's visual.

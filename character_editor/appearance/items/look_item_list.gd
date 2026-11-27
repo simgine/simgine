@@ -183,7 +183,7 @@ func _show_swatch_popup() -> void:
 ## Applies swatch selection from the popup.
 ##
 ## The popup's item indices mirror the order of the dictionary passed to it:
-## item 0 is the default appearance, the rest are the [ItemLook.swatches].
+## item 0 is the default appearance, the rest are the [member LookItem.swatches].
 func _apply_popup_swatch(index: int) -> void:
 	var swatch: LookSwatch
 	if index > 0:

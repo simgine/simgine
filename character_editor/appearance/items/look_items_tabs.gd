@@ -4,7 +4,7 @@ extends TabContainer
 
 signal item_selected(item: LookItem)
 signal item_deselected(item: LookItem)
-signal preview_requested(item: LookItem, texture: ImageTexture)
+signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 ## Whether to display tabs for permanent or non-permanent items.
 @export var permanent: bool

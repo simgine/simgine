@@ -1,29 +1,23 @@
 class_name SwatchPopup
 extends PopupPanel
-## A popup that shows the swatches of a [LookItem].
+## A popup for swatch selection.
 
 @onready var _list: ItemList = $ItemList
 
 ## Catches clicks outside the popup so they don't reach any other controls.
 var _click_catcher: Control
 
-static var _placeholder: Texture2D = _create_placeholder()
 
-
-static func _create_placeholder() -> Texture2D:
-	var image := Image.create_empty(60, 80, false, Image.FORMAT_RGBA8)
-	return ImageTexture.create_from_image(image)
-
-
-## Shows the popup with [param item]'s swatches.
+## Shows the popup with the given swatches.
 ##
+## A null swatch is the item's default appearance, shown first.
 ## Centers horizontally below [param icon_rect],
 ## which is defined in screen coordinates.
-func display(item: LookItem, icon_rect: Rect2) -> void:
-	_populate(item)
+func display(icon_rect: Rect2, swatches: Dictionary[LookSwatch, ImageTexture]) -> void:
+	_populate(swatches)
 
 	# The popup is its own window, so position it in screen coordinates.
-	var popup_size := _calculate_size(item.swatches.size())
+	var popup_size := _calculate_size(swatches.size())
 	var popup_pos := Vector2i(
 		int(icon_rect.get_center().x - popup_size.x / 2.0),
 		int(icon_rect.end.y),
@@ -33,11 +27,16 @@ func display(item: LookItem, icon_rect: Rect2) -> void:
 	popup(Rect2i(popup_pos, popup_size))
 
 
-func _populate(item: LookItem) -> void:
+func _populate(swatches: Dictionary[LookSwatch, ImageTexture]) -> void:
 	_list.clear()
-	for swatch in item.swatches:
-		var index := _list.add_item("", _placeholder)
-		_list.set_item_tooltip(index, swatch.name)
+
+	# ItemList doesn't listen for the icon texture's changed signal when the icon
+	# is passed to add_item(), but it does when assigned via set_item_icon().
+	# This is probably a bug.
+	for swatch in swatches:
+		var index := _list.add_item("")
+		_list.set_item_icon(index, swatches[swatch])
+		_list.set_item_tooltip(index, "Original" if swatch == null else swatch.name)
 
 
 func _calculate_size(item_count: int) -> Vector2i:

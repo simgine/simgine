@@ -10,8 +10,8 @@ var _rendering := false
 ## Item currently layered on the base look.
 var _layered_item: LookItem
 
-## Base look items displaced by [member _layered_item].
-var _displaced: Array[LookItem]
+## Base look items displaced by [member _layered_item], with their swatches.
+var _displaced: Dictionary[LookItem, LookSwatch]
 
 
 func load_scene(scene_path: String) -> void:
@@ -31,9 +31,10 @@ func load_scene(scene_path: String) -> void:
 	_visual = visual
 
 
-func _queue_preview(item: LookItem, texture: ImageTexture) -> void:
+func _queue_preview(item: LookItem, swatch: LookSwatch, texture: ImageTexture) -> void:
 	var request := PreviewRequest.new()
 	request.item = item
+	request.swatch = swatch
 	request.texture = texture
 	_queue.append(request)
 
@@ -49,9 +50,13 @@ func _queue_preview(item: LookItem, texture: ImageTexture) -> void:
 
 func _render_preview(request: PreviewRequest) -> void:
 	var item := request.item
-	Log.debug("Rendering the preview of %s", item)
+	var swatch := request.swatch
+	if swatch:
+		Log.debug("Rendering the preview of %s with %s", item, swatch)
+	else:
+		Log.debug("Rendering the preview of %s", item)
 	_restore_base_look()
-	_set_item(item)
+	_set_item(item, swatch)
 
 	# Wait for the attachment rebuild, which is deferred.
 	await get_tree().process_frame
@@ -92,24 +97,32 @@ func _restore_base_look() -> void:
 	if _layered_item:
 		_visual.look.remove(_layered_item)
 	for displaced_item in _displaced:
-		_visual.look.add(displaced_item)
+		_visual.look.add(displaced_item, _displaced[displaced_item])
 	_displaced.clear()
 	_layered_item = null
 
 
-func _set_item(item: LookItem) -> void:
+func _set_item(item: LookItem, swatch: LookSwatch) -> void:
 	# Record conflicting items to restore before the next item.
+	# Items in the base look conflict with themselves, so they are recorded too.
 	for look_item: LookItem in _visual.look.items:
 		if item.conflicts_with(look_item):
-			_displaced.append(look_item)
+			_displaced[look_item] = _visual.look.get_swatch(look_item)
 
-	_visual.look.add(item)
+	if _visual.look.items.has(item):
+		# The item is part of the base look, so only its swatch changes.
+		_visual.look.set_swatch(item, swatch)
+	else:
+		_visual.look.add(item, swatch)
 	_layered_item = item
 
 
 class PreviewRequest:
 	## The item to render.
 	var item: LookItem
+
+	## The swatch to render with. Null renders the default appearance.
+	var swatch: LookSwatch
 
 	## The texture the rendered image is filled into in place.
 	var texture: ImageTexture

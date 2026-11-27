@@ -3,14 +3,18 @@ extends ItemList
 
 signal look_item_selected(item: LookItem)
 signal look_item_deselected(item: LookItem)
-signal preview_requested(item: LookItem, texture: ImageTexture)
+signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 var slot: LookSlot
 var _items: Array[LookItem]
 var _item_indices: Dictionary[LookItem, int]
 
-## Items whose previews were already requested.
-var _previewed: Dictionary[LookItem, bool]
+## Previews for items.
+##
+## The inner dictionary maps swatches to their textures.
+## A null swatch uses the item's default appearance.
+## An entry may still be waiting to render.
+var _thumbnails: Dictionary[LookItem, Dictionary]
 
 var _hovered_rect: Rect2
 var _hovered_item: LookItem
@@ -72,29 +76,14 @@ func _on_multi_selected(index: int, selected: bool) -> void:
 
 
 func _check_visible_previews() -> void:
-	if not is_visible_in_tree() or _previewed.size() == _items.size():
+	if not is_visible_in_tree() or _thumbnails.size() == _items.size():
 		return
 
 	var item_range := _get_visible_item_range()
 	for index in range(item_range[0], item_range[1]):
-		var item := _items[index]
-		if not _previewed.has(item):
-			_previewed[item] = true
-			# We create a new icon instead of duplicating the old placeholder
-			# because it causes GPU -> CPU readback.
-			var texture := _create_item_texture()
-			set_item_icon(index, texture)
-			# The preview renderer fills the texture once the item is rendered.
-			preview_requested.emit(item, texture)
-
-
-## Creates a placeholder texture for an item icon.
-func _create_item_texture() -> ImageTexture:
-	const PLACEHOLDER_COLOR := Color(1, 1, 1, 0.15)
-	var icon_size := get_fixed_icon_size()
-	var image := Image.create_empty(icon_size.x, icon_size.y, false, Image.FORMAT_RGBA8)
-	image.fill(PLACEHOLDER_COLOR)
-	return ImageTexture.create_from_image(image)
+		if get_item_icon(index) == _placeholder:
+			var icon := _get_or_request_thumbnail(_items[index])
+			set_item_icon(index, icon)
 
 
 ## Returns the visible items as a `[first, end)` index range.
@@ -166,4 +155,36 @@ func _get_item_icon_rect(index: int) -> Rect2:
 ## Shows the swatch popup for the hovered item, below its icon.
 func _show_swatch_popup() -> void:
 	var icon_rect := Rect2(get_screen_position() + _hovered_rect.position, _hovered_rect.size)
-	_swatch_popup.display(_hovered_item, icon_rect)
+
+	var swatches: Dictionary[LookSwatch, ImageTexture]
+	swatches[null] = _get_or_request_thumbnail(_hovered_item)
+	for swatch in _hovered_item.swatches:
+		swatches[swatch] = _get_or_request_thumbnail(_hovered_item, swatch)
+
+	_swatch_popup.display(icon_rect, swatches)
+
+
+func _get_or_request_thumbnail(item: LookItem, swatch: LookSwatch = null) -> ImageTexture:
+	var variants: Dictionary = _thumbnails.get_or_add(item, { })
+	var texture: ImageTexture = variants.get(swatch)
+	if texture:
+		return texture
+
+	# We create a new icon instead of duplicating the old placeholder
+	# because it causes GPU -> CPU readback.
+	texture = _create_item_texture()
+	variants[swatch] = texture
+
+	# The preview renderer fills the texture once the item is rendered.
+	preview_requested.emit(item, swatch, texture)
+
+	return texture
+
+
+## Creates a placeholder texture for an item icon.
+func _create_item_texture() -> ImageTexture:
+	const PLACEHOLDER_COLOR := Color(1, 1, 1, 0.15)
+	var icon_size := get_fixed_icon_size()
+	var image := Image.create_empty(icon_size.x, icon_size.y, false, Image.FORMAT_RGBA8)
+	image.fill(PLACEHOLDER_COLOR)
+	return ImageTexture.create_from_image(image)

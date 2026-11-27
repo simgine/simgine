@@ -97,7 +97,7 @@ func _restore_base_look() -> void:
 	if _layered_item:
 		_visual.look.remove(_layered_item)
 	for displaced_item in _displaced:
-		_visual.look.add(displaced_item, _displaced[displaced_item])
+		_visual.look.apply(displaced_item, _displaced[displaced_item])
 	_displaced.clear()
 	_layered_item = null
 
@@ -109,11 +109,7 @@ func _set_item(item: LookItem, swatch: LookSwatch) -> void:
 		if item.conflicts_with(look_item):
 			_displaced[look_item] = _visual.look.get_swatch(look_item)
 
-	if _visual.look.items.has(item):
-		# The item is part of the base look, so only its swatch changes.
-		_visual.look.set_swatch(item, swatch)
-	else:
-		_visual.look.add(item, swatch)
+	_visual.look.apply(item, swatch)
 	_layered_item = item
 
 

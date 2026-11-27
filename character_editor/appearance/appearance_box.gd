@@ -40,9 +40,9 @@ func _mirror_gender_slider() -> void:
 
 static func _disconnect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> void:
 	tabs.body_tabs.modifier_changed.disconnect(visual.set_modifier)
-	tabs.features_tabs.item_selected.disconnect(visual.look.add)
+	tabs.features_tabs.item_selected.disconnect(visual.look.apply)
 	tabs.features_tabs.item_deselected.disconnect(visual.look.remove)
-	tabs.wardrobe_tabs.item_selected.disconnect(visual.look.add)
+	tabs.wardrobe_tabs.item_selected.disconnect(visual.look.apply)
 	tabs.wardrobe_tabs.item_deselected.disconnect(visual.look.remove)
 	visual.look.item_added.disconnect(tabs.select_item)
 	visual.look.item_removed.disconnect(tabs.deselect_item)
@@ -50,9 +50,9 @@ static func _disconnect_visual(tabs: AppearanceTabs, visual: CharacterVisual) ->
 
 static func _connect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> void:
 	tabs.body_tabs.modifier_changed.connect(visual.set_modifier)
-	tabs.features_tabs.item_selected.connect(visual.look.add)
+	tabs.features_tabs.item_selected.connect(visual.look.apply)
 	tabs.features_tabs.item_deselected.connect(visual.look.remove)
-	tabs.wardrobe_tabs.item_selected.connect(visual.look.add)
+	tabs.wardrobe_tabs.item_selected.connect(visual.look.apply)
 	tabs.wardrobe_tabs.item_deselected.connect(visual.look.remove)
 	visual.look.item_added.connect(tabs.select_item.unbind(1))
 	visual.look.item_removed.connect(tabs.deselect_item)

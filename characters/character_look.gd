@@ -24,13 +24,23 @@ signal item_swatch_changed(item: LookItem, swatch: LookSwatch)
 	set = _set_items
 
 
-## Adds the item with its initial swatch, removing the items it conflicts with.
+## Attaches the item if missing, otherwise changes its swatch.
 ##
-## Already attached items keep their current swatch. A foreign swatch falls back to the default.
-func add(new_item: LookItem, swatch: LookSwatch = null) -> void:
+## A null swatch uses the item's default appearance.
+## Attaching removes the items it conflicts with.
+func apply(new_item: LookItem, swatch: LookSwatch = null) -> void:
 	assert(new_item)
 
 	if items.has(new_item):
+		if items[new_item] == swatch:
+			return
+
+		if swatch and not new_item.swatches.has(swatch):
+			Log.warn("'%s' does not belong to %s", swatch, new_item)
+			return
+
+		items[new_item] = swatch
+		item_swatch_changed.emit(new_item, swatch)
 		return
 
 	Log.trace("Adding %s", new_item)
@@ -59,25 +69,6 @@ func remove(item: LookItem) -> void:
 
 	Log.trace("Removing %s", item)
 	item_removed.emit(item)
-
-
-## Changes an attached item's swatch without detaching it.
-##
-## Null swatch restores the default appearance.
-func set_swatch(item: LookItem, swatch: LookSwatch) -> void:
-	if not items.has(item):
-		Log.warn("Unable to set %s because %s is not attached", swatch, item)
-		return
-
-	if items[item] == swatch:
-		return
-
-	if swatch and not item.swatches.has(swatch):
-		Log.warn("'%s' does not belong to %s", swatch, item)
-		return
-
-	items[item] = swatch
-	item_swatch_changed.emit(item, swatch)
 
 
 ## Returns the selected swatch, or null if the item is not attached or uses its default appearance.
@@ -111,7 +102,4 @@ func _set_items(new_items: Dictionary[LookItem, LookSwatch]) -> void:
 			Log.warn("Ignoring an invalid %s", new_item)
 			continue
 
-		if items.has(new_item):
-			set_swatch(new_item, new_items[new_item])
-		else:
-			add(new_item, new_items[new_item])
+		apply(new_item, new_items[new_item])

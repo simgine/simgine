@@ -15,7 +15,7 @@ const PONYTAIL_BLACK := preload(
 
 func test_replace_item() -> void:
 	var look := CharacterLook.new()
-	look.add(BRAID)
+	look.apply(BRAID)
 
 	var events: Array[Array]
 	look.item_removed.connect(
@@ -32,8 +32,7 @@ func test_replace_item() -> void:
 			panic("The initial swatch should already be set at attachment"),
 	)
 
-	look.add(PONYTAIL, PONYTAIL_BLACK)
-	look.add(PONYTAIL)
+	look.apply(PONYTAIL, PONYTAIL_BLACK)
 
 	assert_eq(events, [["removed", BRAID], ["added", PONYTAIL, PONYTAIL_BLACK]])
 	assert_eq(look.items, { PONYTAIL: PONYTAIL_BLACK })
@@ -62,7 +61,7 @@ func test_item_validation() -> void:
 
 func test_swatch_changes() -> void:
 	var look := CharacterLook.new()
-	look.add(PONYTAIL)
+	look.apply(PONYTAIL)
 
 	look.item_added.connect(
 		func(_item: LookItem, _swatch: LookSwatch) -> void:
@@ -79,22 +78,22 @@ func test_swatch_changes() -> void:
 			changes.append(swatch),
 	)
 
-	look.set_swatch(PONYTAIL, PONYTAIL_BLACK)
+	look.apply(PONYTAIL, PONYTAIL_BLACK)
 	assert_eq(look.get_swatch(PONYTAIL), PONYTAIL_BLACK)
 	assert_eq(changes, [PONYTAIL_BLACK])
 
-	look.set_swatch(PONYTAIL, PONYTAIL_BLACK)
+	look.apply(PONYTAIL, PONYTAIL_BLACK)
 	assert_eq(changes, [PONYTAIL_BLACK])
 
-	look.set_swatch(PONYTAIL, null)
+	look.apply(PONYTAIL, null)
 	assert_eq(look.get_swatch(PONYTAIL), null)
 	assert_eq(changes, [PONYTAIL_BLACK, null])
 
 
 func test_remove_item() -> void:
 	var look := CharacterLook.new()
-	look.add(PONYTAIL)
-	look.add(EYES)
+	look.apply(PONYTAIL)
+	look.apply(EYES)
 
 	var removed: Array[LookItem]
 	look.item_removed.connect(
@@ -110,8 +109,8 @@ func test_remove_item() -> void:
 
 func test_clear_items() -> void:
 	var look := CharacterLook.new()
-	look.add(PONYTAIL)
-	look.add(EYES)
+	look.apply(PONYTAIL)
+	look.apply(EYES)
 
 	var removed: Array[LookItem]
 	look.item_removed.connect(
@@ -127,8 +126,8 @@ func test_clear_items() -> void:
 
 func test_save_restore() -> void:
 	var look := CharacterLook.new()
-	look.add(PONYTAIL, PONYTAIL_BLACK)
-	look.add(EYES)
+	look.apply(PONYTAIL, PONYTAIL_BLACK)
+	look.apply(EYES)
 
 	var file := FileAccess.create_temp(FileAccess.READ, "character_look", "tres")
 	var path := file.get_path_absolute()

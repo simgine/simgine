@@ -2,9 +2,8 @@ class_name LookItemsTabs
 extends TabContainer
 ## An appearance tab set that groups [LookItem]s into subtabs by slot.
 
-signal item_selected(item: LookItem)
+signal item_applied(item: LookItem, swatch: LookSwatch)
 signal item_deselected(item: LookItem)
-signal swatch_selected(item: LookItem, swatch: LookSwatch)
 signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 ## Whether to display tabs for permanent or non-permanent items.
@@ -37,9 +36,8 @@ func _create_item_list(slot: LookSlot) -> LookItemList:
 	list.name = slot.name
 	list.slot = slot
 
-	list.look_item_selected.connect(item_selected.emit)
+	list.look_item_applied.connect(item_applied.emit)
 	list.look_item_deselected.connect(item_deselected.emit)
-	list.swatch_selected.connect(swatch_selected.emit)
 	list.preview_requested.connect(preview_requested.emit)
 
 	_lists[slot] = list

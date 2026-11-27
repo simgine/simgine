@@ -1,9 +1,8 @@
 class_name LookItemList
 extends ItemList
 
-signal look_item_selected(item: LookItem)
+signal look_item_applied(item: LookItem, swatch: LookSwatch)
 signal look_item_deselected(item: LookItem)
-signal swatch_selected(item: LookItem, swatch: LookSwatch)
 signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 var slot: LookSlot
@@ -83,7 +82,8 @@ func _on_multi_selected(index: int, selected: bool) -> void:
 	# The state will be updated via signals from CharacterVisual.
 	if selected:
 		deselect(index)
-		look_item_selected.emit(_items[index])
+		var item := _items[index]
+		look_item_applied.emit(item, _item_swatches.get(item))
 	else:
 		select(index)
 		# Ignore deselection if the slot is required.
@@ -184,12 +184,12 @@ func _show_swatch_popup() -> void:
 ##
 ## The popup's item indices mirror the order of the dictionary passed to it:
 ## item 0 is the default appearance, the rest are the [ItemLook.swatches].
-func _select_swatch(index: int) -> void:
+func _apply_popup_swatch(index: int) -> void:
 	var swatch: LookSwatch
 	if index > 0:
 		swatch = _hovered_item.swatches[index - 1]
 	set_item_swatch(_hovered_item, swatch)
-	swatch_selected.emit(_hovered_item, swatch)
+	look_item_applied.emit(_hovered_item, swatch)
 
 
 func _get_or_request_thumbnail(item: LookItem, swatch: LookSwatch = null) -> ImageTexture:

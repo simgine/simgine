@@ -2,6 +2,8 @@ class_name SwatchPopup
 extends PopupPanel
 ## A popup for swatch selection.
 
+signal swatch_selected(index: int)
+
 @onready var _list: ItemList = $ItemList
 
 ## Catches clicks outside the popup so they don't reach any other controls.
@@ -37,6 +39,11 @@ func _populate(swatches: Dictionary[LookSwatch, ImageTexture]) -> void:
 		var index := _list.add_item("")
 		_list.set_item_icon(index, swatches[swatch])
 		_list.set_item_tooltip(index, "Original" if swatch == null else swatch.name)
+
+
+func _select_swatch(index: int) -> void:
+	swatch_selected.emit(index)
+	hide()
 
 
 func _calculate_size(item_count: int) -> Vector2i:

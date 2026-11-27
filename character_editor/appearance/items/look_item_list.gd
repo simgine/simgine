@@ -3,6 +3,7 @@ extends ItemList
 
 signal look_item_selected(item: LookItem)
 signal look_item_deselected(item: LookItem)
+signal swatch_selected(item: LookItem, swatch: LookSwatch)
 signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 var slot: LookSlot
@@ -162,6 +163,17 @@ func _show_swatch_popup() -> void:
 		swatches[swatch] = _get_or_request_thumbnail(_hovered_item, swatch)
 
 	_swatch_popup.display(icon_rect, swatches)
+
+
+## Applies swatch selection from the poup.
+##
+## The popup's item indices mirror the order of the dictionary passed to it:
+## item 0 is the default appearance, the rest are the [ItemLook.swatches].
+func _select_swatch(index: int) -> void:
+	var swatch: LookSwatch
+	if index > 0:
+		swatch = _hovered_item.swatches[index - 1]
+	swatch_selected.emit(_hovered_item, swatch)
 
 
 func _get_or_request_thumbnail(item: LookItem, swatch: LookSwatch = null) -> ImageTexture:

@@ -32,3 +32,4 @@ text = "⚙"
 [connection signal="visibility_changed" from="." to="." method="_check_visible_previews"]
 [connection signal="mouse_exited" from="SwatchButton" to="." method="_update_hovered_item"]
 [connection signal="pressed" from="SwatchButton" to="." method="_show_swatch_popup"]
+[connection signal="swatch_selected" from="SwatchPopup" to="." method="_select_swatch"]

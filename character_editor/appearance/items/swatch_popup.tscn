@@ -36,3 +36,4 @@ icon_mode = 0
 fixed_icon_size = Vector2i(60, 80)
 
 [connection signal="popup_hide" from="." to="." method="_remove_click_catcher"]
+[connection signal="item_selected" from="ItemList" to="." method="_select_swatch"]

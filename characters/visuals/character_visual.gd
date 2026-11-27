@@ -50,13 +50,8 @@ func _set_look(new_look: CharacterLook) -> void:
 	Log.trace("Adding new look")
 	_connect_look(look)
 	for item in look.items:
-		if not previous.items.has(item):
-			_apply_item(item, look.get_swatch(item))
-			changed = true
-			continue
-
 		var swatch := look.get_swatch(item)
-		if previous.get_swatch(item) != swatch:
+		if not previous.items.has(item) or previous.get_swatch(item) != swatch:
 			_apply_item(item, swatch)
 			changed = true
 

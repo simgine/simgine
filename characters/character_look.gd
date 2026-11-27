@@ -24,6 +24,11 @@ signal item_swatch_changed(item: LookItem, swatch: LookSwatch)
 	set = _set_items
 
 
+func _init() -> void:
+	# Each instantiated scene should have independent look.
+	set_local_to_scene(true)
+
+
 ## Attaches the item if missing, otherwise changes its swatch.
 ##
 ## A null swatch uses the item's default appearance.

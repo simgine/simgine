@@ -56,6 +56,9 @@ func load_state(visual: CharacterVisual) -> void:
 		var item := visual.look.get_item(slot)
 		if item:
 			list.select_item(item)
+			var swatch := visual.look.get_swatch(item)
+			if swatch:
+				list.set_item_swatch(item, swatch)
 
 
 ## Selects the item's icon in the list of its slot.

@@ -17,6 +17,11 @@ var _item_indices: Dictionary[LookItem, int]
 ## An entry may still be waiting to render.
 var _thumbnails: Dictionary[LookItem, Dictionary]
 
+## The selected swatch for each item.
+##
+## An absent entry uses the item's default appearance.
+var _item_swatches: Dictionary[LookItem, LookSwatch]
+
 var _hovered_rect: Rect2
 var _hovered_item: LookItem
 
@@ -56,6 +61,16 @@ func select_item(item: LookItem) -> void:
 
 func deselect_item(item: LookItem) -> void:
 	deselect(_item_indices[item])
+
+
+func set_item_swatch(item: LookItem, swatch: LookSwatch) -> void:
+	if swatch:
+		_item_swatches[item] = swatch
+	else:
+		_item_swatches.erase(item)
+
+	var icon := _get_or_request_thumbnail(item, swatch)
+	set_item_icon(_item_indices[item], icon)
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -173,6 +188,7 @@ func _select_swatch(index: int) -> void:
 	var swatch: LookSwatch
 	if index > 0:
 		swatch = _hovered_item.swatches[index - 1]
+	set_item_swatch(_hovered_item, swatch)
 	swatch_selected.emit(_hovered_item, swatch)
 
 

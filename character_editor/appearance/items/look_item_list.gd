@@ -153,20 +153,10 @@ func _update_hovered_item() -> void:
 
 func _get_item_icon_rect(index: int) -> Rect2:
 	var icon_size := Vector2(get_fixed_icon_size())
-	# Cells are the icon plus separations, with the icon centered in them.
-	var cell := icon_size + Vector2(
-		get_theme_constant("h_separation"),
-		get_theme_constant("v_separation"),
-	)
-	var columns := get_max_columns()
-	var panel := get_theme_stylebox("panel")
-	@warning_ignore("integer_division")
-	var row := index / columns
-	var origin := Vector2(
-		panel.get_offset().x + (index % columns) * cell.x,
-		panel.get_offset().y + row * cell.y - get_v_scroll_bar().value,
-	)
-	return Rect2(origin + (cell - icon_size) / 2.0, icon_size)
+	var cell := get_item_rect(index, false)
+	var origin := cell.position + ((cell.size - icon_size) / 2.0).floor()
+	origin.y -= roundf(get_v_scroll_bar().value)
+	return Rect2(origin, icon_size)
 
 
 ## Shows the swatch popup for the hovered item, below its icon.

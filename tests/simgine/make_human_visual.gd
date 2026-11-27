@@ -99,6 +99,6 @@ func test_body_material_slot() -> void:
 	add_child(visual)
 	visual.look.apply(SKIN)
 
-	expect_error("must use the skin slot")
+	expect_error("must be an MHProxy or a PackedScene")
 	visual.look.apply(item)
 	assert_eq(visual.body_instance.material_override, load(SKIN.asset_path) as Material)

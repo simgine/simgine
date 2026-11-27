@@ -2,70 +2,70 @@
 class_name MakeHumanVisual
 extends CharacterVisual
 
+const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
+
 @onready var body_instance: MHBodyInstance = %Body
 
 ## Runtime attachments for items that add a proxy mesh.
 var _proxy_attachments: Dictionary[LookItem, ProxyAttachment]
 
-## The skin item that sets the body's [member GeometryInstance3D.material_override]
-## instead of adding a proxy mesh.
-var _body_material_item: LookItem
-
 
 func _apply_item(item: LookItem, swatch: LookSwatch) -> void:
-	var mesh: MeshInstance3D
-	var material: Material
-
-	if item == _body_material_item:
-		mesh = body_instance
-		if not swatch:
-			# Restore the original
-			material = ResourceLoader.load(item.asset_path) as StandardMaterial3D
-			if not material:
-				Log.error("Body material asset '%s' must be a StandardMaterial3D", item.asset_path)
-				return
-	elif _proxy_attachments.has(item):
-		var attachment: ProxyAttachment = _proxy_attachments[item]
-		mesh = attachment.instance
-		material = attachment.default_material
+	if item.slot == SKIN_SLOT:
+		_apply_skin(item, swatch)
 	else:
+		_apply_proxy(item, swatch)
+
+
+func _apply_skin(item: LookItem, swatch: LookSwatch) -> void:
+	var material := ResourceLoader.load(item.asset_path) as Material
+	if not material:
+		Log.error("Skin asset '%s' must be a Material", item.asset_path)
+		return
+
+	_apply_swatch(body_instance, material, swatch)
+
+
+func _apply_proxy(item: LookItem, swatch: LookSwatch) -> void:
+	var attachment: ProxyAttachment = _proxy_attachments.get(item)
+	if not attachment:
 		var asset := ResourceLoader.load(item.asset_path)
 		if not asset:
 			Log.error("Unable to load '%s'", item.asset_path)
 			return
 
-		var body_material := asset as StandardMaterial3D
-		if body_material:
-			const SKIN_SLOT := preload("res://characters/look_slots/skin.tres")
-			if item.slot != SKIN_SLOT:
-				Log.error("Material-only item %s must use the skin slot", item)
-				return
-
-			_body_material_item = item
-			mesh = body_instance
-			material = body_material
-		else:
-			var attachment := ProxyAttachment.from_asset(asset)
-			if not attachment:
-				return
-
-			body_instance.add_child(attachment.instance)
-			_proxy_attachments[item] = attachment
-			mesh = attachment.instance
-			material = attachment.default_material
-
-	if swatch:
-		material = ResourceLoader.load(swatch.asset_path) as Material
-		if not material:
-			Log.error("Swatch asset '%s' must be a Material", swatch.asset_path)
+		attachment = ProxyAttachment.from_asset(asset)
+		if not attachment:
 			return
+
+		body_instance.add_child(attachment.instance)
+		_proxy_attachments[item] = attachment
+
+	_apply_swatch(attachment.instance, attachment.default_material, swatch)
+
+
+## Applies a swatch material to the mesh, or uses the default material if the swatch is null.
+##
+## For skin materials, the mesh is the body. For proxy materials, it's the proxy instance.
+static func _apply_swatch(
+	mesh: MeshInstance3D,
+	default_material: Material,
+	swatch: LookSwatch,
+) -> void:
+	if not swatch:
+		mesh.material_override = default_material
+		return
+
+	var material := ResourceLoader.load(swatch.asset_path) as Material
+	if not material:
+		Log.error("Swatch asset '%s' must be a Material", swatch.asset_path)
+		return
 
 	mesh.material_override = material
 
 
 func _detach_item(item: LookItem) -> void:
-	if item == _body_material_item:
-		_body_material_item = null
+	if item.slot == SKIN_SLOT:
 		body_instance.material_override = null
 		return
 
@@ -269,7 +269,7 @@ class ProxyAttachment:
 			return ProxyAttachment.new(proxy_instance)
 
 		Log.error(
-			"'%s' must be a StandardMaterial3D, MHProxy resource, or PackedScene with an MHProxyInstance root",
+			"'%s' must be an MHProxy or a PackedScene with an MHProxyInstance root",
 			asset.resource_path,
 		)
 		return null

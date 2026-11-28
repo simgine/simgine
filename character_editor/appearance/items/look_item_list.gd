@@ -3,7 +3,7 @@ extends ItemList
 
 signal look_item_applied(item: LookItem, swatch: LookSwatch)
 signal look_item_deselected(item: LookItem)
-signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
+signal thumbnail_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 var _items: Array[LookItem]
 var _item_indices: Dictionary[LookItem, int]
@@ -216,7 +216,7 @@ func _get_or_request_thumbnail(item: LookItem, swatch: LookSwatch = null) -> Ima
 	variants[swatch] = texture
 
 	# The preview renderer fills the texture once the item is rendered.
-	preview_requested.emit(item, swatch, texture)
+	thumbnail_requested.emit(item, swatch, texture)
 
 	return texture
 

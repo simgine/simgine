@@ -113,7 +113,7 @@ func get_modifiers_dir() -> String
 ##
 ## The scene's root must be a [CharacterVisual].
 @abstract
-func get_preview_scene_path() -> String
+func get_thumbnail_scene_path() -> String
 
 
 ## Returns the visual's skeleton profile identifier, e.g. "SkeletonProfileHumanoid".

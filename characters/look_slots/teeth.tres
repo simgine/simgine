@@ -6,6 +6,6 @@
 script = ExtResource("1_slot")
 name = "Teeth"
 permanent = true
-preview_camera = "Mouth"
+thumbnail_camera = "Mouth"
 conflicts = Array[ExtResource("1_slot")]([])
 metadata/_custom_type_script = "uid://v4rpudpmubdt"

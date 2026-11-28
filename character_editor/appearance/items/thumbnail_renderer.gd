@@ -1,10 +1,10 @@
-class_name LookItemPreview
+class_name ThumbnailRenderer
 extends SubViewport
-## Renders previews for [LookItem]s in a scene from [method CharacterVisual.get_preview_scene_path].
+## Renders previews for [LookItem]s in a scene from [method CharacterVisual.get_thumbnail_scene_path].
 
 var _visual: CharacterVisual
 
-var _queue: Array[PreviewRequest]
+var _queue: Array[ThumbnailRequest]
 var _rendering := false
 
 ## Item currently layered on the base look.
@@ -31,8 +31,8 @@ func load_scene(scene_path: String) -> void:
 	_visual = visual
 
 
-func _queue_preview(item: LookItem, swatch: LookSwatch, texture: ImageTexture) -> void:
-	var request := PreviewRequest.new()
+func _queue_thumbnail(item: LookItem, swatch: LookSwatch, texture: ImageTexture) -> void:
+	var request := ThumbnailRequest.new()
 	request.item = item
 	request.swatch = swatch
 	request.texture = texture
@@ -43,12 +43,12 @@ func _queue_preview(item: LookItem, swatch: LookSwatch, texture: ImageTexture) -
 
 	_rendering = true
 	while not _queue.is_empty():
-		await _render_preview(_queue.pop_front())
+		await _render_thumbnail(_queue.pop_front())
 
 	_rendering = false
 
 
-func _render_preview(request: PreviewRequest) -> void:
+func _render_thumbnail(request: ThumbnailRequest) -> void:
 	var item := request.item
 	var swatch := request.swatch
 	if swatch:
@@ -62,9 +62,9 @@ func _render_preview(request: PreviewRequest) -> void:
 	await get_tree().process_frame
 
 	var slot := item.slot
-	var camera := _visual.get_node_or_null(slot.preview_camera) as Camera3D
+	var camera := _visual.get_node_or_null(slot.thumbnail_camera) as Camera3D
 	if not camera:
-		Log.error("Preview camera '%s' of the '%s' slot is missing", slot.preview_camera, slot.name)
+		Log.error("Preview camera '%s' of the '%s' slot is missing", slot.thumbnail_camera, slot.name)
 		return
 
 	camera.current = true
@@ -113,7 +113,7 @@ func _set_item(item: LookItem, swatch: LookSwatch) -> void:
 	_layered_item = item
 
 
-class PreviewRequest:
+class ThumbnailRequest:
 	## The item to render.
 	var item: LookItem
 

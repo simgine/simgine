@@ -71,6 +71,6 @@ func _create_tabs(visual: CharacterVisual) -> AppearanceTabs:
 	tabs.features_tabs.populate(items)
 	tabs.wardrobe_tabs.populate(items)
 
-	tabs.preview.load_scene(visual.get_preview_scene_path())
+	tabs.thumbnail_renderer.load_scene(visual.get_thumbnail_scene_path())
 
 	return tabs

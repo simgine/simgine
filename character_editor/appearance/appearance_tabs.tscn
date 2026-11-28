@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://cfaaaq0t8oyog" path="res://character_editor/appearance/appearance_tabs.gd" id="1_appearance_tabs"]
 [ext_resource type="Script" uid="uid://cvgattjuyu776" path="res://character_editor/appearance/body/body_tabs.gd" id="2_body_tabs"]
 [ext_resource type="Script" uid="uid://bqsh54hcofd35" path="res://character_editor/appearance/items/look_items_tabs.gd" id="3_look_items_tabs"]
-[ext_resource type="Script" uid="uid://b4wbb1vo82x7e" path="res://character_editor/appearance/items/look_item_preview.gd" id="4_v8yi7"]
+[ext_resource type="Script" uid="uid://b4wbb1vo82x7e" path="res://character_editor/appearance/items/thumbnail_renderer.gd" id="4_v8yi7"]
 
 [node name="AppearanceTabs" type="TabContainer" unique_id=1586993996]
 size_flags_vertical = 3
@@ -28,7 +28,7 @@ layout_mode = 2
 script = ExtResource("3_look_items_tabs")
 metadata/_tab_index = 2
 
-[node name="Preview" type="SubViewport" parent="." unique_id=1562166991]
+[node name="ThumbnailRenderer" type="SubViewport" parent="." unique_id=1562166991]
 own_world_3d = true
 transparent_bg = true
 msaa_3d = 1
@@ -36,9 +36,9 @@ size = Vector2i(300, 400)
 render_target_update_mode = 0
 script = ExtResource("4_v8yi7")
 
-[node name="Light" type="DirectionalLight3D" parent="Preview" unique_id=1197551859]
+[node name="Light" type="DirectionalLight3D" parent="ThumbnailRenderer" unique_id=1197551859]
 transform = Transform3D(0.8253356, 0.47513026, -0.3050776, 0, 0.5403023, 0.841471, 0.5646425, -0.694496, 0.44593075, 0, 0, 0)
 layers = 3
 
-[connection signal="preview_requested" from="Features" to="Preview" method="_queue_preview"]
-[connection signal="preview_requested" from="Wardrobe" to="Preview" method="_queue_preview"]
+[connection signal="thumbnail_requested" from="Features" to="ThumbnailRenderer" method="_queue_thumbnail"]
+[connection signal="thumbnail_requested" from="Wardrobe" to="ThumbnailRenderer" method="_queue_thumbnail"]

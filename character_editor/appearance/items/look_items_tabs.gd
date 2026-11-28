@@ -4,7 +4,7 @@ extends TabContainer
 
 signal item_applied(item: LookItem, swatch: LookSwatch)
 signal item_deselected(item: LookItem)
-signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
+signal thumbnail_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
 ## Whether to display tabs for permanent or non-permanent items.
 @export var permanent: bool
@@ -37,7 +37,7 @@ func _create_item_list(slot: LookSlot) -> LookItemList:
 
 	list.look_item_applied.connect(item_applied.emit)
 	list.look_item_deselected.connect(item_deselected.emit)
-	list.preview_requested.connect(preview_requested.emit)
+	list.thumbnail_requested.connect(thumbnail_requested.emit)
 
 	_lists[slot] = list
 	add_child(list)

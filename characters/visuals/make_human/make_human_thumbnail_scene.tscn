@@ -19,7 +19,7 @@ ExtResource("5_l3p8a"): null,
 ExtResource("6_xeu00"): null
 })
 
-[node name="MakeHumanPreview" unique_id=344067901 instance=ExtResource("1_visual")]
+[node name="MakeHumanThumbnailScene" unique_id=344067901 instance=ExtResource("1_visual")]
 look = SubResource("Resource_k538c")
 
 [node name="Skeleton" parent="." index="0" unique_id=338036088]

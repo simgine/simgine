@@ -33,6 +33,8 @@ var _hovered_item: LookItem
 func _ready() -> void:
 	get_v_scroll_bar().value_changed.connect(_check_visible_previews.unbind(1))
 	get_v_scroll_bar().value_changed.connect(_update_hovered_item.unbind(1))
+	# The parent populates the list just after adding it to the tree.
+	_check_visible_previews.call_deferred()
 
 
 func add_look_item(item: LookItem) -> void:
@@ -40,7 +42,6 @@ func add_look_item(item: LookItem) -> void:
 	var index := add_item("", _placeholder)
 	set_item_tooltip(index, _build_tooltip(item))
 	_item_indices[item] = index
-	_check_visible_previews()
 
 
 ## Builds the item's tooltip, appending author and license credits when set.

@@ -200,6 +200,13 @@ func _apply_popup_swatch(index: int) -> void:
 	var swatch: LookSwatch
 	if index > 0:
 		swatch = _hovered_item.swatches[index - 1]
+
+	# The swatch picker can be shown even for an unselected item.
+	# We select it on swatch selection.
+	var item_index := _item_indices[_hovered_item]
+	if is_selected(item_index) and _item_swatches.get(_hovered_item) == swatch:
+		return
+
 	select_item(_hovered_item, swatch)
 	look_item_applied.emit(_hovered_item, swatch)
 

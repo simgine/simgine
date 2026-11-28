@@ -44,7 +44,6 @@ static func _disconnect_visual(tabs: AppearanceTabs, visual: CharacterVisual) ->
 	tabs.features_tabs.item_deselected.disconnect(visual.look.remove)
 	tabs.wardrobe_tabs.item_applied.disconnect(visual.look.apply)
 	tabs.wardrobe_tabs.item_deselected.disconnect(visual.look.remove)
-	visual.look.item_added.disconnect(tabs.select_item)
 	visual.look.item_removed.disconnect(tabs.deselect_item)
 
 
@@ -54,7 +53,7 @@ static func _connect_visual(tabs: AppearanceTabs, visual: CharacterVisual) -> vo
 	tabs.features_tabs.item_deselected.connect(visual.look.remove)
 	tabs.wardrobe_tabs.item_applied.connect(visual.look.apply)
 	tabs.wardrobe_tabs.item_deselected.connect(visual.look.remove)
-	visual.look.item_added.connect(tabs.select_item.unbind(1))
+	# Sync removals to UI since adding one item might remove another.
 	visual.look.item_removed.connect(tabs.deselect_item)
 
 

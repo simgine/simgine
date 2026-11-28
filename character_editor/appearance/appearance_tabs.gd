@@ -13,13 +13,6 @@ func load_state(visual: CharacterVisual) -> void:
 	wardrobe_tabs.load_state(visual)
 
 
-func select_item(item: LookItem) -> void:
-	if item.slot.permanent:
-		features_tabs.select_item(item)
-	else:
-		wardrobe_tabs.select_item(item)
-
-
 func deselect_item(item: LookItem) -> void:
 	if item.slot.permanent:
 		features_tabs.deselect_item(item)

@@ -34,7 +34,6 @@ func _create_item_list(slot: LookSlot) -> LookItemList:
 	const LOOK_ITEM_LIST := preload("res://character_editor/appearance/items/look_item_list.tscn")
 	var list: LookItemList = LOOK_ITEM_LIST.instantiate()
 	list.name = slot.name
-	list.slot = slot
 
 	list.look_item_applied.connect(item_applied.emit)
 	list.look_item_deselected.connect(item_deselected.emit)
@@ -53,16 +52,7 @@ func load_state(visual: CharacterVisual) -> void:
 
 		var item := visual.look.get_item(slot)
 		if item:
-			list.select_item(item)
-			var swatch := visual.look.get_swatch(item)
-			if swatch:
-				list.set_item_swatch(item, swatch)
-
-
-## Selects the item's icon in the list of its slot.
-func select_item(item: LookItem) -> void:
-	var list: LookItemList = _lists.get(item.slot)
-	list.select_item(item)
+			list.select_item(item, visual.look.get_swatch(item))
 
 
 ## Deselects the item's icon in the list of its slot.

@@ -5,7 +5,6 @@ signal look_item_applied(item: LookItem, swatch: LookSwatch)
 signal look_item_deselected(item: LookItem)
 signal preview_requested(item: LookItem, swatch: LookSwatch, texture: ImageTexture)
 
-var slot: LookSlot
 var _items: Array[LookItem]
 var _item_indices: Dictionary[LookItem, int]
 
@@ -54,22 +53,23 @@ static func _build_tooltip(item: LookItem) -> String:
 	return tooltip
 
 
-func select_item(item: LookItem) -> void:
-	select(_item_indices[item])
+func select_item(item: LookItem, swatch: LookSwatch = null) -> void:
+	var index := _item_indices[item]
+	select(index)
+	if _item_swatches.get(item) == swatch:
+		return
 
-
-func deselect_item(item: LookItem) -> void:
-	deselect(_item_indices[item])
-
-
-func set_item_swatch(item: LookItem, swatch: LookSwatch) -> void:
 	if swatch:
 		_item_swatches[item] = swatch
 	else:
 		_item_swatches.erase(item)
 
 	var icon := _get_or_request_thumbnail(item, swatch)
-	set_item_icon(_item_indices[item], icon)
+	set_item_icon(index, icon)
+
+
+func deselect_item(item: LookItem) -> void:
+	deselect(_item_indices[item])
 
 
 func _on_gui_input(event: InputEvent) -> void:
@@ -78,17 +78,14 @@ func _on_gui_input(event: InputEvent) -> void:
 
 
 func _on_multi_selected(index: int, selected: bool) -> void:
-	# Undo the selection and only emit signals.
-	# The state will be updated via signals from CharacterVisual.
+	var item := _items[index]
 	if selected:
-		deselect(index)
-		var item := _items[index]
 		look_item_applied.emit(item, _item_swatches.get(item))
-	else:
+	elif item.slot.permanent:
+		# Undo the deselection.
 		select(index)
-		# Ignore deselection if the slot is required.
-		if not slot.permanent:
-			look_item_deselected.emit(_items[index])
+	else:
+		look_item_deselected.emit(item)
 
 
 func _check_visible_previews() -> void:
@@ -188,7 +185,7 @@ func _apply_popup_swatch(index: int) -> void:
 	var swatch: LookSwatch
 	if index > 0:
 		swatch = _hovered_item.swatches[index - 1]
-	set_item_swatch(_hovered_item, swatch)
+	select_item(_hovered_item, swatch)
 	look_item_applied.emit(_hovered_item, swatch)
 
 

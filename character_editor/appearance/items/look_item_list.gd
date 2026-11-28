@@ -56,6 +56,7 @@ static func _build_tooltip(item: LookItem) -> String:
 func select_item(item: LookItem, swatch: LookSwatch = null) -> void:
 	var index := _item_indices[item]
 	select(index)
+
 	if _item_swatches.get(item) == swatch:
 		return
 
@@ -63,6 +64,15 @@ func select_item(item: LookItem, swatch: LookSwatch = null) -> void:
 		_item_swatches[item] = swatch
 	else:
 		_item_swatches.erase(item)
+
+	if not is_visible_in_tree():
+		set_item_icon(index, _placeholder)
+		return
+
+	var item_range := _get_visible_item_range()
+	if index < item_range[0] or index >= item_range[1]:
+		set_item_icon(index, _placeholder)
+		return
 
 	var icon := _get_or_request_thumbnail(item, swatch)
 	set_item_icon(index, icon)
@@ -89,13 +99,14 @@ func _on_multi_selected(index: int, selected: bool) -> void:
 
 
 func _check_visible_previews() -> void:
-	if not is_visible_in_tree() or _thumbnails.size() == _items.size():
+	if not is_visible_in_tree():
 		return
 
 	var item_range := _get_visible_item_range()
 	for index in range(item_range[0], item_range[1]):
 		if get_item_icon(index) == _placeholder:
-			var icon := _get_or_request_thumbnail(_items[index])
+			var item := _items[index]
+			var icon := _get_or_request_thumbnail(item, _item_swatches.get(item))
 			set_item_icon(index, icon)
 
 

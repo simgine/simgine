@@ -31,10 +31,10 @@ var _hovered_item: LookItem
 
 
 func _ready() -> void:
-	get_v_scroll_bar().value_changed.connect(_check_visible_previews.unbind(1))
+	get_v_scroll_bar().value_changed.connect(_update_visible_icons.unbind(1))
 	get_v_scroll_bar().value_changed.connect(_update_hovered_item.unbind(1))
 	# The parent populates the list just after adding it to the tree.
-	_check_visible_previews.call_deferred()
+	_update_visible_icons.call_deferred()
 
 
 func add_look_item(item: LookItem) -> void:
@@ -70,7 +70,7 @@ func select_item(item: LookItem, swatch: LookSwatch = null) -> void:
 		var icon := _get_or_request_thumbnail(item, swatch)
 		set_item_icon(index, icon)
 	else:
-		# Will be updated later in _check_visible_previews
+		# Will be updated later in _update_visible_icons
 		set_item_icon(index, _placeholder)
 
 
@@ -102,7 +102,7 @@ func _on_multi_selected(index: int, selected: bool) -> void:
 		look_item_deselected.emit(item)
 
 
-func _check_visible_previews() -> void:
+func _update_visible_icons() -> void:
 	if not is_visible_in_tree():
 		return
 

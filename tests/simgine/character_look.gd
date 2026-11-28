@@ -22,19 +22,15 @@ func test_replace_item() -> void:
 		func(item: LookItem) -> void:
 			events.append(["removed", item]),
 	)
-	look.item_added.connect(
+	look.item_applied.connect(
 		func(item: LookItem, swatch: LookSwatch) -> void:
 			assert_eq(swatch, look.get_swatch(item), "the swatch is stored before the signal")
-			events.append(["added", item, swatch]),
-	)
-	look.item_swatch_changed.connect(
-		func(_item: LookItem, _swatch: LookSwatch) -> void:
-			panic("The initial swatch should already be set at attachment"),
+			events.append(["applied", item, swatch]),
 	)
 
 	look.apply(PONYTAIL, PONYTAIL_BLACK)
 
-	assert_eq(events, [["removed", BRAID], ["added", PONYTAIL, PONYTAIL_BLACK]])
+	assert_eq(events, [["removed", BRAID], ["applied", PONYTAIL, PONYTAIL_BLACK]])
 	assert_eq(look.items, { PONYTAIL: PONYTAIL_BLACK })
 
 
@@ -46,7 +42,7 @@ func test_item_validation() -> void:
 
 	var look := CharacterLook.new()
 	var swatches: Array[LookSwatch]
-	look.item_added.connect(
+	look.item_applied.connect(
 		func(_item: LookItem, swatch: LookSwatch) -> void:
 			swatches.append(swatch),
 	)
@@ -63,19 +59,14 @@ func test_swatch_changes() -> void:
 	var look := CharacterLook.new()
 	look.apply(PONYTAIL)
 
-	look.item_added.connect(
-		func(_item: LookItem, _swatch: LookSwatch) -> void:
-			panic("The item was attached again"),
+	var changes: Array[LookSwatch]
+	look.item_applied.connect(
+		func(_item: LookItem, swatch: LookSwatch) -> void:
+			changes.append(swatch),
 	)
 	look.item_removed.connect(
 		func(_item: LookItem) -> void:
 			panic("The item was detached"),
-	)
-
-	var changes: Array[LookSwatch]
-	look.item_swatch_changed.connect(
-		func(_item: LookItem, swatch: LookSwatch) -> void:
-			changes.append(swatch),
 	)
 
 	look.apply(PONYTAIL, PONYTAIL_BLACK)
@@ -83,7 +74,7 @@ func test_swatch_changes() -> void:
 	assert_eq(changes, [PONYTAIL_BLACK])
 
 	look.apply(PONYTAIL, PONYTAIL_BLACK)
-	assert_eq(changes, [PONYTAIL_BLACK])
+	assert_eq(changes, [PONYTAIL_BLACK], "applying the same swatch is a no-op")
 
 	look.apply(PONYTAIL, null)
 	assert_eq(look.get_swatch(PONYTAIL), null)

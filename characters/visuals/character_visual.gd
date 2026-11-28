@@ -60,21 +60,17 @@ func _set_look(new_look: CharacterLook) -> void:
 
 
 func _connect_look(new_look: CharacterLook) -> void:
-	new_look.item_added.connect(_apply_item)
+	new_look.item_applied.connect(_apply_item)
 	new_look.item_removed.connect(_detach_item)
-	new_look.item_swatch_changed.connect(_apply_item)
-	new_look.item_added.connect(look_changed.emit.unbind(2))
+	new_look.item_applied.connect(look_changed.emit.unbind(2))
 	new_look.item_removed.connect(look_changed.emit.unbind(1))
-	new_look.item_swatch_changed.connect(look_changed.emit.unbind(2))
 
 
 func _disconnect_look(old_look: CharacterLook) -> void:
-	old_look.item_added.disconnect(_apply_item)
+	old_look.item_applied.disconnect(_apply_item)
 	old_look.item_removed.disconnect(_detach_item)
-	old_look.item_swatch_changed.disconnect(_apply_item)
-	old_look.item_added.disconnect(look_changed.emit)
+	old_look.item_applied.disconnect(look_changed.emit)
 	old_look.item_removed.disconnect(look_changed.emit)
-	old_look.item_swatch_changed.disconnect(look_changed.emit)
 
 
 ## Attaches item's visual if missing and applies its swatch.

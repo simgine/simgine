@@ -3,18 +3,13 @@ class_name CharacterLook
 extends Resource
 ## Items and their selected appearances on a [CharacterVisual].
 
-## Emitted after an item is attached.
+## Emitted after an item is added to the look or its swatch changes.
 ##
 ## Null swatch means the default appearance.
-signal item_added(item: LookItem, swatch: LookSwatch)
+signal item_applied(item: LookItem, swatch: LookSwatch)
 
 ## Emitted after an item is removed.
 signal item_removed(item: LookItem)
-
-## Emitted after an attached item's swatch changes.
-##
-## Null swatch means the default appearance.
-signal item_swatch_changed(item: LookItem, swatch: LookSwatch)
 
 ## Attached items with an optional selected swatch.
 ##
@@ -45,7 +40,7 @@ func apply(new_item: LookItem, swatch: LookSwatch = null) -> void:
 			return
 
 		items[new_item] = swatch
-		item_swatch_changed.emit(new_item, swatch)
+		item_applied.emit(new_item, swatch)
 		return
 
 	Log.trace("Adding %s", new_item)
@@ -64,7 +59,7 @@ func apply(new_item: LookItem, swatch: LookSwatch = null) -> void:
 		swatch = null
 
 	items[new_item] = swatch
-	item_added.emit(new_item, swatch)
+	item_applied.emit(new_item, swatch)
 
 
 ## Removes the item if present.

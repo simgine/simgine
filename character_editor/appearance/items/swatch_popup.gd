@@ -2,7 +2,7 @@ class_name SwatchPopup
 extends PopupPanel
 ## A popup for swatch selection.
 
-signal swatch_selected(index: int)
+signal swatch_selected(swatch: LookSwatch)
 
 @onready var _list: ItemList = $ItemList
 
@@ -10,16 +10,26 @@ signal swatch_selected(index: int)
 var _click_catcher: Control
 
 
-## Shows the popup with the given swatches.
-##
-## A null swatch is the item's default appearance, shown first.
-## Centers horizontally below [param icon_rect],
-## which is defined in screen coordinates.
-func display(icon_rect: Rect2, swatches: Dictionary[LookSwatch, ImageTexture]) -> void:
-	_populate(swatches)
+func clear_swatches() -> void:
+	_list.clear()
 
-	# The popup is its own window, so position it in screen coordinates.
-	var popup_size := _calculate_size(swatches.size())
+
+## Adds a swatch to the list in the popup.
+##
+## A null swatch represents the item's original appearance.
+func add_swatch(swatch: LookSwatch, icon: Texture2D) -> void:
+	var index := _list.add_item("")
+	# ItemList doesn't listen for the icon texture's changed signal when the icon
+	# is passed to add_item(), but it does when assigned via set_item_icon().
+	# This is probably a bug.
+	_list.set_item_icon(index, icon)
+	_list.set_item_tooltip(index, "Original" if swatch == null else swatch.name)
+	_list.set_item_metadata(index, swatch)
+
+
+## Centers the popup below [param icon_rect], which is in screen coordinates.
+func display(icon_rect: Rect2) -> void:
+	var popup_size := _calculate_size(_list.item_count)
 	var popup_pos := Vector2i(
 		int(icon_rect.get_center().x - popup_size.x / 2.0),
 		int(icon_rect.end.y),
@@ -29,20 +39,8 @@ func display(icon_rect: Rect2, swatches: Dictionary[LookSwatch, ImageTexture]) -
 	popup(Rect2i(popup_pos, popup_size))
 
 
-func _populate(swatches: Dictionary[LookSwatch, ImageTexture]) -> void:
-	_list.clear()
-
-	# ItemList doesn't listen for the icon texture's changed signal when the icon
-	# is passed to add_item(), but it does when assigned via set_item_icon().
-	# This is probably a bug.
-	for swatch in swatches:
-		var index := _list.add_item("")
-		_list.set_item_icon(index, swatches[swatch])
-		_list.set_item_tooltip(index, "Original" if swatch == null else swatch.name)
-
-
 func _select_swatch(index: int) -> void:
-	swatch_selected.emit(index)
+	swatch_selected.emit(_list.get_item_metadata(index))
 	hide()
 
 

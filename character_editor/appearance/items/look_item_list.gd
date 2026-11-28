@@ -184,27 +184,20 @@ func _get_item_icon_rect(index: int) -> Rect2:
 func _show_swatch_popup() -> void:
 	var icon_rect := Rect2(get_screen_position() + _hovered_rect.position, _hovered_rect.size)
 
-	var swatches: Dictionary[LookSwatch, ImageTexture]
-	swatches[null] = _get_or_request_thumbnail(_hovered_item)
+	_swatch_popup.clear_swatches()
+	_swatch_popup.add_swatch(null, _get_or_request_thumbnail(_hovered_item))
 	for swatch in _hovered_item.swatches:
-		swatches[swatch] = _get_or_request_thumbnail(_hovered_item, swatch)
+		_swatch_popup.add_swatch(swatch, _get_or_request_thumbnail(_hovered_item, swatch))
 
-	_swatch_popup.display(icon_rect, swatches)
+	_swatch_popup.display(icon_rect)
 
 
 ## Applies swatch selection from the popup.
-##
-## The popup's item indices mirror the order of the dictionary passed to it:
-## item 0 is the default appearance, the rest are the [member LookItem.swatches].
-func _apply_popup_swatch(index: int) -> void:
-	var swatch: LookSwatch
-	if index > 0:
-		swatch = _hovered_item.swatches[index - 1]
-
+func _apply_popup_swatch(swatch: LookSwatch) -> void:
 	# The swatch picker can be shown even for an unselected item.
 	# We select it on swatch selection.
-	var item_index := _item_indices[_hovered_item]
-	if is_selected(item_index) and _item_swatches.get(_hovered_item) == swatch:
+	var index := _item_indices[_hovered_item]
+	if is_selected(index) and _item_swatches.get(_hovered_item) == swatch:
 		return
 
 	select_item(_hovered_item, swatch)

@@ -66,17 +66,20 @@ func select_item(item: LookItem, swatch: LookSwatch = null) -> void:
 	else:
 		_item_swatches.erase(item)
 
-	if not is_visible_in_tree():
+	if _is_item_visible(index):
+		var icon := _get_or_request_thumbnail(item, swatch)
+		set_item_icon(index, icon)
+	else:
+		# Will be updated later in _check_visible_previews
 		set_item_icon(index, _placeholder)
-		return
+
+
+func _is_item_visible(index: int) -> bool:
+	if not is_visible_in_tree():
+		return false
 
 	var item_range := _get_visible_item_range()
-	if index < item_range[0] or index >= item_range[1]:
-		set_item_icon(index, _placeholder)
-		return
-
-	var icon := _get_or_request_thumbnail(item, swatch)
-	set_item_icon(index, icon)
+	return index >= item_range.x and index < item_range.y
 
 
 func deselect_item(item: LookItem) -> void:
